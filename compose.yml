@@ -1,0 +1,39 @@
+services:
+# Server has been copied from private project and can serve as template for later on
+#  server:
+#    environment:
+#      - ASPNETCORE_ENVIRONMENT=Development
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    image: server
+#    ports:
+#      - "7200:8080"
+#    develop:
+#      watch:
+#        - path: .
+#          action: rebuild
+#    depends_on:
+#      db:
+#        condition: service_healthy
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      PGUSER :
+      PGPASSWORD : ""
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5432:5432"
+
+
+
+volumes:
+  pgdata:
