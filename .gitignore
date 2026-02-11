@@ -25,3 +25,7 @@ replay_pid*
 
 # Secrets #
 *.env
+
+# IDE #
+.idea
+.env
