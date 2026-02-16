@@ -1,0 +1,45 @@
+name: "hard-work"
+services:
+# Server has been copied from private project and can serve as template for later on
+#  server:
+#    environment:
+#      - ASPNETCORE_ENVIRONMENT=Development
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    image: server
+#    ports:
+#      - "7200:8080"
+#    develop:
+#      watch:
+#        - path: .
+#          action: rebuild
+#    depends_on:
+#      db:
+#        condition: service_healthy
+
+  db:
+    env_file: ".env"
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER : ${POSTGRES_USER}
+      POSTGRES_PASSWORD : ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DATABASE}
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-d", "${POSTGRES_DATABASE}", "-U", "${POSTGRES_USER}" ]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "6032:5432"
+    expose:
+      - 5432
+
+    mem_limit: "2g"
+    cpus: "1"
+
+volumes:
+  pgdata:
