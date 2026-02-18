@@ -8,13 +8,11 @@ services:
     image: hr-cms-server
     ports:
       - "6031:8080"
-#    develop:
-#      watch:
-#        - path: .
-#          action: rebuild
     depends_on:
       db:
         condition: service_healthy
+    mem_limit: "500mb"
+    cpus: "1"
 
   db:
     env_file: ".env"
