@@ -29,6 +29,8 @@
     <properties>
         <java.version>25</java.version>
     </properties>
+
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -58,6 +60,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.10</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -89,5 +97,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
