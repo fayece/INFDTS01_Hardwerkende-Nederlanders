@@ -1,0 +1,86 @@
+name: Java CI Pipeline
+on:
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ dev, main ]
+
+jobs:
+  format-check:
+    name: Code Formatting Check
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Check Formatting
+        run: mvn spotless:check -B
+
+  test-and-coverage:
+    name: Unit Tests and Coverage
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Run Tests and Generate Coverage
+        run: mvn clean jacoco:prepare-agent test jacoco:report jacoco:check -B
+
+      - name: Upload Test Reports
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: test-reports
+          path: target/surefire-reports
+
+      - name: Upload Coverage Report
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: jacoco-coverage
+          path: target/site/jacoco
+
+  qodana-analysis:
+    name: Qodana Code Analysis
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+      pull-requests: write
+      checks: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: 'Qodana Scan'
+        uses: JetBrains/qodana-action@v2025.2
+        with:
+          pr-mode: true
+          use-caches: true
+          post-pr-comment: true
+          use-annotations: true
+          upload-result: true
+          push-fixes: 'none'
+
+  build-artifact:
+    name: Build Spring Boot JAR
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build Application Package
+        run: mvn clean package -DskipTests -B
