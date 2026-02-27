@@ -5,6 +5,10 @@ on:
   pull_request:
     branches: [ dev, main ]
 
+defaults:
+  run:
+    working-directory: hr-cms
+
 jobs:
   format-check:
     name: Code Formatting Check
@@ -64,6 +68,7 @@ jobs:
       - name: 'Qodana Scan'
         uses: JetBrains/qodana-action@v2025.2
         with:
+          args: "--project-dir,hr-cms"
           pr-mode: true
           use-caches: true
           post-pr-comment: true
