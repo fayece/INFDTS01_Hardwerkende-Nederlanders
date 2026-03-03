@@ -1,10 +1,5 @@
 <body>
-    <nav>
-        <h1>
-            HR CMS
-        </h1>
-        <strong>See It All</strong>
-    </nav>
+    <div th:insert="fragments/navbar :: navigation" class="navbar"></div>
     <div>
         <h1>
             New:
@@ -23,4 +18,5 @@
             </p>
         </div>
     </div>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
 </body>
