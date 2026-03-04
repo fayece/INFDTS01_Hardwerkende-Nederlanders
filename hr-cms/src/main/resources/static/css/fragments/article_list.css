@@ -1,0 +1,10 @@
+@import "../main.css";
+
+.article_list{
+    border: var(--edge), solid, 2px;
+    border-radius: var(--radius-small);
+    display: flex;
+    flex-direction: column;
+    padding: 0.1rem;
+    gap: 0.1rem;
+}

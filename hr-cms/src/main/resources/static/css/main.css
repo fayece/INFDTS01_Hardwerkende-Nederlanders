@@ -3,9 +3,10 @@
     --edge: #cacad9;
     --text: #1f1f21;
     --accent: #FF8237;
+    --radius-small: 0.4rem;
 }
 
-:root {
+body {
     font-family: "Roboto Light", system-ui;
     background: var(--background);
     margin: 0;

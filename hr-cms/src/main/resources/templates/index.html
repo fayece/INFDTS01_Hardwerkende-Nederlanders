@@ -1,22 +1,8 @@
 <body>
     <div th:insert="fragments/navbar :: navigation" class="navbar"></div>
     <div>
-        <h1>
-            New:
-        </h1>
-        <div>
-            <span>New Login System</span>
-            <p>
-                The new login system has been rolled out without any bugs.
-                Much coffee has been drunk in celebration.
-            </p>
-        </div>
-        <div>
-            <span>Stadslab is expanding</span>
-            <p>
-                4 new printers added
-            </p>
-        </div>
+        <h1>Your Personal Feed</h1>
+        <div th:insert="fragments/article_list :: article_list"></div>
     </div>
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
 </body>

@@ -12,4 +12,10 @@
     text-decoration: none;
     font-size: 2rem;
     border-right: 0.5rem solid var(--text);
+    transition: color, background-color 200ms;
+}
+
+.navbar--button:hover {
+    color: var(--accent);
+    background-color: var(--text);
 }

@@ -1,0 +1,6 @@
+<button th:fragment="article_card" class="article_card">
+    <span th:replace="fragments/username :: username"></span>
+    <span>The title of the article is placed right here!</span>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/css/fragments/article_card.css}"/>
+</button>
