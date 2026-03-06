@@ -55,4 +55,18 @@ public class Comment extends BaseTimedEntity {
         this.parentCommentId = parentCommentId;
         this.deletedAt = deletedAt;
     }
+
+    public Comment(
+            String commentBody,
+            UUID creatorId,
+            UUID articleId,
+            @Nullable UUID mediaId,
+            @Nullable UUID parentCommentId) {
+        super();
+        this.commentBody = commentBody;
+        this.creatorId = creatorId;
+        this.articleId = articleId;
+        this.mediaId = mediaId;
+        this.parentCommentId = parentCommentId;
+    }
 }

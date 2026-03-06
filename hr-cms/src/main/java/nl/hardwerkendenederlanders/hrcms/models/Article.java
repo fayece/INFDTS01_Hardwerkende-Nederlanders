@@ -39,4 +39,11 @@ public class Article extends BaseTimedEntity {
         this.updatedAt = updatedAt;
         this.publicationStatus = publicationStatus;
     }
+
+    public Article(String title, String textContent, @Nullable PublicationStatus publicationStatus) {
+        super();
+        this.title = title;
+        this.textContent = textContent;
+        this.publicationStatus = publicationStatus != null ? publicationStatus : PublicationStatus.DRAFT;
+    }
 }
