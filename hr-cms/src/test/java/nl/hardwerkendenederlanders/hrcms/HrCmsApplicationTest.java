@@ -2,9 +2,9 @@ package nl.hardwerkendenederlanders.hrcms;
 
 import org.springframework.boot.SpringApplication;
 
-public class TestHrCmsApplication {
+class HrCmsApplicationTest {
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         SpringApplication.from(HrCmsApplication::main)
                 .with(TestcontainersConfiguration.class)
                 .run(args);

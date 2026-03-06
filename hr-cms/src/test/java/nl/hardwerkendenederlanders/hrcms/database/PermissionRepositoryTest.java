@@ -1,0 +1,102 @@
+package nl.hardwerkendenederlanders.hrcms.database;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.UUID;
+import java.util.stream.Stream;
+import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.PermissionRepository;
+import nl.hardwerkendenederlanders.hrcms.models.Permission;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.transaction.annotation.Transactional;
+
+@SpringBootTest
+@Import(TestcontainersConfiguration.class)
+@Transactional
+public class PermissionRepositoryTest {
+
+    @Autowired
+    private PermissionRepository permissionRepository;
+
+    @Test
+    void insertPermission_withValidPermission_shouldPersistAndRetrieve() {
+        Permission permission = new Permission("ARTICLE", "READ", "article_read");
+
+        permissionRepository.insert(permission);
+
+        Permission retrieved = permissionRepository.findById(permission.getId());
+
+        assertNotNull(retrieved);
+        assertEquals(permission.getId(), retrieved.getId());
+        assertEquals(permission.getResource(), retrieved.getResource());
+        assertEquals(permission.getActionName(), retrieved.getActionName());
+        assertEquals(permission.getPermissionKey(), retrieved.getPermissionKey());
+        assertEquals(permission.getInternalName(), retrieved.getInternalName());
+    }
+
+    @Test
+    void findPermissionById_withExistingId_shouldReturnPermission() {
+        Permission permission = new Permission("ARTICLE", "WRITE", "article_write");
+
+        permissionRepository.insert(permission);
+
+        Permission retrieved = permissionRepository.findById(permission.getId());
+
+        assertNotNull(retrieved);
+        assertEquals(permission.getId(), retrieved.getId());
+        assertEquals(permission.getResource(), retrieved.getResource());
+        assertEquals(permission.getActionName(), retrieved.getActionName());
+        assertEquals(permission.getPermissionKey(), retrieved.getPermissionKey());
+        assertEquals(permission.getInternalName(), retrieved.getInternalName());
+    }
+
+    @Test
+    void findPermissionById_withNonExistingId_shouldThrowException() {
+        assertThrows(Exception.class, () -> permissionRepository.findById(UUID.randomUUID()));
+    }
+
+    @Test
+    void deletePermission_withExistingPermission_shouldRemoveFromDatabase() {
+        Permission permission = new Permission("ARTICLE", "DELETE", "article_delete");
+
+        permissionRepository.insert(permission);
+        permissionRepository.delete(permission.getId());
+
+        assertThrows(Exception.class, () -> permissionRepository.findById(permission.getId()));
+    }
+
+    @Test
+    void findAllPermissionsPaged_withValidPaginationData_shouldReturnCorrectCount() {
+        String[] actions = {
+            "READ", "WRITE", "DELETE", "PUBLISH", "ARCHIVE", "RESTORE", "COMMENT", "LIKE", "SHARE", "EXPORT", "IMPORT",
+            "APPROVE", "REJECT", "TAG", "UNTAG"
+        };
+
+        for (int i = 0; i < 15; i++) {
+            Permission permission = new Permission("ARTICLE", actions[i], "article_" + actions[i].toLowerCase());
+            permissionRepository.insert(permission);
+        }
+
+        var page1 = permissionRepository.findAllPaged(1, 10);
+        var page2 = permissionRepository.findAllPaged(2, 10);
+
+        assertEquals(10, page1.size());
+        assertEquals(5, page2.size());
+    }
+
+    static Stream<Arguments> invalidPaginationData() {
+        return Stream.of(Arguments.of(0, 0), Arguments.of(1, 0), Arguments.of(1, -1), Arguments.of(0, -1));
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidPaginationData")
+    void findAllPermissionsPaged_withInvalidLimit_shouldThrowException(int offset, int limit) {
+        assertThrows(IllegalArgumentException.class, () -> permissionRepository.findAllPaged(offset, limit));
+    }
+}
