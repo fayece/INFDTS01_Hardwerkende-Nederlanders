@@ -72,6 +72,11 @@
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>3.0.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>26.1.0</version>
+        </dependency>
 
         <!-- Database dependencies -->
         <dependency>
