@@ -1,12 +1,12 @@
 package nl.hardwerkendenederlanders.hrcms.models;
 
-import jakarta.annotation.Nullable;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.jetbrains.annotations.Nullable;
 
 @Getter
 @SuperBuilder
