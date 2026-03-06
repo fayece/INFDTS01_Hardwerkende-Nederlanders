@@ -1,5 +1,6 @@
 package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
+import org.jspecify.annotations.NonNull;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 
 public class EnumAwareSqlParameterSource extends BeanPropertySqlParameterSource {
@@ -9,7 +10,7 @@ public class EnumAwareSqlParameterSource extends BeanPropertySqlParameterSource 
     }
 
     @Override
-    public Object getValue(String paramName) throws IllegalArgumentException {
+    public Object getValue(@NonNull String paramName) throws IllegalArgumentException {
 
         Object value = super.getValue(paramName);
         if (value instanceof Enum<?> e) {
