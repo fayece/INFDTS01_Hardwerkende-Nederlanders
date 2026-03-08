@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DatabaseConnection {
+public class SqlDatabaseConnection {
 
     @Value("${spring.datasource.url:#{null}}")
     private String url;
@@ -22,23 +22,5 @@ public class DatabaseConnection {
         var connection = DriverManager.getConnection(url, user, password);
 
         return connection.createStatement();
-    }
-
-    public void makeDatabase() throws Exception {
-        Statement connection = getConnection();
-
-        var createTableStatement = "CREATE TABLE articles ( id SERIAL PRIMARY KEY, title VARCHAR(255), content TEXT)";
-
-        connection.execute(createTableStatement);
-    }
-
-    public void AddArticle() throws Exception {
-
-        Statement connection = getConnection();
-
-        var createTableStatement =
-                "INSERT INTO articles (title, content) VALUES ('title 15','content for the article')";
-
-        connection.execute(createTableStatement);
     }
 }
