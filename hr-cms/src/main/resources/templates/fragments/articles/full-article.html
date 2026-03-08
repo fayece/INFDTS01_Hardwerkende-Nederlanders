@@ -1,0 +1,9 @@
+<div th:fragment="full-article(article)" class="content-section">
+    <h1>Article Title Here</h1>
+    <span th:insert="~{fragments/users/likes-dislikes :: likes-dislikes}"></span>
+    <span th:insert="~{fragments/users/username :: username}"></span>
+    <p>
+        article text is placed right here!
+    </p>
+    <div>This is where multimedia will go</div>
+</div>

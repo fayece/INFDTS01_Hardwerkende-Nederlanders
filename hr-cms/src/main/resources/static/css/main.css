@@ -11,3 +11,8 @@ body {
     background: var(--background);
     margin: 0;
 }
+
+a {
+    color: var(--text);
+    text-decoration: none;
+}

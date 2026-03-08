@@ -4,8 +4,8 @@
 </head>
 <body>
     <div th:insert="~{fragments/app-wide/navbar :: navbar}" class="navbar"></div>
-    <div>
+    <main class="standard-page-layout">
         <h1>Your Personal Feed</h1>
         <div th:replace="~{fragments/articles/article-list :: article-list(articles=${articles})}"></div>
-    </div>
+    </main>
 </body>
