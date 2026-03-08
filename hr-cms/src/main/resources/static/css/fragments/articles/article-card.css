@@ -1,5 +1,3 @@
-@import "../../main.css";
-
 .article_card{
     border: solid var(--edge) 2px;
     border-radius: var(--radius-small);

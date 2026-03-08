@@ -1,28 +1,24 @@
-package nl.hardwerkendenederlanders.hrcms.controllers;
+package nl.hardwerkendenederlanders.hrcms.services;
 
+import io.swagger.v3.oas.annotations.servers.Server;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.HashSet;
+import java.util.Set;
 
-@RestController
-public class CssController {
-
+@Component
+public class CssDiscoveryService {
     private final ResourcePatternResolver _resourcePatternResolver;
-
-    public CssController(ResourcePatternResolver resourcePatternResolver) {
+    public CssDiscoveryService(ResourcePatternResolver resourcePatternResolver) {
         this._resourcePatternResolver = resourcePatternResolver;
     }
 
-    @GetMapping("/css")
     public Set<String> getAllCssPaths() throws IOException {
 
         Resource[] cssResources = _resourcePatternResolver.getResources("classpath:/static/css/**/*.css");
@@ -32,5 +28,6 @@ public class CssController {
         }
         return cssSet;
     }
-
 }
+
+

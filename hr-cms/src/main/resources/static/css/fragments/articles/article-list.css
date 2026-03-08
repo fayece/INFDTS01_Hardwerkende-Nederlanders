@@ -1,5 +1,3 @@
-@import "../../main.css";
-
 .article-list{
     border: var(--edge), solid, 2px;
     border-radius: var(--radius-small);
