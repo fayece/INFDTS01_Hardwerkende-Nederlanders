@@ -1,10 +1,14 @@
-@import "../main.css";
+@import "../../main.css";
 
-.article_list{
+.article-list{
     border: var(--edge), solid, 2px;
     border-radius: var(--radius-small);
     display: flex;
     flex-direction: column;
     padding: 0.1rem;
     gap: 0.1rem;
+}
+
+.article-list ul{
+    list-style: none;
 }

@@ -1,0 +1,8 @@
+<body>
+    <div th:insert="~{fragments/app-wide/navbar :: navbar}" class="navbar"></div>
+    <div>
+        <h1>Your Personal Feed</h1>
+        <div th:replace="~{fragments/articles/article-list :: article-list(articles=${articles})}"></div>
+    </div>
+    <link rel="stylesheet" th:href="@{/css/allcss.css}"/>
+</body>
