@@ -1,5 +1,12 @@
 .navbar {
     background-color: var(--accent);
+    position: sticky;
+    top: -5.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.navbar--button-container{
     display: flex;
     flex-direction: row;
 }

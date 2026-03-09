@@ -1,0 +1,18 @@
+.footer{
+    background-color: var(--text);
+    color: var(--background);
+    font-size: 0.7rem;
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+}
+
+.footer--section{
+    width: 100%;
+    max-width: 15rem;
+}
+
+.footer a{
+    text-decoration: underline;
+    color: var(--background);
+}
