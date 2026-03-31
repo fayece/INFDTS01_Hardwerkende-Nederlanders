@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class ReaderArticleController {
     @GetMapping("article")
-    public String GetArticle(String articleId){
+    public String GetArticle(String articleId) {
         return "pages/article-page";
     }
 }
