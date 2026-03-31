@@ -1,12 +1,8 @@
 package nl.hardwerkendenederlanders.hrcms.services;
 
-import io.swagger.v3.oas.annotations.servers.Server;
-import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -26,6 +22,7 @@ public class CssDiscoveryService {
         for (Resource resource: cssResources){
             cssSet.add("css/" + resource.getURL().getPath().split("static/css/")[1]);
         }
+
         return cssSet;
     }
 }

@@ -2,5 +2,5 @@
 <a th:fragment="article_card(article)" class="article_card" href="article">
     <span th:replace="~{fragments/users/username :: username}"></span>
     <span th:text="${article}" class ="article-card--title">The title of the article is placed right here!</span>
-    <span th:insert="~{fragments/users/likes-dislikes :: likes-dislikes}"></span>
+    <span th:insert="~{fragments/articles/likes-dislikes :: likes-dislikes}"></span>
 </a>

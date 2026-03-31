@@ -1,9 +1,9 @@
 <div th:fragment="full-article(article)" class="content-section">
     <h1>Article Title Here</h1>
-    <span th:insert="~{fragments/users/likes-dislikes :: likes-dislikes}"></span>
+    <span th:insert="~{fragments/articles/likes-dislikes :: likes-dislikes}"></span>
     <span th:insert="~{fragments/users/username :: username}"></span>
     <p>
         article text is placed right here!
     </p>
-    <div>This is where multimedia will go</div>
+    <iframe src="https://www.youtube.com/embed/XUuTlhBqyfw?si=ZHuHYRFiXDo2PP7l" title="YouTube video player" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </div>

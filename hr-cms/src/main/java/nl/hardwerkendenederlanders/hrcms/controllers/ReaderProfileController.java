@@ -4,9 +4,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-public class ReaderArticleController {
-    @GetMapping("article")
+public class ReaderProfileController {
+    @GetMapping("profile")
     public String GetArticle(String articleId){
-        return "pages/article-page";
+        return "pages/profile-page";
     }
 }
