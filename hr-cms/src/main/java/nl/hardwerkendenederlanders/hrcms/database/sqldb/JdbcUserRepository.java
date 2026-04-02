@@ -1,4 +1,4 @@
-﻿package nl.hardwerkendenederlanders.hrcms.database.sqldb;
+package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
 import nl.hardwerkendenederlanders.hrcms.models.User;

@@ -1,5 +1,6 @@
 package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
+import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
@@ -52,7 +53,7 @@ public class DatabaseConfiguration {
     }
 
     @Bean
-    public JdbcUserRepository userRepository(NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
+    public UserRepository userRepository(NamedParameterJdbcTemplate jdbc) {
         return new JdbcUserRepository(jdbc);
     }
 }
