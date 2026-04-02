@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.UUID;
 import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcUserRepository;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.RoleRepository;
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.UserRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Role;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserRepositoryTest {
 
     @Autowired
-    private UserRepository userRepository;
+    private JdbcUserRepository userRepository;
 
     @Autowired
     private RoleRepository roleRepository;

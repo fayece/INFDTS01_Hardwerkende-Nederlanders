@@ -5,10 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.UUID;
 import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.ArticleAuthorRepository;
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.ArticleRepository;
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.RoleRepository;
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.UserRepository;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.*;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.ArticleAuthor;
 import nl.hardwerkendenederlanders.hrcms.models.Role;
@@ -35,7 +32,7 @@ public class ArticleAuthorRepositoryTest {
     private ArticleRepository articleRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private JdbcUserRepository userRepository;
 
     @Autowired
     private RoleRepository roleRepository;

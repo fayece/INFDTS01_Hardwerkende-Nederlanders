@@ -52,7 +52,7 @@ public class DatabaseConfiguration {
     }
 
     @Bean
-    public UserRepository userRepository(NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
-        return new UserRepository(jdbc, resourceLoader);
+    public JdbcUserRepository userRepository(NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
+        return new JdbcUserRepository(jdbc);
     }
 }
