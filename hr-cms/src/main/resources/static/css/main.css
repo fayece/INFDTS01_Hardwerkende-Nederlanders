@@ -1,0 +1,18 @@
+:root {
+    --background: #e9eaf0;
+    --edge: #cacad9;
+    --text: #1f1f21;
+    --accent: #FF8237;
+    --radius-small: 0.4rem;
+}
+
+body {
+    font-family: "Roboto Light", system-ui;
+    background: var(--background);
+    margin: 0;
+}
+
+a {
+    color: var(--text);
+    text-decoration: none;
+}

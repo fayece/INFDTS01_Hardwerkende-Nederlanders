@@ -1,0 +1,9 @@
+.article-list{
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.article-list--list{
+    list-style: none;
+}

@@ -1,0 +1,11 @@
+<section th:fragment="comment-section" class="content-section">
+    <h2>Comments</h2>
+    <ul class="comment-section--list">
+        <li>
+            <div th:insert="~{fragments/articles/comment :: comment}"></div>
+        </li>
+        <li>
+            <div th:insert="~{fragments/articles/comment :: comment}"></div>
+        </li>
+    </ul>
+</section>

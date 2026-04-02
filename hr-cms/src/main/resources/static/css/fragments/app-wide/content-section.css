@@ -1,0 +1,7 @@
+.content-section {
+    border: solid var(--edge) 2px;
+    border-radius: var(--radius-small);
+    background: var(--background);
+    width: 90%;
+    padding: 0.5rem;
+}

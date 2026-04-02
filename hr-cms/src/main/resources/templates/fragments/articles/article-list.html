@@ -1,0 +1,12 @@
+
+
+<!--Dynamic list of article cards-->
+
+<ul th:fragment="article-list(articles)" class="article-list content-section">
+    <li
+            th:each="article: ${articles}"
+            th:insert="~{fragments/articles/article-card :: article_card(article=${article})}"
+            class="article-list--list"
+    ></li>
+</ul>
+

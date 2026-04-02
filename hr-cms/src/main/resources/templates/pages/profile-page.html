@@ -1,0 +1,11 @@
+<head>
+    <title>Profile Page</title>
+    <link rel="stylesheet" th:href="${cssRef}" th:each="cssRef: ${@cssDiscoveryService.getAllCssPaths()}">
+</head>
+<body>
+<div th:insert="~{fragments/app-wide/navbar :: navbar}" class="navbar"></div>
+<main class="standard-page-layout">
+    <section th:insert="fragments/users/profile :: profile"></section>
+</main>
+<footer th:replace="~{fragments/app-wide/footer :: footer}"></footer>
+</body>

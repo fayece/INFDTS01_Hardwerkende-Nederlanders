@@ -1,0 +1,18 @@
+.article_card {
+    border: solid var(--edge) 2px;
+    border-radius: var(--radius-small);
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    background: var(--background);
+    width: 100%;
+}
+
+.article_card:hover {
+    background: linear-gradient(to top, var(--background), var(--accent));
+}
+
+.article-card--title{
+    font-size: 1.2rem;
+}
+

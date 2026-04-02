@@ -1,0 +1,12 @@
+<head>
+    <title>Spotlight!</title>
+    <link rel="stylesheet" th:href="${cssRef}" th:each="cssRef: ${@cssDiscoveryService.getAllCssPaths()}">
+</head>
+<body th:fragment="">
+<div th:insert="~{fragments/app-wide/navbar :: navbar}" class="navbar"></div>
+<main class="standard-page-layout">
+    <div th:replace="~{fragments/articles/full-article :: full-article(article)}"></div>
+    <div th:replace="~{fragments/articles/comment-section :: comment-section}"></div>
+</main>
+<footer th:replace="~{fragments/app-wide/footer :: footer}"></footer>
+</body>
