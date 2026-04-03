@@ -14,7 +14,7 @@ public class GlobalExceptionHandler {
         mav.addObject("warningMessage", ex.getMessage());
         mav.addObject("failedComponent", ex.getComponentName());
 
-        mav.setViewName("article-page");
+        mav.setViewName(ex.getViewName());
         return mav;
     }
 }

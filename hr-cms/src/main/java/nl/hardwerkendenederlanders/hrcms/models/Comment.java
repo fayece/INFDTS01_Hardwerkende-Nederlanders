@@ -2,8 +2,6 @@ package nl.hardwerkendenederlanders.hrcms.models;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
-
-import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;

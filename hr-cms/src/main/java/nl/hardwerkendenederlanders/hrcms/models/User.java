@@ -79,4 +79,11 @@ public class User extends BaseTimedEntity {
         this.organizationId = organizationId;
         this.active = true;
     }
+
+    public String getFullName() {
+        if (prefix == null || prefix.trim().isEmpty()) {
+            return firstName + " " + lastName;
+        }
+        return firstName + " " + prefix + " " + lastName;
+    }
 }

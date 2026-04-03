@@ -20,15 +20,16 @@ public class JdbcCommentRepository extends JdbcMutableRepository<Comment> implem
     protected RowMapper<Comment> rowMapper() {
         return (rs, _) -> {
             Comment comment = new Comment(
-                UUID.fromString(rs.getString("id")),
-                rs.getString("comment_body"),
-                UUID.fromString(rs.getString("creator_id")),
-                UUID.fromString(rs.getString("article_id")),
-                rs.getString("media_id") != null ? UUID.fromString(rs.getString("media_id")) : null,
-                rs.getString("parent_comment_id") != null ? UUID.fromString(rs.getString("parent_comment_id")) : null,
-                rs.getObject("created_at", OffsetDateTime.class),
-                rs.getObject("deleted_at", OffsetDateTime.class)
-            );
+                    UUID.fromString(rs.getString("id")),
+                    rs.getString("comment_body"),
+                    UUID.fromString(rs.getString("creator_id")),
+                    UUID.fromString(rs.getString("article_id")),
+                    rs.getString("media_id") != null ? UUID.fromString(rs.getString("media_id")) : null,
+                    rs.getString("parent_comment_id") != null
+                            ? UUID.fromString(rs.getString("parent_comment_id"))
+                            : null,
+                    rs.getObject("created_at", OffsetDateTime.class),
+                    rs.getObject("deleted_at", OffsetDateTime.class));
 
             comment.setCreatorName(rs.getString("name"));
 
@@ -43,31 +44,27 @@ public class JdbcCommentRepository extends JdbcMutableRepository<Comment> implem
         int offset = (page - 1) * limit;
 
         return jdbc.query(
-            "SELECT c.*, " +
-                "CONCAT_WS(' ', u.first_name, NULLIF(TRIM(u.prefix), ''), u.last_name) AS name " +
-                "FROM comments c " +
-                "JOIN users u ON c.creator_id = u.id " +
-                "WHERE c.article_id = :articleId " +
-                "AND c.parent_comment_id IS NULL " +
-                "AND c.deleted_at IS NULL " +
-                "ORDER BY c.created_at DESC " +
-                "LIMIT :limit OFFSET :offset",
-            Map.of("articleId", articleId, "limit", limit, "offset", offset),
-            rowMapper()
-        );
+                "SELECT c.*, " + "CONCAT_WS(' ', u.first_name, NULLIF(TRIM(u.prefix), ''), u.last_name) AS name "
+                        + "FROM comments c "
+                        + "JOIN users u ON c.creator_id = u.id "
+                        + "WHERE c.article_id = :articleId "
+                        + "AND c.parent_comment_id IS NULL "
+                        + "AND c.deleted_at IS NULL "
+                        + "ORDER BY c.created_at DESC "
+                        + "LIMIT :limit OFFSET :offset",
+                Map.of("articleId", articleId, "limit", limit, "offset", offset),
+                rowMapper());
     }
 
     public List<Comment> findCommentsByParentId(UUID parentId) {
         return jdbc.query(
-            "SELECT c.*, " +
-                "CONCAT_WS(' ', u.first_name, NULLIF(TRIM(u.prefix), ''), u.last_name) AS name " +
-                "FROM comments c " +
-                "JOIN users u ON c.creator_id = u.id " +
-                "WHERE c.parent_comment_id = :parentId " +
-                "AND c.deleted_at IS NULL " +
-                "ORDER BY c.created_at",
-            Map.of("parentId", parentId),
-            rowMapper()
-        );
+                "SELECT c.*, " + "CONCAT_WS(' ', u.first_name, NULLIF(TRIM(u.prefix), ''), u.last_name) AS name "
+                        + "FROM comments c "
+                        + "JOIN users u ON c.creator_id = u.id "
+                        + "WHERE c.parent_comment_id = :parentId "
+                        + "AND c.deleted_at IS NULL "
+                        + "ORDER BY c.created_at",
+                Map.of("parentId", parentId),
+                rowMapper());
     }
 }

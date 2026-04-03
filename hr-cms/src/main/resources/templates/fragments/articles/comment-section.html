@@ -1,8 +1,44 @@
 <section th:fragment="comment-section" class="content-section">
     <h2>Comments</h2>
+    <!--    Write comment -->
+    <!--    There is no way to log in at the moment. Therefore, a temporary dropdown has been put in place
+            to select the author of a comment. This should be replaced ASAP. The affected element has been tagged
+            with a TO-DO comment for easy identification. -->
+
+    <form class="comment-section--create"
+          th:action="@{/comment/article/{articleId}/new(articleId=${articleId})}"
+          method="post">
+
+    <!--    TODO: Remove authorId selection when auth is implemented -->
+        <label>
+            <select name="authorId" required>
+                <option value="" disabled selected>Post as...</option>
+                <option th:each="user: ${users}"
+                        th:value="${user.id}"
+                        th:text="${user.fullName}">
+                </option>
+            </select>
+        </label>
+        <label>
+            <textarea name="commentBody" placeholder="Leave a comment..." required></textarea>
+        </label>
+
+        <button type="submit">Post Comment</button>
+    </form>
+
+    <!--    Read comments-->
     <ul th:fragment="comment-list" class="comment-section--list">
         <li th:each="comment : ${comments}">
             <div th:replace="~{fragments/articles/comment :: comment(comment=${comment})}"></div>
         </li>
     </ul>
 </section>
+
+<!--    Handle exceptions-->
+<div th:fragment="comments-unavailable" class="error-container">
+    <p>
+        <strong>Oops!</strong>
+        The <span th:text="${failedComponent ?: 'comments'}">comments</span> are temporarily unavailable.
+        Please try again later.
+    </p>
+</div>

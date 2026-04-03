@@ -1,5 +1,6 @@
 package nl.hardwerkendenederlanders.hrcms.controllers;
 
+import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.services.ArticleService;
 import org.springframework.stereotype.Controller;
@@ -7,8 +8,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.util.UUID;
 
 @Controller
 @RequestMapping("/article")

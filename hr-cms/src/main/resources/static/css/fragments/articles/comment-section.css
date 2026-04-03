@@ -35,6 +35,27 @@
 .local-time {
     display: block;
     font-size: 0.7rem;
-    color: var(--text-dim);
+    color: var(--text-light);
     margin-bottom: 0.3rem;
+}
+
+.comment-section--create textarea {
+    width: 100%;
+    height: 5rem;
+    resize: none;
+    border: solid var(--edge) 0.1rem;
+    border-radius: var(--radius-small);
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    box-sizing: border-box;
+}
+
+.error-container {
+    border: solid var(--warning-light) 0.1rem;
+    border-radius: var(--radius-small);
+    padding: 0.5rem;
+    background: var(--warning-background);
+    color: var(--warning);
+    font-size: 0.8rem;
+    width: 90%;
 }
