@@ -7,4 +7,18 @@ const editor = new toastui.Editor({
   usageStatistics: false
 });
 
-editor.getMarkdown();
+const getArticle = () => {
+
+
+  const articleContent = {
+    'title': title,
+    'contentText': markdown,
+  }
+  return articleContent
+}
+
+const editorIntoTextContent = () => {
+  const markdown = editor.getMarkdown();
+  const contentField = document.getElementById("text-content");
+  contentField.innerHTML = markdown
+}

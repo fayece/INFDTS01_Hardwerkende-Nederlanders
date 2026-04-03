@@ -9,9 +9,38 @@
 <body>
 <div th:insert="~{fragments/app-wide/navbar :: navbar}" class="navbar"></div>
 <main class="standard-page-layout">
-    <div id="editor"></div>
+    <section class="content-section">
+
+        <button>To Overview</button>
+
+        <form
+            role="form"
+            method="post"
+            th:action="@{/article-editor}"
+            th:object="${articleForm}"
+            onsubmit="editorIntoTextContent()">
+
+            <div>
+                <div>
+                    <button type="submit" name="publicationStatus" value="DRAFT">save as draft</button>
+                    <button type="submit" name="publicationStatus" value="PUBLISHED">save and publish</button>
+                </div>
+            </div>
+
+            <label>title<input type="text" th:field="*{title}"></label>
+            <label>categories
+                <select>
+                    <option value="category">category</option>
+                </select>
+            </label>
+
+            <div id="editor"></div>
+            <textarea th:field="*{textContent}" id="text-content" hidden></textarea>
+        </form>
+    </section>
+
 </main>
 <footer th:replace="~{fragments/app-wide/footer :: footer}"></footer>
-
+-
 
 </body>
