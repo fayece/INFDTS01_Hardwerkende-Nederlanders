@@ -3,9 +3,11 @@ package nl.hardwerkendenederlanders.hrcms.services;
 import jakarta.servlet.http.HttpSession;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
+import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+@Service
 public class UserSessionServiceImpl implements UserSessionService {
 
     public void login(HttpSession session, User user){

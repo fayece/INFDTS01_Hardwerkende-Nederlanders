@@ -4,7 +4,9 @@ import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.AuthService;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AuthServiceImpl implements AuthService {
     //    String hash = BCrypt.hashpw(password, BCrypt.gensalt()); dit gebruiken bij account maken om het ww te hashen
 //    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
