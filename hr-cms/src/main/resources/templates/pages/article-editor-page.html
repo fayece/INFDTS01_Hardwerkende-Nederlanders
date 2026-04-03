@@ -1,0 +1,17 @@
+<head>
+    <title>Spotlight!</title>
+    <link rel="stylesheet" th:href="${cssRef}" th:each="cssRef: ${@cssDiscoveryService.getAllCssPaths()}">
+
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+    <script th:src = "@{/javascript/pages/article-editor-page.js}" defer></script>
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+</head>
+<body>
+<div th:insert="~{fragments/app-wide/navbar :: navbar}" class="navbar"></div>
+<main class="standard-page-layout">
+    <div id="editor"></div>
+</main>
+<footer th:replace="~{fragments/app-wide/footer :: footer}"></footer>
+
+
+</body>

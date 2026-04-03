@@ -20,7 +20,7 @@ public class CssDiscoveryService {
         Resource[] cssResources = _resourcePatternResolver.getResources("classpath:/static/css/**/*.css");
         var cssSet = new HashSet<String>();
         for (Resource resource : cssResources) {
-            cssSet.add("css/" + resource.getURL().getPath().split("static/css/")[1]);
+            cssSet.add("/css/" + resource.getURL().getPath().split("static/css/")[1]);
         }
 
         return cssSet;
