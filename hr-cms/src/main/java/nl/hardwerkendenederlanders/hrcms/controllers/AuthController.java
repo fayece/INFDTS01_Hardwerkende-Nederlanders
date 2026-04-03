@@ -33,7 +33,7 @@ public class AuthController {
         try {
             User user = authService.login(email, password);
             userSessionService.login(session, user);
-            return "redirect:/home";
+            return "redirect:/";
         } catch (RuntimeException e) {
             return "redirect:/login?error=true";
         }

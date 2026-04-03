@@ -2,12 +2,14 @@ package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
 import nl.hardwerkendenederlanders.hrcms.models.User;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -69,7 +71,18 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public Optional<User> findByEmail(String email) {
-        return Optional.empty();
+        //this method was made by AI
+        String sql = """
+            SELECT *
+            FROM users
+            WHERE email = :email
+            """;
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("email", email);
+
+        List<User> users = jdbc.query(sql, params, rowMapper);
+        return users.stream().findFirst();
     }
 
     @Override
