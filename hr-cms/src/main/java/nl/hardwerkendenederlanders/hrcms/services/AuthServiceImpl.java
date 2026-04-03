@@ -2,16 +2,16 @@ package nl.hardwerkendenederlanders.hrcms.services;
 
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
 import nl.hardwerkendenederlanders.hrcms.models.User;
+import nl.hardwerkendenederlanders.hrcms.services.interfaces.AuthService;
 import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-public class AuthService {
+public class AuthServiceImpl implements AuthService {
     //    String hash = BCrypt.hashpw(password, BCrypt.gensalt()); dit gebruiken bij account maken om het ww te hashen
 //    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 //    String hash = encoder.encode(password);
     private final UserRepository userRepository;
 
-    public AuthService(UserRepository userRepository){
+    public AuthServiceImpl(UserRepository userRepository){
         this.userRepository = userRepository;
     }
 
