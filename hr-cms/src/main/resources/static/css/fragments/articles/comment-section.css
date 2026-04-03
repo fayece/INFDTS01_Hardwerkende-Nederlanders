@@ -1,6 +1,40 @@
+#comment-section-container {
+}
+
 .comment-section--list {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+}
+
+.author-name {
+    font-weight: bold;
+    font-size: 0.8rem;
+    color: var(--accent);
+}
+
+.comment-body {
+    margin-top: 0;
+    margin-bottom: 0.2rem;
+}
+
+.replies-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.load-replies-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--accent);
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.local-time {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-bottom: 0.3rem;
 }

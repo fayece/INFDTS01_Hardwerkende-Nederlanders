@@ -30,3 +30,5 @@ replay_pid*
 
 # IDE #
 .idea
+/node_modules
+/hr-cms/src/main/resources/static/js/

@@ -1,11 +1,8 @@
 <section th:fragment="comment-section" class="content-section">
     <h2>Comments</h2>
-    <ul class="comment-section--list">
-        <li>
-            <div th:insert="~{fragments/articles/comment :: comment}"></div>
-        </li>
-        <li>
-            <div th:insert="~{fragments/articles/comment :: comment}"></div>
+    <ul th:fragment="comment-list" class="comment-section--list">
+        <li th:each="comment : ${comments}">
+            <div th:replace="~{fragments/articles/comment :: comment(comment=${comment})}"></div>
         </li>
     </ul>
 </section>

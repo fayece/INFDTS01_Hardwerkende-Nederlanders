@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
 @Transactional
-public class CommentRepositoryTest {
+public class JdbcCommentRepositoryTest {
 
     @Autowired
     private CommentRepository commentRepository;
