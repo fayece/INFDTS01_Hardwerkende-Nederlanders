@@ -8,9 +8,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AuthServiceImpl implements AuthService {
-    //    String hash = BCrypt.hashpw(password, BCrypt.gensalt()); dit gebruiken bij account maken om het ww te hashen
-    //    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-    //    String hash = encoder.encode(password);
     private final UserRepository userRepository;
 
     public AuthServiceImpl(UserRepository userRepository) {
