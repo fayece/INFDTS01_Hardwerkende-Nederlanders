@@ -10,7 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.ui.Model;
 
 import java.util.UUID;
 
@@ -40,6 +42,12 @@ public class AuthController {
     @PostMapping("/logout")
     public String logout(HttpSession session){
         userSessionService.logout(session);
-        return "redirect:/loginscreen";
+        return "redirect:/login";
+    }
+
+    @GetMapping("/login")
+    public String loginPage(@RequestParam(required = false) Boolean error, Model model) {
+        model.addAttribute("error", error);
+        return "pages/login";
     }
 }
