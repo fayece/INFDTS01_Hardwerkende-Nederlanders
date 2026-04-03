@@ -1,11 +1,9 @@
 package nl.hardwerkendenederlanders.hrcms.models.dtos.userDtos;
 
-import lombok.Builder;
-import lombok.Setter;
-import org.jetbrains.annotations.Nullable;
-
 import java.time.OffsetDateTime;
 import java.util.UUID;
+import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 
 public class UserViewDto {
 
@@ -24,7 +22,6 @@ public class UserViewDto {
 
     @Setter
     private String email;
-
 
     @Setter
     private UUID roleId;

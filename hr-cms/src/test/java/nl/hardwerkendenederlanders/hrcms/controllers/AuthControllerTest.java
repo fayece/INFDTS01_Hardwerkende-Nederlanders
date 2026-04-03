@@ -1,26 +1,25 @@
 package nl.hardwerkendenederlanders.hrcms.controllers;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import jakarta.servlet.http.HttpSession;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.AuthService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
 import org.junit.jupiter.api.Test;
-import org.springframework.ui.Model;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import org.springframework.ui.ConcurrentModel;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import org.springframework.ui.Model;
 
 class AuthControllerTest {
 
     private final UserSessionService userSessionService = mock(UserSessionService.class);
     private final AuthService authService = mock(AuthService.class);
 
-    private final AuthController authController =
-            new AuthController(userSessionService, authService);
+    private final AuthController authController = new AuthController(userSessionService, authService);
 
     @Test
     void login_success_redirectsToHome() {
@@ -40,8 +39,7 @@ class AuthControllerTest {
     void login_failure_redirectsToLoginWithError() {
         HttpSession session = mock(HttpSession.class);
 
-        when(authService.login("test@test.com", "wrong"))
-                .thenThrow(new RuntimeException("Invalid credentials"));
+        when(authService.login("test@test.com", "wrong")).thenThrow(new RuntimeException("Invalid credentials"));
 
         String result = authController.login(session, "test@test.com", "wrong");
 

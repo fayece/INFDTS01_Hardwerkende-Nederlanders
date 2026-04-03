@@ -1,20 +1,18 @@
 package nl.hardwerkendenederlanders.hrcms.database;
 
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcUserRepository;
-import nl.hardwerkendenederlanders.hrcms.models.User;
-import org.junit.jupiter.api.Test;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-
-import java.time.OffsetDateTime;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.time.OffsetDateTime;
+import java.util.UUID;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcUserRepository;
+import nl.hardwerkendenederlanders.hrcms.models.User;
+import org.junit.jupiter.api.Test;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 class JdbcUserRepositoryTest {
 
@@ -33,8 +31,7 @@ class JdbcUserRepositoryTest {
                 null,
                 null,
                 true,
-                OffsetDateTime.now()
-        );
+                OffsetDateTime.now());
 
         when(jdbc.update(anyString(), any(SqlParameterSource.class))).thenReturn(1);
 
@@ -58,8 +55,7 @@ class JdbcUserRepositoryTest {
                 null,
                 null,
                 true,
-                OffsetDateTime.now()
-        );
+                OffsetDateTime.now());
 
         when(jdbc.update(anyString(), any(SqlParameterSource.class))).thenReturn(1);
 

@@ -1,5 +1,7 @@
 package nl.hardwerkendenederlanders.hrcms.controllers;
 
+import java.time.OffsetDateTime;
+import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -7,9 +9,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import java.time.OffsetDateTime;
-import java.util.UUID;
 
 @Controller
 public class RegisterController {
@@ -32,22 +31,11 @@ public class RegisterController {
             @RequestParam(required = false) String prefix,
             @RequestParam String lastName,
             @RequestParam String email,
-            @RequestParam String password
-    ) {
+            @RequestParam String password) {
         String hash = BCrypt.hashpw(password, BCrypt.gensalt());
 
         User user = new User(
-                UUID.randomUUID(),
-                firstName,
-                prefix,
-                lastName,
-                email,
-                hash,
-                null,
-                null,
-                true,
-                OffsetDateTime.now()
-        );
+                UUID.randomUUID(), firstName, prefix, lastName, email, hash, null, null, true, OffsetDateTime.now());
 
         userRepository.insert(user);
 

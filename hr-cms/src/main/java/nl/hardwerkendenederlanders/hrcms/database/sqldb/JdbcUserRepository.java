@@ -1,22 +1,21 @@
 package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
 import nl.hardwerkendenederlanders.hrcms.models.User;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 @Repository
 public class JdbcUserRepository implements UserRepository {
     private final NamedParameterJdbcTemplate jdbc;
     private static final String TABLE = "users";
+
     public JdbcUserRepository(NamedParameterJdbcTemplate jdbc) {
         this.jdbc = jdbc;
     }
@@ -31,8 +30,7 @@ public class JdbcUserRepository implements UserRepository {
             rs.getString("role_id") != null ? UUID.fromString(rs.getString("role_id")) : null,
             rs.getString("organization_id") != null ? UUID.fromString(rs.getString("organization_id")) : null,
             rs.getBoolean("active"),
-            rs.getObject("created_at", OffsetDateTime.class)
-    );
+            rs.getObject("created_at", OffsetDateTime.class));
 
     private MapSqlParameterSource paramsFromUser(User user) {
         return new MapSqlParameterSource()
@@ -60,9 +58,7 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public void update(User user) {
-
-    }
+    public void update(User user) {}
 
     @Override
     public Optional<User> findById(UUID id) {
@@ -71,22 +67,19 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public Optional<User> findByEmail(String email) {
-        //this method was made by AI
+        // this method was made by AI
         String sql = """
             SELECT *
             FROM users
             WHERE email = :email
             """;
 
-        MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("email", email);
+        MapSqlParameterSource params = new MapSqlParameterSource().addValue("email", email);
 
         List<User> users = jdbc.query(sql, params, rowMapper);
         return users.stream().findFirst();
     }
 
     @Override
-    public void deleteById(UUID id) {
-
-    }
+    public void deleteById(UUID id) {}
 }
