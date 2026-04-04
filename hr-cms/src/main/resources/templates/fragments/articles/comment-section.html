@@ -1,5 +1,10 @@
 <section th:fragment="comment-section" class="content-section">
     <h2>Comments</h2>
+
+    <div th:if="${errorMessage}" class="error-container">
+        <p th:text="${errorMessage}"></p>
+    </div>
+
     <!--    Write comment -->
     <!--    There is no way to log in at the moment. Therefore, a temporary dropdown has been put in place
             to select the author of a comment. This should be replaced ASAP. The affected element has been tagged

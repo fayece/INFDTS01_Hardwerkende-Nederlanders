@@ -3,6 +3,7 @@ package nl.hardwerkendenederlanders.hrcms.exceptions;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -16,5 +17,15 @@ public class GlobalExceptionHandler {
 
         mav.setViewName(ex.getViewName());
         return mav;
+    }
+
+    @ExceptionHandler(ComponentActionException.class)
+    public String handleComponentAction(ComponentActionException ex, RedirectAttributes redirectAttributes) {
+        String errorMessage = String.format(
+                "Could not %s your %s. Please try again later.",
+                ex.getAction().name().toLowerCase(), ex.getComponentName());
+
+        redirectAttributes.addFlashAttribute("errorMessage", errorMessage);
+        return "redirect:" + ex.getRedirectTarget();
     }
 }

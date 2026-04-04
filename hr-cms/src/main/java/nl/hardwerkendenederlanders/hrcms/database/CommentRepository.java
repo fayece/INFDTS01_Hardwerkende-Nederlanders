@@ -3,10 +3,11 @@ package nl.hardwerkendenederlanders.hrcms.database;
 import java.util.List;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.models.Comment;
+import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentWithAuthor;
 
 public interface CommentRepository extends DatabaseMutableRepository<Comment> {
 
-    public List<Comment> findTopLevelCommentsByArticleIdPaged(UUID articleId, int page, int limit);
+    public List<CommentWithAuthor> findTopLevelCommentsByArticleIdPaged(UUID articleId, int page, int limit);
 
-    public List<Comment> findCommentsByParentId(UUID parentId);
+    public List<CommentWithAuthor> findCommentsByParentId(UUID parentId);
 }
