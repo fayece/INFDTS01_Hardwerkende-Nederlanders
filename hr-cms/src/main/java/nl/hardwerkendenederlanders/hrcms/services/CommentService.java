@@ -7,6 +7,7 @@ import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentActionException;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentUnavailableException;
 import nl.hardwerkendenederlanders.hrcms.models.Comment;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentViewDto;
+import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.PagedComments;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,11 +21,18 @@ public class CommentService {
         this.commentRepository = commentRepository;
     }
 
-    public List<CommentViewDto> getTopLevelComments(UUID articleId, int page, int limit) {
+    public PagedComments getTopLevelComments(UUID articleId, int offset, int limit) {
         try {
-            return commentRepository.findTopLevelCommentsByArticleIdPaged(articleId, page, limit).stream()
-                    .map(record -> CommentViewDto.from(record.comment(), record.authorName()))
-                    .toList();
+            List<CommentViewDto> comments =
+                    commentRepository.findTopLevelCommentsByArticleIdPaged(articleId, offset, limit + 1).stream()
+                            .map(record ->
+                                    CommentViewDto.from(record.comment(), record.authorName(), record.replyCount()))
+                            .toList();
+
+            boolean hasMore = comments.size() > limit;
+            comments = hasMore ? comments.subList(0, limit) : comments;
+
+            return new PagedComments(comments, hasMore);
         } catch (Exception e) {
             throw new ComponentUnavailableException("comments", UNAVAILABLE_FRAGMENT, e);
         }
@@ -33,7 +41,7 @@ public class CommentService {
     public List<CommentViewDto> getReplies(UUID parentId) {
         try {
             return commentRepository.findCommentsByParentId(parentId).stream()
-                    .map(record -> CommentViewDto.from(record.comment(), record.authorName()))
+                    .map(record -> CommentViewDto.from(record.comment(), record.authorName(), record.replyCount()))
                     .toList();
         } catch (Exception e) {
             throw new ComponentUnavailableException("comments", UNAVAILABLE_FRAGMENT, e);

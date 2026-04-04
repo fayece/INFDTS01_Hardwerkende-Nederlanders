@@ -37,35 +37,52 @@ public class JdbcCommentRepository extends JdbcMutableRepository<Comment> implem
     private final RowMapper<CommentWithAuthor> commentWithAuthorRowMapper = (rs, rowNum) -> {
         Comment comment = rowMapper().mapRow(rs, rowNum);
         String authorName = rs.getString("name");
-        return new CommentWithAuthor(comment, authorName);
+        int replyCount = rs.getInt("reply_count");
+        return new CommentWithAuthor(comment, authorName, replyCount);
     };
 
-    public List<CommentWithAuthor> findTopLevelCommentsByArticleIdPaged(UUID articleId, int page, int limit) {
+    public List<CommentWithAuthor> findTopLevelCommentsByArticleIdPaged(UUID articleId, int offset, int limit) {
 
         if (limit <= 0) throw new IllegalArgumentException("Limit must be greater than 0.");
-        if (page <= 0) throw new IllegalArgumentException("Page must be greater than 0.");
-        int offset = (page - 1) * limit;
+        if (offset < 0) throw new IllegalArgumentException("Page must be greater than 0.");
 
         return jdbc.query(
-                "SELECT c.*, " + "CONCAT_WS(' ', u.first_name, NULLIF(TRIM(u.prefix), ''), u.last_name) AS name "
-                        + "FROM comments c "
-                        + "JOIN users u ON c.creator_id = u.id "
-                        + "WHERE c.article_id = :articleId "
-                        + "AND c.parent_comment_id IS NULL "
-                        + "ORDER BY c.created_at DESC "
-                        + "LIMIT :limit OFFSET :offset",
+                REPLY_COUNTS_CTE + """
+
+                SELECT c.*,
+                CONCAT_WS(' ', u.first_name, NULLIF(TRIM(u.prefix), ''), u.last_name) AS name,
+                COALESCE(rc.reply_count, 0) AS reply_count
+                FROM comments c
+                JOIN users u ON c.creator_id = u.id
+                LEFT JOIN reply_counts rc ON rc.parent_comment_id = c.id
+                WHERE c.article_id = :articleId
+                AND c.parent_comment_id IS NULL
+                ORDER BY c.created_at DESC, c.id DESC
+                LIMIT :limit OFFSET :offset
+                """,
                 Map.of("articleId", articleId, "limit", limit, "offset", offset),
                 commentWithAuthorRowMapper);
     }
 
     public List<CommentWithAuthor> findCommentsByParentId(UUID parentId) {
-        return jdbc.query(
-                "SELECT c.*, " + "CONCAT_WS(' ', u.first_name, NULLIF(TRIM(u.prefix), ''), u.last_name) AS name "
-                        + "FROM comments c "
-                        + "JOIN users u ON c.creator_id = u.id "
-                        + "WHERE c.parent_comment_id = :parentId "
-                        + "ORDER BY c.created_at",
-                Map.of("parentId", parentId),
-                commentWithAuthorRowMapper);
+        return jdbc.query(REPLY_COUNTS_CTE + """
+                SELECT c.*,
+                CONCAT_WS(' ', u.first_name, NULLIF(TRIM(u.prefix), ''), u.last_name) AS name,
+                COALESCE(rc.reply_count, 0) AS reply_count
+                FROM comments c
+                JOIN users u ON c.creator_id = u.id
+                LEFT JOIN reply_counts rc ON rc.parent_comment_id = c.id
+                WHERE c.parent_comment_id = :parentId
+                ORDER BY c.created_at
+                """, Map.of("parentId", parentId), commentWithAuthorRowMapper);
     }
+
+    private static final String REPLY_COUNTS_CTE = """
+        WITH reply_counts AS (
+            SELECT parent_comment_id, COUNT(*) AS reply_count
+            FROM comments
+            WHERE parent_comment_id IS NOT NULL
+            GROUP BY parent_comment_id
+        )
+        """;
 }

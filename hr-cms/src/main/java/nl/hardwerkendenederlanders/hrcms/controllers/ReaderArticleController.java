@@ -6,7 +6,7 @@ import nl.hardwerkendenederlanders.hrcms.database.sqldb.UserRepository;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentUnavailableException;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.User;
-import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentViewDto;
+import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.PagedComments;
 import nl.hardwerkendenederlanders.hrcms.services.ArticleService;
 import nl.hardwerkendenederlanders.hrcms.services.CommentService;
 import org.springframework.stereotype.Controller;
@@ -41,8 +41,12 @@ public class ReaderArticleController {
         model.addAttribute("article", article);
 
         try {
-            List<CommentViewDto> comments = commentService.getTopLevelComments(articleId, 1, 10);
-            model.addAttribute("comments", comments);
+            PagedComments result = commentService.getTopLevelComments(articleId, 0, 10);
+            model.addAttribute("comments", result.comments());
+            model.addAttribute("hasMore", result.hasMore());
+            model.addAttribute("nextPage", 2);
+            model.addAttribute("articleId", articleId);
+            model.addAttribute("offset", result.comments().size());
 
             // TODO: remove user-related code once auth has been set up.
             List<User> users = userRepository.findAllPaged(1, Integer.MAX_VALUE);

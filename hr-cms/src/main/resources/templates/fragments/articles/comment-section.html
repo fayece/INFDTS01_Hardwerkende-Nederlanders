@@ -37,6 +37,12 @@
             <div th:replace="~{fragments/articles/comment :: comment(comment=${comment})}"></div>
         </li>
     </ul>
+    <button th:if="${hasMore}"
+            th:attr="data-article-id=${articleId}, data-offset=${offset}"
+            class="comment-section--load-more"
+            id="load-more-comments">
+        Show more comments
+    </button>
 </section>
 
 <!--    Handle exceptions-->

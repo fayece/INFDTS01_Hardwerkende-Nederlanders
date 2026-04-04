@@ -7,6 +7,7 @@ import nl.hardwerkendenederlanders.hrcms.models.Comment;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentCreateDto;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentViewDto;
+import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.PagedComments;
 import nl.hardwerkendenederlanders.hrcms.services.CommentService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,10 +34,14 @@ public class ReaderCommentController {
 
     @GetMapping("/article/{articleId}")
     public String getCommentsByArticle(
-            @PathVariable UUID articleId, @RequestParam(defaultValue = "1") int page, Model model) {
+            @PathVariable UUID articleId, @RequestParam(defaultValue = "10") int offset, Model model) {
         final int limit = 10;
-        List<CommentViewDto> comments = commentService.getTopLevelComments(articleId, page, limit);
-        model.addAttribute("comments", comments);
+        PagedComments result = commentService.getTopLevelComments(articleId, offset, limit);
+
+        model.addAttribute("comments", result.comments());
+        model.addAttribute("hasMore", result.hasMore());
+        model.addAttribute("offset", offset + result.comments().size());
+        model.addAttribute("articleId", articleId);
 
         // TODO: remove user-related code once auth has been set up.
         List<User> users = userRepository.findAllPaged(1, Integer.MAX_VALUE);

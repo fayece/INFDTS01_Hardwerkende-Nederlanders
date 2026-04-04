@@ -14,8 +14,9 @@ public record CommentViewDto(
         String commentBody,
         String creatorName,
         OffsetDateTime createdAt,
-        boolean isDeleted) {
-    public static CommentViewDto from(Comment comment, String authorName) {
+        boolean isDeleted,
+        boolean hasReplies) {
+    public static CommentViewDto from(Comment comment, String authorName, int replyCount) {
         boolean isDeleted = comment.getDeletedAt() != null;
 
         return CommentViewDto.builder()
@@ -27,6 +28,7 @@ public record CommentViewDto(
                 .creatorName(authorName)
                 .createdAt(comment.getCreatedAt())
                 .isDeleted(isDeleted)
+                .hasReplies(replyCount > 0)
                 .build();
     }
 }

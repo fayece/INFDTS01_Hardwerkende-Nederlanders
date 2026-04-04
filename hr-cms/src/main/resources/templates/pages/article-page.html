@@ -8,10 +8,7 @@
     <div class="article-page-layout">
         <div th:replace="~{fragments/articles/full-article :: full-article(article)}"></div>
 
-        <section id="comment-section-container"
-                 th:data-article-id="${article.id}">
-            <p>Loading comments...</p>
-        </section>
+        <div th:replace="~{fragments/articles/comment-section :: comment-section}"></div>
     </div>
 
 </main>

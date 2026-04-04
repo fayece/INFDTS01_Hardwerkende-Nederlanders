@@ -10,7 +10,9 @@
     </small>
 
     <div class="replies-container" th:id="'replies-for-' + ${comment.id}"></div>
-    <button class="load-replies-button" th:data-parent-id="${comment.id}">
+    <button class="load-replies-button"
+            th:if="${comment.hasReplies}"
+            th:data-parent-id="${comment.id}">
         View Replies
     </button>
 
