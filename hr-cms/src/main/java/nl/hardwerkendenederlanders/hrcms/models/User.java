@@ -10,7 +10,10 @@ import org.jetbrains.annotations.Nullable;
 
 @SuperBuilder
 @Getter
-public class User extends BaseTimedEntity {
+public class User {
+
+    @Builder.Default
+    private UUID id = UUID.randomUUID();
 
     @Setter
     private String firstName;
@@ -39,6 +42,31 @@ public class User extends BaseTimedEntity {
     @Builder.Default
     private boolean active = true;
 
+    @Setter
+    @Builder.Default
+    private OffsetDateTime createdAt = OffsetDateTime.now();
+
+    public User(
+            String firstName,
+            @Nullable String prefix,
+            String lastName,
+            String email,
+            String passwordHash,
+            UUID roleId,
+            @Nullable UUID organizationId,
+            boolean active,
+            OffsetDateTime createdAt) {
+        this.firstName = firstName;
+        this.prefix = prefix;
+        this.lastName = lastName;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.roleId = roleId;
+        this.organizationId = organizationId;
+        this.active = active;
+        this.createdAt = createdAt;
+    }
+
     public User(
             UUID id,
             String firstName,
@@ -50,7 +78,7 @@ public class User extends BaseTimedEntity {
             @Nullable UUID organizationId,
             boolean active,
             OffsetDateTime createdAt) {
-        super(id, createdAt);
+        this.id = id;
         this.firstName = firstName;
         this.prefix = prefix;
         this.lastName = lastName;
@@ -59,25 +87,7 @@ public class User extends BaseTimedEntity {
         this.roleId = roleId;
         this.organizationId = organizationId;
         this.active = active;
-    }
-
-    public User(
-            String firstName,
-            @Nullable String prefix,
-            String lastname,
-            String email,
-            String passwordHash,
-            UUID roleId,
-            @Nullable UUID organizationId) {
-        super();
-        this.firstName = firstName;
-        this.prefix = prefix;
-        this.lastName = lastname;
-        this.email = email;
-        this.passwordHash = passwordHash;
-        this.roleId = roleId;
-        this.organizationId = organizationId;
-        this.active = true;
+        this.createdAt = createdAt;
     }
 
     public String getFullName() {
