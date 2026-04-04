@@ -20,8 +20,8 @@ public class DatabaseConfiguration {
     }
 
     @Bean
-    public JdbcCommentRepository commentRepository(NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
-        return new JdbcCommentRepository(jdbc, resourceLoader);
+    public JdbcCommentRepository commentRepository(NamedParameterJdbcTemplate jdbc) {
+        return new JdbcCommentRepository(jdbc);
     }
 
     @Bean
