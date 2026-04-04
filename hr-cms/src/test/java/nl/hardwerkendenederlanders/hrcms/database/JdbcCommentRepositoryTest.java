@@ -78,7 +78,7 @@ public class JdbcCommentRepositoryTest {
                 .build();
 
         commentRepository.insert(comment);
-        Comment retrieved = commentRepository.findById(comment.getId());
+        Comment retrieved = commentRepository.findById(comment.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(comment.getId(), retrieved.getId());
@@ -116,8 +116,10 @@ public class JdbcCommentRepositoryTest {
                 .build();
         commentRepository.insert(thirdLevelComment);
 
-        Comment retrievedReply = commentRepository.findById(replyComment.getId());
-        Comment retrievedThirdLevel = commentRepository.findById(thirdLevelComment.getId());
+        Comment retrievedReply =
+                commentRepository.findById(replyComment.getId()).orElse(null);
+        Comment retrievedThirdLevel =
+                commentRepository.findById(thirdLevelComment.getId()).orElse(null);
 
         assertNotNull(retrievedReply);
         assertNotNull(retrievedThirdLevel);
@@ -138,7 +140,7 @@ public class JdbcCommentRepositoryTest {
         comment.setCommentBody("This is an updated test comment.");
         commentRepository.update(comment);
 
-        Comment retrieved = commentRepository.findById(comment.getId());
+        Comment retrieved = commentRepository.findById(comment.getId()).orElse(null);
         assertNotNull(retrieved);
         assertEquals("This is an updated test comment.", retrieved.getCommentBody());
     }
@@ -153,7 +155,7 @@ public class JdbcCommentRepositoryTest {
                 .build();
         commentRepository.insert(comment);
 
-        Comment retrieved = commentRepository.findById(comment.getId());
+        Comment retrieved = commentRepository.findById(comment.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(comment.getId(), retrieved.getId());
@@ -181,7 +183,7 @@ public class JdbcCommentRepositoryTest {
         commentRepository.delete(comment.getId());
 
         // Since comments are soft-deleted, we can still retrieve it, and deletedAt should have been set
-        Comment retrieved = commentRepository.findById(comment.getId());
+        Comment retrieved = commentRepository.findById(comment.getId()).orElse(null);
         assertNotNull(retrieved);
         assertNotNull(retrieved.getDeletedAt());
     }

@@ -7,7 +7,7 @@ import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentWithAuthor;
 
 public interface CommentRepository extends DatabaseMutableRepository<Comment> {
 
-    public List<CommentWithAuthor> findTopLevelCommentsByArticleIdPaged(UUID articleId, int page, int limit);
+    List<CommentWithAuthor> findTopLevelCommentsByArticleIdPaged(UUID articleId, int page, int limit);
 
-    public List<CommentWithAuthor> findCommentsByParentId(UUID parentId);
+    List<CommentWithAuthor> findCommentsByParentId(UUID parentId);
 }

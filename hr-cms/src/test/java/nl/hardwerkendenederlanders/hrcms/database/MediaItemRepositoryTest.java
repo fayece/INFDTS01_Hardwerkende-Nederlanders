@@ -31,7 +31,7 @@ public class MediaItemRepositoryTest {
 
         mediaItemRepository.insert(mediaItem);
 
-        MediaItem retrieved = mediaItemRepository.findById(mediaItem.getId());
+        MediaItem retrieved = mediaItemRepository.findById(mediaItem.getId()).orElse(null);
         assertNotNull(retrieved);
         assertEquals(mediaItem.getId(), retrieved.getId());
         assertEquals(mediaItem.getUrl(), retrieved.getUrl());
@@ -51,7 +51,7 @@ public class MediaItemRepositoryTest {
         mediaItem.setMediaType(newMediaType);
         mediaItemRepository.update(mediaItem);
 
-        MediaItem retrieved = mediaItemRepository.findById(mediaItem.getId());
+        MediaItem retrieved = mediaItemRepository.findById(mediaItem.getId()).orElse(null);
         assertNotNull(retrieved);
         assertEquals(mediaItem.getId(), retrieved.getId());
         assertEquals(newUrl, retrieved.getUrl());
@@ -64,7 +64,7 @@ public class MediaItemRepositoryTest {
 
         mediaItemRepository.insert(mediaItem);
 
-        MediaItem retrieved = mediaItemRepository.findById(mediaItem.getId());
+        MediaItem retrieved = mediaItemRepository.findById(mediaItem.getId()).orElse(null);
         assertNotNull(retrieved);
         assertEquals(mediaItem.getId(), retrieved.getId());
         assertEquals(mediaItem.getUrl(), retrieved.getUrl());

@@ -30,7 +30,7 @@ public class PermissionRepositoryTest {
 
         permissionRepository.insert(permission);
 
-        Permission retrieved = permissionRepository.findById(permission.getId());
+        Permission retrieved = permissionRepository.findById(permission.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(permission.getId(), retrieved.getId());
@@ -46,7 +46,7 @@ public class PermissionRepositoryTest {
 
         permissionRepository.insert(permission);
 
-        Permission retrieved = permissionRepository.findById(permission.getId());
+        Permission retrieved = permissionRepository.findById(permission.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(permission.getId(), retrieved.getId());

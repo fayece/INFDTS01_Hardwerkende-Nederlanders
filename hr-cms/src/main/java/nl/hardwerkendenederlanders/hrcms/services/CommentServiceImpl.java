@@ -1,5 +1,6 @@
 package nl.hardwerkendenederlanders.hrcms.services;
 
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.CommentRepository;
@@ -8,17 +9,21 @@ import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentUnavailableExceptio
 import nl.hardwerkendenederlanders.hrcms.models.Comment;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentViewDto;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.PagedComments;
+import nl.hardwerkendenederlanders.hrcms.services.interfaces.CommentService;
+import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CommentService {
+public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
+    private final UserSessionService userSessionService;
 
     private static final String UNAVAILABLE_FRAGMENT = "fragments/articles/comment-section :: comments-unavailable";
 
-    public CommentService(CommentRepository commentRepository) {
+    public CommentServiceImpl(CommentRepository commentRepository, UserSessionService userSessionService) {
         this.commentRepository = commentRepository;
+        this.userSessionService = userSessionService;
     }
 
     public PagedComments getTopLevelComments(UUID articleId, int offset, int limit) {
@@ -48,9 +53,14 @@ public class CommentService {
         }
     }
 
-    public void postComment(Comment comment) {
+    public void postComment(Comment comment, HttpSession session) {
         try {
+            UUID userId = userSessionService.getLoggedInUser(session);
+            comment.setCreatorId(userId);
             commentRepository.insert(comment);
+            commentRepository.insert(comment);
+        } catch (ComponentActionException e) {
+            throw e;
         } catch (Exception e) {
             String target = "/article/" + comment.getArticleId();
             throw new ComponentActionException("comments", ComponentActionException.Action.CREATE, target, e);

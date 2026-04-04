@@ -14,16 +14,6 @@
           th:action="@{/comment/article/{articleId}/new(articleId=${articleId})}"
           method="post">
 
-    <!--    TODO: Remove authorId selection when auth is implemented -->
-        <label>
-            <select name="authorId" required>
-                <option value="" disabled selected>Post as...</option>
-                <option th:each="user: ${users}"
-                        th:value="${user.id}"
-                        th:text="${user.fullName}">
-                </option>
-            </select>
-        </label>
         <label>
             <textarea name="commentBody" placeholder="Leave a comment..." required></textarea>
         </label>

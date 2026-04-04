@@ -30,7 +30,7 @@ public class RoleRepositoryTest {
 
         roleRepository.insert(role);
 
-        Role retrieved = roleRepository.findById(role.getId());
+        Role retrieved = roleRepository.findById(role.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(role.getId(), retrieved.getId());
@@ -47,7 +47,7 @@ public class RoleRepositoryTest {
         role.setRoleName("Senior Editor");
         roleRepository.update(role);
 
-        Role retrieved = roleRepository.findById(role.getId());
+        Role retrieved = roleRepository.findById(role.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(role.getId(), retrieved.getId());
@@ -60,7 +60,7 @@ public class RoleRepositoryTest {
 
         roleRepository.insert(role);
 
-        Role retrieved = roleRepository.findById(role.getId());
+        Role retrieved = roleRepository.findById(role.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(role.getId(), retrieved.getId());

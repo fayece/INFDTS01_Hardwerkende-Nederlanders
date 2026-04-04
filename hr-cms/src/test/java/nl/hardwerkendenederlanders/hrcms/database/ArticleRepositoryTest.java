@@ -36,7 +36,7 @@ public class ArticleRepositoryTest {
                 Article.builder().title(title).textContent(textContent).build();
 
         articleRepository.insert(article);
-        Article retrieved = articleRepository.findById(article.getId());
+        Article retrieved = articleRepository.findById(article.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(article.getId(), retrieved.getId());
@@ -59,7 +59,8 @@ public class ArticleRepositoryTest {
         article.setUpdatedAt(OffsetDateTime.now());
         articleRepository.update(article);
 
-        Article retrieved = articleRepository.findById(article.getId());
+        Article retrieved = articleRepository.findById(article.getId()).orElse(null);
+        assertNotNull(retrieved);
         assertEquals("Updated Title", retrieved.getTitle());
         assertEquals("Updated content", retrieved.getTextContent());
         assertEquals(PublicationStatus.PUBLISHED, retrieved.getPublicationStatus());
@@ -73,7 +74,7 @@ public class ArticleRepositoryTest {
                 .build();
         articleRepository.insert(article);
 
-        Article retrieved = articleRepository.findById(article.getId());
+        Article retrieved = articleRepository.findById(article.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(article.getId(), retrieved.getId());
@@ -94,7 +95,7 @@ public class ArticleRepositoryTest {
                 .build();
         articleRepository.insert(article);
 
-        Article retrieved = articleRepository.findById(article.getId());
+        Article retrieved = articleRepository.findById(article.getId()).orElse(null);
         assertNotNull(retrieved);
 
         articleRepository.delete(article.getId());

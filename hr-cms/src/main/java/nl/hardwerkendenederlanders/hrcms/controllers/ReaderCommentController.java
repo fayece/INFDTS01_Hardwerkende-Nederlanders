@@ -1,14 +1,13 @@
 package nl.hardwerkendenederlanders.hrcms.controllers;
 
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.UUID;
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.UserRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Comment;
-import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentCreateDto;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentViewDto;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.PagedComments;
-import nl.hardwerkendenederlanders.hrcms.services.CommentService;
+import nl.hardwerkendenederlanders.hrcms.services.interfaces.CommentService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -24,12 +23,8 @@ public class ReaderCommentController {
     private static final String COMMENT_SECTION_VIEW = COMMENT_SECTION_FRAGMENT + " :: comment-section";
     private static final String COMMENT_LIST_FRAGMENT = COMMENT_SECTION_FRAGMENT + " :: comment-list";
 
-    // TODO: remove user-related code once auth has been set up.
-    private final UserRepository userRepository;
-
-    public ReaderCommentController(CommentService commentService, UserRepository userRepository) {
+    public ReaderCommentController(CommentService commentService) {
         this.commentService = commentService;
-        this.userRepository = userRepository;
     }
 
     @GetMapping("/article/{articleId}")
@@ -43,10 +38,6 @@ public class ReaderCommentController {
         model.addAttribute("offset", offset + result.comments().size());
         model.addAttribute("articleId", articleId);
 
-        // TODO: remove user-related code once auth has been set up.
-        List<User> users = userRepository.findAllPaged(1, Integer.MAX_VALUE);
-        model.addAttribute("users", users);
-
         return COMMENT_SECTION_VIEW;
     }
 
@@ -59,10 +50,11 @@ public class ReaderCommentController {
     }
 
     @PostMapping("/article/{articleId}/new")
-    public String postComment(@PathVariable UUID articleId, @ModelAttribute CommentCreateDto formDto) {
+    public String postComment(
+            @PathVariable UUID articleId, @ModelAttribute CommentCreateDto formDto, HttpSession session) {
 
         Comment comment = formDto.toComment(articleId);
-        commentService.postComment(comment);
+        commentService.postComment(comment, session);
 
         return "redirect:/article/" + articleId;
     }

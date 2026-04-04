@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 public class Comment {
 
     @Builder.Default
-    private UUID id = UUID.randomUUID();
+    private final UUID id = UUID.randomUUID();
 
     @Setter
     @Nullable
@@ -32,7 +32,7 @@ public class Comment {
     private UUID parentCommentId;
 
     @Builder.Default
-    private OffsetDateTime createdAt = OffsetDateTime.now();
+    private final OffsetDateTime createdAt = OffsetDateTime.now();
 
     @Setter
     @Nullable

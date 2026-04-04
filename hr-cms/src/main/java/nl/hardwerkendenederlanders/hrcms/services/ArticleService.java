@@ -14,6 +14,6 @@ public class ArticleService {
     }
 
     public Article getArticleById(java.util.UUID articleId) {
-        return articleRepository.findById(articleId);
+        return articleRepository.findById(articleId).orElse(null);
     }
 }

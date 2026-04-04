@@ -53,7 +53,8 @@ public class RolePermissionRepositoryTest {
 
         rolePermissionRepository.insert(rolePermission);
 
-        RolePermission retrieved = rolePermissionRepository.findById(rolePermission.getId());
+        RolePermission retrieved =
+                rolePermissionRepository.findById(rolePermission.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(rolePermission.getId(), retrieved.getId());
@@ -67,7 +68,8 @@ public class RolePermissionRepositoryTest {
 
         rolePermissionRepository.insert(rolePermission);
 
-        RolePermission retrieved = rolePermissionRepository.findById(rolePermission.getId());
+        RolePermission retrieved =
+                rolePermissionRepository.findById(rolePermission.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(rolePermission.getId(), retrieved.getId());

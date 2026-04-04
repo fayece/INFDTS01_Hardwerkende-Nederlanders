@@ -67,7 +67,8 @@ public class ArticleAuthorRepositoryTest {
         ArticleAuthor articleAuthor = new ArticleAuthor(article.getId(), author.getId());
 
         articleAuthorRepository.insert(articleAuthor);
-        ArticleAuthor retrieved = articleAuthorRepository.findById(articleAuthor.getId());
+        ArticleAuthor retrieved =
+                articleAuthorRepository.findById(articleAuthor.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(articleAuthor.getId(), retrieved.getId());
@@ -80,7 +81,8 @@ public class ArticleAuthorRepositoryTest {
         ArticleAuthor articleAuthor = new ArticleAuthor(article.getId(), author.getId());
 
         articleAuthorRepository.insert(articleAuthor);
-        ArticleAuthor retrieved = articleAuthorRepository.findById(articleAuthor.getId());
+        ArticleAuthor retrieved =
+                articleAuthorRepository.findById(articleAuthor.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(articleAuthor.getId(), retrieved.getId());

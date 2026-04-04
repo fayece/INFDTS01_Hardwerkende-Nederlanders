@@ -1,14 +1,11 @@
 package nl.hardwerkendenederlanders.hrcms.controllers;
 
-import java.util.List;
 import java.util.UUID;
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.UserRepository;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentUnavailableException;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
-import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.PagedComments;
 import nl.hardwerkendenederlanders.hrcms.services.ArticleService;
-import nl.hardwerkendenederlanders.hrcms.services.CommentService;
+import nl.hardwerkendenederlanders.hrcms.services.CommentServiceImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,14 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class ReaderArticleController {
 
     private final ArticleService articleService;
-    private final CommentService commentService;
-    private final UserRepository userRepository;
+    private final CommentServiceImpl commentService;
 
-    public ReaderArticleController(
-            ArticleService articleService, CommentService commentService, UserRepository userRepository) {
+    public ReaderArticleController(ArticleService articleService, CommentServiceImpl commentService) {
         this.articleService = articleService;
         this.commentService = commentService;
-        this.userRepository = userRepository;
     }
 
     @GetMapping("/{articleId}")
@@ -47,10 +41,6 @@ public class ReaderArticleController {
             model.addAttribute("nextPage", 2);
             model.addAttribute("articleId", articleId);
             model.addAttribute("offset", result.comments().size());
-
-            // TODO: remove user-related code once auth has been set up.
-            List<User> users = userRepository.findAllPaged(1, Integer.MAX_VALUE);
-            model.addAttribute("users", users);
 
         } catch (ComponentUnavailableException e) {
             model.addAttribute("failedComponent", "comments");
