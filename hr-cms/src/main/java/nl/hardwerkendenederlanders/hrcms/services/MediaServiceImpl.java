@@ -11,6 +11,7 @@ import nl.hardwerkendenederlanders.hrcms.exceptions.MediaUploadException;
 import nl.hardwerkendenederlanders.hrcms.models.MediaItem;
 import nl.hardwerkendenederlanders.hrcms.models.MediaType;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.MediaService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +26,7 @@ public class MediaServiceImpl implements MediaService {
         Files.createDirectories(uploadDir);
     }
 
+    @NotNull
     public String store(MultipartFile file) {
         try {
             System.out.println("Uploading to: " + uploadDir.toAbsolutePath());

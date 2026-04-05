@@ -1,9 +1,12 @@
 package nl.hardwerkendenederlanders.hrcms.exceptions;
 
-import java.util.Map;
-import org.springframework.http.ResponseEntity;
+import static java.util.Objects.requireNonNullElse;
+
+import nl.hardwerkendenederlanders.hrcms.models.dtos.exceptions.ErrorResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -32,7 +35,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MediaUploadException.class)
-    public ResponseEntity<Map<String, String>> handleMediaUpload(MediaUploadException ex) {
-        return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleMediaUpload(MediaUploadException ex) {
+        String errorMessage = requireNonNullElse(ex.getMessage(), "An unknown error occurred");
+        return new ErrorResponse(errorMessage);
     }
 }

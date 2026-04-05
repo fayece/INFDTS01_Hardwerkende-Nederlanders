@@ -3,7 +3,6 @@ package nl.hardwerkendenederlanders.hrcms.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
 import org.commonmark.Extension;
 import org.commonmark.ext.gfm.strikethrough.Strikethrough;
 import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension;

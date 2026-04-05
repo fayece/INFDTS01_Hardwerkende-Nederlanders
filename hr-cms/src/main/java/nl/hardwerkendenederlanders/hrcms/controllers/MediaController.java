@@ -1,8 +1,7 @@
 package nl.hardwerkendenederlanders.hrcms.controllers;
 
-import java.util.Map;
+import nl.hardwerkendenederlanders.hrcms.models.dtos.media.UploadUrl;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.MediaService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,8 +19,8 @@ public class MediaController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<Map<String, String>> upload(@RequestParam("file") MultipartFile file) {
+    public UploadUrl upload(@RequestParam("file") MultipartFile file) {
         String url = mediaService.store(file);
-        return ResponseEntity.ok(Map.of("url", url));
+        return new UploadUrl(url);
     }
 }

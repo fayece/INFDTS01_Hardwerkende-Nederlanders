@@ -1,5 +1,5 @@
 <div th:fragment="comment" class="comment" xmlns="http://www.w3.org/1999/html">
-    <span class="author-name" th:text="${comment.creatorName ?: 'Unknown User'}"></span>
+    <span class="author-name" th:text="${comment.authorName ?: 'Unknown User'}"></span>
     <div class="comment-body" th:attr="data-markdown=${comment.commentBody}"></div>
 
     <small class="local-time"

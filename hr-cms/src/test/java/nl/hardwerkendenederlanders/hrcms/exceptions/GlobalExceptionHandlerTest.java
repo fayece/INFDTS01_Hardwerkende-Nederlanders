@@ -5,10 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.*;
 
-import java.util.Map;
+import nl.hardwerkendenederlanders.hrcms.models.dtos.exceptions.ErrorResponse;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -52,10 +50,9 @@ class GlobalExceptionHandlerTest {
 
         MediaUploadException exception = new MediaUploadException(expectedErrorMessage, null);
 
-        ResponseEntity<Map<String, String>> response = exceptionHandler.handleMediaUpload(exception);
+        ErrorResponse response = exceptionHandler.handleMediaUpload(exception);
 
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(exception.getMessage(), response.getBody().get("error"));
+        assertNotNull(response);
+        assertEquals(exception.getMessage(), response.error());
     }
 }
