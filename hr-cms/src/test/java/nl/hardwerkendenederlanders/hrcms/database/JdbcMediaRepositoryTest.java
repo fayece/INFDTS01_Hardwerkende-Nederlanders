@@ -2,6 +2,7 @@ package nl.hardwerkendenederlanders.hrcms.database;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
@@ -81,8 +82,9 @@ public class JdbcMediaRepositoryTest {
     }
 
     @Test
-    void findMediaItemById_withNonExistingId_shouldReturnNull() {
-        assertThrows(Exception.class, () -> jdbcMediaRepository.findById(UUID.randomUUID()));
+    void findMediaItemById_withNonExistingId_sshouldReturnEmptyOptional() {
+        Optional<MediaItem> result = jdbcMediaRepository.findById(UUID.randomUUID());
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -96,7 +98,8 @@ public class JdbcMediaRepositoryTest {
 
         jdbcMediaRepository.delete(mediaItem.getId());
 
-        assertThrows(Exception.class, () -> jdbcMediaRepository.findById(mediaItem.getId()));
+        Optional<MediaItem> result = jdbcMediaRepository.findById(mediaItem.getId());
+        assertTrue(result.isEmpty());
     }
 
     @Test

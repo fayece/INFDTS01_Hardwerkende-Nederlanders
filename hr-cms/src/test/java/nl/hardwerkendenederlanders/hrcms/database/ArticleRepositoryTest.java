@@ -3,6 +3,7 @@ package nl.hardwerkendenederlanders.hrcms.database;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.OffsetDateTime;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
@@ -83,8 +84,9 @@ public class ArticleRepositoryTest {
     }
 
     @Test
-    void findArticleById_withNonExistentId_shouldThrowException() {
-        assertThrows(Exception.class, () -> articleRepository.findById(UUID.randomUUID()));
+    void findArticleById_withNonExistentId_shouldReturnEmptyOptional() {
+        Optional<Article> result = articleRepository.findById(UUID.randomUUID());
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -100,7 +102,8 @@ public class ArticleRepositoryTest {
 
         articleRepository.delete(article.getId());
 
-        assertThrows(Exception.class, () -> articleRepository.findById(article.getId()));
+        Optional<Article> result = articleRepository.findById(article.getId());
+        assertTrue(result.isEmpty());
     }
 
     @Test

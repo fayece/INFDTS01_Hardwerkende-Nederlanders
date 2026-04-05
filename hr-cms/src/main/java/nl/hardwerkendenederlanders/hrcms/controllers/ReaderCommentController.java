@@ -5,7 +5,6 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-
 import nl.hardwerkendenederlanders.hrcms.models.Comment;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentCreateDto;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentViewDto;

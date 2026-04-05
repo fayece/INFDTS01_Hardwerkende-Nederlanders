@@ -2,6 +2,7 @@ package nl.hardwerkendenederlanders.hrcms.database;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
@@ -166,8 +167,9 @@ public class JdbcCommentRepositoryTest {
     }
 
     @Test
-    void findCommentById_withNonExistingId_shouldThrowException() {
-        assertThrows(RuntimeException.class, () -> commentRepository.findById(UUID.randomUUID()));
+    void findCommentById_withNonExistingId_shouldReturnEmptyOptional() {
+        Optional<Comment> result = commentRepository.findById(UUID.randomUUID());
+        assertTrue(result.isEmpty());
     }
 
     @Test

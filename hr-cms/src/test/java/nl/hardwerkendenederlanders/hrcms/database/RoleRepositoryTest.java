@@ -2,6 +2,7 @@ package nl.hardwerkendenederlanders.hrcms.database;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
@@ -69,8 +70,9 @@ public class RoleRepositoryTest {
     }
 
     @Test
-    void findRoleById_withNonExistingId_shouldThrowException() {
-        assertThrows(Exception.class, () -> roleRepository.findById(UUID.randomUUID()));
+    void findRoleById_withNonExistingId_shouldReturnEmptyOptional() {
+        Optional<Role> result = roleRepository.findById(UUID.randomUUID());
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -80,7 +82,8 @@ public class RoleRepositoryTest {
         roleRepository.insert(role);
         roleRepository.delete(role.getId());
 
-        assertThrows(Exception.class, () -> roleRepository.findById(role.getId()));
+        Optional<Role> result = roleRepository.findById(role.getId());
+        assertTrue(result.isEmpty());
     }
 
     @Test

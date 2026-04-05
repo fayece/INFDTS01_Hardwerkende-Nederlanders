@@ -2,6 +2,7 @@ package nl.hardwerkendenederlanders.hrcms.database;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
@@ -69,8 +70,9 @@ public class OrganizationRepositoryTest {
     }
 
     @Test
-    void findOrganizationById_withNonExistingId_shouldReturnNull() {
-        assertThrows(Exception.class, () -> organizationRepository.findById(UUID.randomUUID()));
+    void findOrganizationById_withNonExistingId_shouldReturnEmptyOptional() {
+        Optional<Organization> result = organizationRepository.findById(UUID.randomUUID());
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -80,7 +82,8 @@ public class OrganizationRepositoryTest {
 
         organizationRepository.delete(organization.getId());
 
-        assertThrows(Exception.class, () -> organizationRepository.findById(organization.getId()));
+        Optional<Organization> result = organizationRepository.findById(organization.getId());
+        assertTrue(result.isEmpty());
     }
 
     @Test

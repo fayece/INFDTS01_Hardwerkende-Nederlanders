@@ -88,6 +88,9 @@ public class JdbcMediaRepository implements MediaRepository {
 
     @Override
     public List<MediaItem> findAllPaged(int page, int limit) {
+        if (limit <= 0) throw new IllegalArgumentException("Limit must be greater than 0.");
+        if (page <= 0) throw new IllegalArgumentException("Page must be greater than 0.");
+        int offset = (page - 1) * limit;
 
         String sql = """
             SELECT * FROM media_items
@@ -95,6 +98,6 @@ public class JdbcMediaRepository implements MediaRepository {
             LIMIT :limit OFFSET :offset;
             """;
 
-        return jdbc.query(sql, Map.of("limit", limit, "offset", (page - 1) * limit), rowMapper());
+        return jdbc.query(sql, Map.of("limit", limit, "offset", offset), rowMapper());
     }
 }
