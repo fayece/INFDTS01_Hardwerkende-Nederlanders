@@ -1,4 +1,4 @@
-const button = document.getElementById("load-more-comments");
+import {formatLocalTimes} from "./time-formatter.js";
 
 async function loadMore(btn: HTMLButtonElement): Promise<void> {
     const articleId = btn.dataset.articleId!;
@@ -11,6 +11,7 @@ async function loadMore(btn: HTMLButtonElement): Promise<void> {
     const newComments = doc.querySelectorAll(".comment-section--list li");
     const list = document.querySelector(".comment-section--list")!;
     newComments.forEach(comment => list.appendChild(comment));
+    formatLocalTimes();
 
     const nextButton = doc.getElementById("load-more-comments");
     if (nextButton instanceof HTMLButtonElement) {
