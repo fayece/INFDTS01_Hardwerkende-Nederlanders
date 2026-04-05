@@ -16,6 +16,8 @@ services:
         condition: service_healthy
     mem_limit: 500mb
     cpus: 1
+    volumes:
+      - uploads:/app/uploads/media
 
   db:
     image: postgres:18.2-trixie
@@ -40,3 +42,4 @@ services:
 
 volumes:
   pgdata:
+  uploads:

@@ -13,5 +13,5 @@ public interface CommentService {
 
     List<CommentViewDto> getReplies(UUID parentId);
 
-    void postComment(Comment comment, HttpSession session);
+    CommentViewDto postComment(Comment comment, HttpSession session);
 }

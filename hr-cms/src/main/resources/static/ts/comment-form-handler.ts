@@ -1,11 +1,45 @@
 import { formatLocalTimes } from './time-formatter.js';
+import {renderMarkdown} from "./render-markdown.js";
 
 export function initCommentForm(): void {
     const form = document.querySelector(".comment-section--create") as HTMLFormElement;
     if (!form) return;
 
+    const editor = new (window as any).toastui.Editor({
+        el: document.getElementById("comment-editor"),
+        height: "auto",
+        minHeight: "8rem",
+        initialEditType: "markdown",
+        hideModeSwitch: true,
+        previewStyle: "tab",
+        placeholder: "Leave a comment...",
+        toolbarItems: [
+            ["bold", "italic", "strike", "image"]
+        ],
+        hooks: {
+            addImageBlobHook: async (blob: Blob, callback: (url: string, alt: string) => void) => {
+                const formData = new FormData();
+                formData.append("file", blob);
+
+                const response = await fetch("/media/upload", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await response.json();
+                console.log("upload response:", data);
+
+                const { url } = data;
+                callback(url, "image");
+            }
+        }
+    });
+
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
+
+        const hiddenInput = document.getElementById("commentBody") as HTMLInputElement;
+        hiddenInput.value = editor.getMarkdown().trim();
 
         const formData = new FormData(form);
         const response = await fetch(form.action, {
@@ -26,10 +60,21 @@ export function initCommentForm(): void {
                 form.insertAdjacentElement("beforebegin", errorEl);
             }
         } else {
-            (form.querySelector("textarea") as HTMLTextAreaElement).value = "";
-            const newList = doc.querySelector(".comment-section--list");
-            document.querySelector(".comment-section--list")?.replaceWith(newList!);
-            formatLocalTimes();
+            editor.setMarkdown("");
+            const newComment = doc.querySelector(".comment");
+            const list = document.querySelector(".comment-section--list");
+            if (newComment && list) {
+                const li = document.createElement("li");
+                li.appendChild(newComment);
+                list.prepend(li);
+                formatLocalTimes();
+                renderMarkdown(li);
+
+                const loadMoreBtn = document.getElementById("load-more-comments") as HTMLButtonElement;
+                if (loadMoreBtn) {
+                    loadMoreBtn.dataset.offset = String(Number(loadMoreBtn.dataset.offset) + 1);
+                }
+            }
         }
     });
 }

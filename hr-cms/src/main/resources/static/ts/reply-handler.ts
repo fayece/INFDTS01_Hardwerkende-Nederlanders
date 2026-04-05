@@ -1,4 +1,5 @@
 import { formatLocalTimes } from './time-formatter.js';
+import { renderMarkdown } from "./render-markdown.js";
 
 export const initReplyLoader = (): void => {
     document.addEventListener("click", async (event: MouseEvent) => {
@@ -31,6 +32,8 @@ export const initReplyLoader = (): void => {
             target.style.display = "none";
 
             formatLocalTimes();
+            renderMarkdown();
+
         } catch (error) {
             console.error("Network error:", error);
             button.textContent = "Connection error";

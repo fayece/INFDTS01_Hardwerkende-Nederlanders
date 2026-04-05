@@ -26,8 +26,8 @@ public class DatabaseConfiguration {
     }
 
     @Bean
-    public MediaItemRepository mediaItemRepository(NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
-        return new MediaItemRepository(jdbc, resourceLoader);
+    public JdbcMediaRepository mediaItemRepository(NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
+        return new JdbcMediaRepository(jdbc);
     }
 
     @Bean

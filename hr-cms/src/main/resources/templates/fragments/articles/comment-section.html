@@ -1,33 +1,34 @@
 <section th:fragment="comment-section" class="content-section comment-section">
-    <h2>Comments</h2>
+    <div class="comment-section--inner">
+        <h2>Comments</h2>
 
-    <div th:if="${errorMessage}" class="error-container">
-        <p th:text="${errorMessage}"></p>
+        <div th:if="${errorMessage}" class="error-container">
+            <p th:text="${errorMessage}"></p>
+        </div>
+
+        <form class="comment-section--create"
+              th:action="@{/comment/article/{articleId}/new(articleId=${articleId})}"
+              method="post">
+
+            <div id="comment-editor"></div>
+            <input type="hidden" name="commentBody" id="commentBody">
+
+            <button type="submit">Post Comment</button>
+        </form>
+
+        <!--    Read comments-->
+        <ul th:fragment="comment-list" class="comment-section--list">
+            <li th:each="comment : ${comments}">
+                <div th:replace="~{fragments/articles/comment :: comment(comment=${comment})}"></div>
+            </li>
+        </ul>
+        <button th:if="${hasMore}"
+                th:attr="data-article-id=${articleId}, data-offset=${offset}"
+                class="comment-section--load-more"
+                id="load-more-comments">
+            Show more comments
+        </button>
     </div>
-
-    <form class="comment-section--create"
-          th:action="@{/comment/article/{articleId}/new(articleId=${articleId})}"
-          method="post">
-
-        <label>
-            <textarea name="commentBody" placeholder="Leave a comment..." required></textarea>
-        </label>
-
-        <button type="submit">Post Comment</button>
-    </form>
-
-    <!--    Read comments-->
-    <ul th:fragment="comment-list" class="comment-section--list">
-        <li th:each="comment : ${comments}">
-            <div th:replace="~{fragments/articles/comment :: comment(comment=${comment})}"></div>
-        </li>
-    </ul>
-    <button th:if="${hasMore}"
-            th:attr="data-article-id=${articleId}, data-offset=${offset}"
-            class="comment-section--load-more"
-            id="load-more-comments">
-        Show more comments
-    </button>
 </section>
 
 <!--    Handle exceptions-->

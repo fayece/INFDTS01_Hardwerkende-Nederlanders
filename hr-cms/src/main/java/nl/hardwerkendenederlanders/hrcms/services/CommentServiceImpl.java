@@ -8,9 +8,11 @@ import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentActionException;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentUnavailableException;
 import nl.hardwerkendenederlanders.hrcms.models.Comment;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentViewDto;
+import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentWithAuthor;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.PagedComments;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.CommentService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
+import nl.hardwerkendenederlanders.hrcms.util.MarkdownSanitizer;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -53,11 +55,15 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
-    public void postComment(Comment comment, HttpSession session) {
+    public CommentViewDto postComment(Comment comment, HttpSession session) {
         try {
             UUID userId = userSessionService.getLoggedInUser(session);
             comment.setCreatorId(userId);
-            commentRepository.insert(comment);
+            comment.setCommentBody(MarkdownSanitizer.sanitizeComment(comment.getCommentBody()));
+
+            CommentWithAuthor result = commentRepository.insertReturning(comment);
+            return CommentViewDto.from(result.comment(), result.authorName(), result.replyCount());
+
         } catch (ComponentActionException e) {
             throw e;
         } catch (Exception e) {

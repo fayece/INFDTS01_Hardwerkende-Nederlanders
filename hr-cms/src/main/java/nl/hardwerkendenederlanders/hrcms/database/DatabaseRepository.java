@@ -8,6 +8,7 @@ public interface DatabaseRepository<T> {
 
     void insert(T entity);
 
+
     Optional<T> findById(UUID id);
 
     void delete(UUID id);

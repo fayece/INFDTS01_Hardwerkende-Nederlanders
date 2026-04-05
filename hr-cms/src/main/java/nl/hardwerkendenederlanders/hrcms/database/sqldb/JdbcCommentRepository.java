@@ -66,6 +66,26 @@ public class JdbcCommentRepository implements CommentRepository {
         jdbc.update(sql, paramsFromComment(comment));
     }
 
+    public CommentWithAuthor insertReturning(Comment comment) {
+
+        String sql = """
+            WITH inserted AS (
+                INSERT INTO comments
+                    (id, media_id, comment_body, creator_id, article_id, parent_comment_id, created_at, deleted_at)
+                VALUES
+                    (:id, :mediaId, :commentBody, :creatorId, :articleId, :parentCommentId, :createdAt, :deletedAt)
+                RETURNING *
+            )
+            SELECT i.*,
+                   CONCAT_WS(' ', u.first_name, NULLIF(TRIM(u.prefix), ''), u.last_name) AS name,
+                   0 AS reply_count
+            FROM inserted i
+            JOIN users u ON i.creator_id = u.id
+            """;
+
+        return jdbc.queryForObject(sql, paramsFromComment(comment), commentWithAuthorRowMapper);
+    }
+
     @Override
     public void update(Comment comment) {
 

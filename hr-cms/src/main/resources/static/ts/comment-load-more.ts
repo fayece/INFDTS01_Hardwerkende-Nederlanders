@@ -1,4 +1,5 @@
 import {formatLocalTimes} from "./time-formatter.js";
+import {renderMarkdown} from "./render-markdown.js";
 
 async function loadMore(btn: HTMLButtonElement): Promise<void> {
     const articleId = btn.dataset.articleId!;
@@ -12,6 +13,7 @@ async function loadMore(btn: HTMLButtonElement): Promise<void> {
     const list = document.querySelector(".comment-section--list")!;
     newComments.forEach(comment => list.appendChild(comment));
     formatLocalTimes();
+    renderMarkdown();
 
     const nextButton = doc.getElementById("load-more-comments");
     if (nextButton instanceof HTMLButtonElement) {

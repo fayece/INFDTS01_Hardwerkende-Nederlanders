@@ -26,7 +26,7 @@ public class JdbcCommentRepositoryTest {
     private CommentRepository commentRepository;
 
     @Autowired
-    private MediaItemRepository mediaItemRepository;
+    private JdbcMediaRepository jdbcMediaRepository;
 
     @Autowired
     private RoleRepository roleRepository;
@@ -65,7 +65,7 @@ public class JdbcCommentRepositoryTest {
                 .url("https://example.com/image" + UUID.randomUUID() + ".jpg")
                 .mediaType(MediaType.IMAGE)
                 .build();
-        mediaItemRepository.insert(mediaItem);
+        jdbcMediaRepository.insert(mediaItem);
     }
 
     @Test
