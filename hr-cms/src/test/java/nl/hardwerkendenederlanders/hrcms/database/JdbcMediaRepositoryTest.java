@@ -9,6 +9,7 @@ import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcMediaRepository;
 import nl.hardwerkendenederlanders.hrcms.models.MediaItem;
 import nl.hardwerkendenederlanders.hrcms.models.MediaType;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -16,6 +17,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -25,6 +28,14 @@ public class JdbcMediaRepositoryTest {
 
     @Autowired
     private JdbcMediaRepository jdbcMediaRepository;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @BeforeEach
+    void setUp() {
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "media_items");
+    }
 
     @Test
     void insertMediaItem_withValidMediaItem_shouldPersistAndRetrieve() {

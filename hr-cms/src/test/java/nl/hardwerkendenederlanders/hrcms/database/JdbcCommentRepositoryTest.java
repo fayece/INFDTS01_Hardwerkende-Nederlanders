@@ -1,59 +1,65 @@
 package nl.hardwerkendenederlanders.hrcms.database;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.*;
+import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.ArticleRepository;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.RoleRepository;
 import nl.hardwerkendenederlanders.hrcms.models.*;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
 @Transactional
-public class JdbcCommentRepositoryTest {
+public class JdbcCommentRepositoryTest extends CommentRepositoryContractTest {
 
     @Autowired
     private CommentRepository commentRepository;
 
     @Autowired
-    private JdbcMediaRepository jdbcMediaRepository;
+    private MediaRepository mediaRepository;
 
     @Autowired
     private RoleRepository roleRepository;
 
     @Autowired
-    private JdbcUserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private ArticleRepository articleRepository;
 
-    private Article article;
-    private User author;
-    private MediaItem mediaItem;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    private UUID articleId;
+    private UUID authorId;
+    private UUID mediaId;
 
     @BeforeEach
     void setUp() {
-        article = Article.builder()
+        clearCommentsTable();
+    }
+
+    @BeforeEach
+    void setupDatabasePrerequisites() {
+        Article article = Article.builder()
                 .title("Test Article")
                 .textContent("Test content.")
                 .build();
         articleRepository.insert(article);
+        this.articleId = article.getId();
 
-        Role role = new Role("Author Role");
+        String uniqueRoleName = "Author Role " + UUID.randomUUID();
+        Role role = new Role(uniqueRoleName);
         roleRepository.insert(role);
 
-        author = User.builder()
+        User author = User.builder()
                 .firstName("Test")
                 .lastName("Author")
                 .email(UUID.randomUUID() + "@example.com")
@@ -61,161 +67,38 @@ public class JdbcCommentRepositoryTest {
                 .roleId(role.getId())
                 .build();
         userRepository.insert(author);
+        this.authorId = author.getId();
 
-        mediaItem = MediaItem.builder()
+        MediaItem mediaItem = MediaItem.builder()
                 .url("https://example.com/image" + UUID.randomUUID() + ".jpg")
                 .mediaType(MediaType.IMAGE)
                 .build();
-        jdbcMediaRepository.insert(mediaItem);
+        mediaRepository.insert(mediaItem);
+        this.mediaId = mediaItem.getId();
     }
 
-    @Test
-    void insertComment_withValidComment_shouldPersistAndRetrieve() {
-        Comment comment = Comment.builder()
-                .articleId(article.getId())
-                .creatorId(author.getId())
-                .commentBody("This is a test comment.")
-                .mediaId(mediaItem.getId())
-                .build();
-
-        commentRepository.insert(comment);
-        Comment retrieved = commentRepository.findById(comment.getId()).orElse(null);
-
-        assertNotNull(retrieved);
-        assertEquals(comment.getId(), retrieved.getId());
-        assertEquals(article.getId(), retrieved.getArticleId());
-        assertEquals(author.getId(), retrieved.getCreatorId());
-        assertEquals("This is a test comment.", retrieved.getCommentBody());
-        assertEquals(mediaItem.getId(), retrieved.getMediaId());
+    @Override
+    protected CommentRepository getRepository() {
+        return this.commentRepository;
     }
 
-    @Test
-    void insertComment_replyToExistingComment_shouldPersistWithParentCommentId() {
-        Comment parentComment = Comment.builder()
-                .articleId(article.getId())
-                .creatorId(author.getId())
-                .commentBody("This is a parent comment.")
-                .mediaId(mediaItem.getId())
-                .build();
-        commentRepository.insert(parentComment);
-
-        Comment replyComment = Comment.builder()
-                .articleId(article.getId())
-                .creatorId(author.getId())
-                .commentBody("This is a reply to the parent comment.")
-                .mediaId(mediaItem.getId())
-                .parentCommentId(parentComment.getId())
-                .build();
-        commentRepository.insert(replyComment);
-
-        Comment thirdLevelComment = Comment.builder()
-                .articleId(article.getId())
-                .creatorId(author.getId())
-                .commentBody("This is a reply to the reply comment.")
-                .mediaId(mediaItem.getId())
-                .parentCommentId(replyComment.getId())
-                .build();
-        commentRepository.insert(thirdLevelComment);
-
-        Comment retrievedReply =
-                commentRepository.findById(replyComment.getId()).orElse(null);
-        Comment retrievedThirdLevel =
-                commentRepository.findById(thirdLevelComment.getId()).orElse(null);
-
-        assertNotNull(retrievedReply);
-        assertNotNull(retrievedThirdLevel);
-        assertEquals(parentComment.getId(), retrievedReply.getParentCommentId());
-        assertEquals(replyComment.getId(), retrievedThirdLevel.getParentCommentId());
+    @Override
+    protected UUID getValidArticleId() {
+        return this.articleId;
     }
 
-    @Test
-    void updateComment_withModifiedFields_shouldReflectChanges() {
-        Comment comment = Comment.builder()
-                .articleId(article.getId())
-                .creatorId(author.getId())
-                .commentBody("This is a test comment.")
-                .mediaId(mediaItem.getId())
-                .build();
-        commentRepository.insert(comment);
-
-        comment.setCommentBody("This is an updated test comment.");
-        commentRepository.update(comment);
-
-        Comment retrieved = commentRepository.findById(comment.getId()).orElse(null);
-        assertNotNull(retrieved);
-        assertEquals("This is an updated test comment.", retrieved.getCommentBody());
+    @Override
+    protected UUID getValidAuthorId() {
+        return this.authorId;
     }
 
-    @Test
-    void findCommentById_withExistingId_shouldReturnComment() {
-        Comment comment = Comment.builder()
-                .articleId(article.getId())
-                .creatorId(author.getId())
-                .commentBody("This is a test comment.")
-                .mediaId(mediaItem.getId())
-                .build();
-        commentRepository.insert(comment);
-
-        Comment retrieved = commentRepository.findById(comment.getId()).orElse(null);
-
-        assertNotNull(retrieved);
-        assertEquals(comment.getId(), retrieved.getId());
-        assertEquals(article.getId(), retrieved.getArticleId());
-        assertEquals(author.getId(), retrieved.getCreatorId());
-        assertEquals("This is a test comment.", retrieved.getCommentBody());
-        assertEquals(mediaItem.getId(), retrieved.getMediaId());
+    @Override
+    protected UUID getValidMediaId() {
+        return this.mediaId;
     }
 
-    @Test
-    void findCommentById_withNonExistingId_shouldReturnEmptyOptional() {
-        Optional<Comment> result = commentRepository.findById(UUID.randomUUID());
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void deleteCommentById_withExistingComment_shouldRemoveComment() {
-        Comment comment = Comment.builder()
-                .articleId(article.getId())
-                .creatorId(author.getId())
-                .commentBody("This is a test comment.")
-                .mediaId(mediaItem.getId())
-                .build();
-        commentRepository.insert(comment);
-
-        commentRepository.delete(comment.getId());
-
-        // Since comments are soft-deleted, we can still retrieve it, and deletedAt should have been set
-        Comment retrieved = commentRepository.findById(comment.getId()).orElse(null);
-        assertNotNull(retrieved);
-        assertNotNull(retrieved.getDeletedAt());
-    }
-
-    @Test
-    void findAllCommentsPaged_withMultipleComments_shouldReturnPagedResults() {
-        for (int i = 0; i < 15; i++) {
-            Comment comment = Comment.builder()
-                    .articleId(article.getId())
-                    .creatorId(author.getId())
-                    .commentBody("Comment " + i)
-                    .mediaId(mediaItem.getId())
-                    .build();
-            commentRepository.insert(comment);
-        }
-
-        var page1 = commentRepository.findAllPaged(1, 10);
-        var page2 = commentRepository.findAllPaged(2, 10);
-
-        assertEquals(10, page1.size());
-        assertEquals(5, page2.size());
-    }
-
-    static Stream<Arguments> invalidPaginationData() {
-        return Stream.of(Arguments.of(0, 0), Arguments.of(1, 0), Arguments.of(1, -1), Arguments.of(0, -1));
-    }
-
-    @ParameterizedTest
-    @MethodSource("invalidPaginationData")
-    void findAllCommentsPaged_withInvalidLimit_shouldThrowException(int page, int size) {
-        assertThrows(RuntimeException.class, () -> commentRepository.findAllPaged(page, size));
+    @Override
+    protected void clearCommentsTable() {
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "comments");
     }
 }

@@ -3,6 +3,8 @@ package nl.hardwerkendenederlanders.hrcms.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import org.commonmark.Extension;
 import org.commonmark.ext.gfm.strikethrough.Strikethrough;
 import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension;
 import org.commonmark.node.*;
@@ -11,11 +13,16 @@ import org.commonmark.renderer.markdown.MarkdownRenderer;
 
 public class MarkdownSanitizer {
 
-    private static final Parser PARSER = Parser.builder()
-            .extensions(List.of(StrikethroughExtension.create()))
-            .build();
+    private static final List<Extension> EXTENSIONS = List.of(StrikethroughExtension.create());
+
+    private static final Parser PARSER = Parser.builder().extensions(EXTENSIONS).build();
+
+    private static final MarkdownRenderer RENDERER =
+            MarkdownRenderer.builder().extensions(EXTENSIONS).build();
 
     public static String sanitizeComment(String markdown) {
+        if (markdown == null) return "";
+
         return sanitize(
                 markdown,
                 Set.of(
@@ -33,7 +40,7 @@ public class MarkdownSanitizer {
     private static String sanitize(String markdown, Set<Class<? extends Node>> allowedNodes) {
         Node document = PARSER.parse(markdown);
         stripDisallowed(document, allowedNodes);
-        return MarkdownRenderer.builder().build().render(document);
+        return RENDERER.render(document);
     }
 
     private static void stripDisallowed(Node node, Set<Class<? extends Node>> allowedNodes) {
@@ -44,8 +51,10 @@ public class MarkdownSanitizer {
             if (allowedNodes.contains(child.getClass())) {
                 stripDisallowed(child, allowedNodes);
             } else {
-                Node finalChild = child;
-                extractText(child).forEach(text -> finalChild.insertBefore(new Text(text)));
+                List<String> texts = extractText(child);
+                for (String text : texts) child.insertBefore(new Text(text));
+
+                if (child instanceof Block) child.insertBefore(new SoftLineBreak());
                 child.unlink();
             }
 
@@ -55,10 +64,15 @@ public class MarkdownSanitizer {
 
     private static List<String> extractText(Node node) {
         List<String> texts = new ArrayList<>();
+
+        if (node instanceof Text t) texts.add(t.getLiteral());
+        else if (node instanceof Code c) texts.add(c.getLiteral());
+        else if (node instanceof IndentedCodeBlock icb) texts.add(icb.getLiteral());
+        else if (node instanceof FencedCodeBlock fcb) texts.add(fcb.getLiteral());
+
         Node child = node.getFirstChild();
         while (child != null) {
-            if (child instanceof Text t) texts.add(t.getLiteral());
-            else texts.addAll(extractText(child));
+            texts.addAll(extractText(child));
             child = child.getNext();
         }
         return texts;
