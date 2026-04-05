@@ -62,7 +62,7 @@ public class CommentServiceImpl implements CommentService {
             throw e;
         } catch (Exception e) {
             String target = "/article/" + comment.getArticleId();
-            throw new ComponentActionException("comments", ComponentActionException.Action.CREATE, target, e);
+            throw new ComponentActionException("comment", ComponentActionException.Action.CREATE, target, e);
         }
     }
 }

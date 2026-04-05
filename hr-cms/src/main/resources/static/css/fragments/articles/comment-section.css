@@ -1,10 +1,13 @@
-#comment-section-container {
+.comment-section {
+    padding: 0 1.5rem;
 }
 
 .comment-section--list {
     list-style: none;
     display: flex;
     flex-direction: column;
+    padding: 0;
+    gap: 0.5rem;
 }
 
 .author-name {
@@ -16,6 +19,7 @@
 .comment-body {
     margin-top: 0;
     margin-bottom: 0.2rem;
+    overflow-wrap: break-word;
 }
 
 .replies-container {
@@ -48,6 +52,14 @@
     padding: 0.5rem;
     font-size: 0.8rem;
     box-sizing: border-box;
+}
+
+.comment-section--load-more {
+    justify-content: center;
+    align-items: center;
+    font-size: 0.8rem;
+    cursor: pointer;
+    margin-bottom: 1rem;
 }
 
 .error-container {

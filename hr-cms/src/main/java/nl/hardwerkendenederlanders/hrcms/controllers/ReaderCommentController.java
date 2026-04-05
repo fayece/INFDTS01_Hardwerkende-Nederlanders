@@ -1,7 +1,9 @@
 package nl.hardwerkendenederlanders.hrcms.controllers;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.models.Comment;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentCreateDto;
@@ -10,7 +12,9 @@ import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.PagedComments;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.CommentService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/comment")
@@ -51,11 +55,20 @@ public class ReaderCommentController {
 
     @PostMapping("/article/{articleId}/new")
     public String postComment(
-            @PathVariable UUID articleId, @ModelAttribute CommentCreateDto formDto, HttpSession session) {
+        @PathVariable UUID articleId,
+        @Valid @ModelAttribute CommentCreateDto formDto,
+        BindingResult bindingResult,
+        Model model,
+        HttpSession session) {
 
-        Comment comment = formDto.toComment(articleId);
-        commentService.postComment(comment, session);
+        if (bindingResult.hasErrors()) {
+            String errorMessage = Objects.requireNonNull(bindingResult.getFieldError("commentBody")).getDefaultMessage();
+            model.addAttribute("errorMessage", errorMessage);
+            model.addAttribute("articleId", articleId);
+            return COMMENT_SECTION_VIEW;
+        }
 
-        return "redirect:/article/" + articleId;
+        commentService.postComment(formDto.toComment(articleId), session);
+        return COMMENT_SECTION_VIEW;
     }
 }
