@@ -32,7 +32,7 @@ public class CommentRepositoryTest {
     private RoleRepository roleRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private JdbcUserRepository userRepository;
 
     @Autowired
     private ArticleRepository articleRepository;
