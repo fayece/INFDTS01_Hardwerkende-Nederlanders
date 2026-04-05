@@ -6,7 +6,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.ArticleAuthorRepository;
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.ArticleRepository;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.ArticleRepositoryImpl;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.RoleRepository;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.UserRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
@@ -32,7 +32,7 @@ public class ArticleAuthorRepositoryTest {
     private ArticleAuthorRepository articleAuthorRepository;
 
     @Autowired
-    private ArticleRepository articleRepository;
+    private ArticleRepositoryImpl articleRepository;
 
     @Autowired
     private UserRepository userRepository;

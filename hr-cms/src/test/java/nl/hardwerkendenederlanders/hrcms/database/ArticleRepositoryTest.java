@@ -6,7 +6,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.ArticleRepository;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.ArticleRepositoryImpl;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.PublicationStatus;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ArticleRepositoryTest {
 
     @Autowired
-    private ArticleRepository articleRepository;
+    private ArticleRepositoryImpl articleRepository;
 
     @Test
     void insertArticle_withValidArticle_shouldPersistAndRetrieve() {

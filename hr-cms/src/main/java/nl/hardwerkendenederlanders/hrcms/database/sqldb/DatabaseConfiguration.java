@@ -9,8 +9,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 public class DatabaseConfiguration {
 
     @Bean
-    public ArticleRepository articleRepository(NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
-        return new ArticleRepository(jdbc, resourceLoader);
+    public ArticleRepositoryImpl articleRepository(SqlDatabaseConnection dbCon) {
+        return new ArticleRepositoryImpl(dbCon);
     }
 
     @Bean

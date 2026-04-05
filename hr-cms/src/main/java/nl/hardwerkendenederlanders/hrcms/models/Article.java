@@ -46,4 +46,10 @@ public class Article extends BaseTimedEntity {
         this.textContent = textContent;
         this.publicationStatus = publicationStatus != null ? publicationStatus : PublicationStatus.DRAFT;
     }
+
+    public  Article() {
+        super();
+    }
+
+
 }

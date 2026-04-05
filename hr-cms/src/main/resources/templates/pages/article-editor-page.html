@@ -11,17 +11,18 @@
 <main class="standard-page-layout">
     <section class="content-section">
 
-        <button>To Overview</button>
+        <a th:href="@{articles-editor-overview}">To Overview</a>
 
         <form
             role="form"
             method="post"
-            th:action="@{/article-editor}"
+            th:action="@{/save-draft-article}"
             th:object="${articleForm}"
             onsubmit="editorIntoTextContent()">
 
             <div>
                 <div>
+                    <span>publication status:</span><span th:text="${publicationStatus}"></span>
                     <button type="submit" name="publicationStatus" value="DRAFT">save as draft</button>
                     <button type="submit" name="publicationStatus" value="PUBLISHED">save and publish</button>
                 </div>
