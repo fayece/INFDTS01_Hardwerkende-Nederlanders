@@ -58,7 +58,6 @@ public class CommentServiceImpl implements CommentService {
             UUID userId = userSessionService.getLoggedInUser(session);
             comment.setCreatorId(userId);
             commentRepository.insert(comment);
-            commentRepository.insert(comment);
         } catch (ComponentActionException e) {
             throw e;
         } catch (Exception e) {
