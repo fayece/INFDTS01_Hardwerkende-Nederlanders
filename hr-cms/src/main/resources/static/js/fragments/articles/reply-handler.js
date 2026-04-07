@@ -1,9 +1,9 @@
 import { formatLocalTimes } from './time-formatter.js';
 import { renderMarkdown } from "./render-markdown.js";
 
-export const initReplyLoader = (): void => {
-    document.addEventListener("click", async (event: MouseEvent) => {
-        const target = event.target as HTMLElement;
+export const initReplyLoader = () => {
+    document.addEventListener("click", async (event) => {
+        const target = event.target;
 
         if (!target.classList.contains("load-replies-button")) return;
 
@@ -12,7 +12,7 @@ export const initReplyLoader = (): void => {
 
         if (!parentId || !repliesContainer) return;
 
-        const button = target as HTMLButtonElement;
+        const button = target;
         const originalText = button.textContent;
 
         button.textContent = "Loading replies...";

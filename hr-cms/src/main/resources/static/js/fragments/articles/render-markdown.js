@@ -1,7 +1,7 @@
-export function renderMarkdown(root: Document | Element = document): void {
+export function renderMarkdown(root = document) {
     root.querySelectorAll(".comment-body[data-markdown]").forEach((el) => {
-        const markdown = el.getAttribute("data-markdown")!;
-        (window as any).toastui.Editor.factory({
+        const markdown = el.getAttribute("data-markdown");
+        window.toastui.Editor.factory({
             el: el,
             viewer: true,
             initialValue: markdown,

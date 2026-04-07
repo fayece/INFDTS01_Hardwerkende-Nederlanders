@@ -1,4 +1,4 @@
-export const formatLocalTimes= (): void => {
+export const formatLocalTimes= () => {
     const timeElements = document.querySelectorAll(".local-time");
 
     timeElements.forEach((element) => {

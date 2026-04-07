@@ -31,7 +31,6 @@ replay_pid*
 # IDE #
 .idea
 /node_modules
-/hr-cms/src/main/resources/static/js/
 .DS_Store
 /hr-cms/qodana-results
 .env.local
