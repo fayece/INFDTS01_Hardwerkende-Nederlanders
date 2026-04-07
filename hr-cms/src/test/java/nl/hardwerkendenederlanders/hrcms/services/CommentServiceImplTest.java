@@ -103,7 +103,6 @@ class CommentServiceImplTest {
         CommentViewDto result = commentService.postComment(inputComment, session);
 
         assertNotNull(result);
-        assertFalse(result.commentBody().contains("#"));
         assertEquals(userId, inputComment.getCreatorId());
         verify(commentRepository).insertReturning(inputComment);
     }

@@ -12,7 +12,6 @@ import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentWithAuthor;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.PagedComments;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.CommentService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
-import nl.hardwerkendenederlanders.hrcms.util.MarkdownSanitizer;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -59,7 +58,6 @@ public class CommentServiceImpl implements CommentService {
         try {
             UUID userId = userSessionService.getLoggedInUser(session);
             comment.setCreatorId(userId);
-            comment.setCommentBody(MarkdownSanitizer.sanitizeComment(comment.getCommentBody()));
 
             CommentWithAuthor result = commentRepository.insertReturning(comment);
             return CommentViewDto.from(result.comment(), result.authorName(), result.replyCount());

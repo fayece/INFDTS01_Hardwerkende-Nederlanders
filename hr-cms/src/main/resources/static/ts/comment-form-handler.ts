@@ -1,5 +1,5 @@
 import { formatLocalTimes } from './time-formatter.js';
-import {renderMarkdown} from "./render-markdown.js";
+import { renderMarkdown } from "./render-markdown.js";
 
 export function initCommentForm(): void {
     const form = document.querySelector(".comment-section--create") as HTMLFormElement;
@@ -9,9 +9,9 @@ export function initCommentForm(): void {
         el: document.getElementById("comment-editor"),
         height: "auto",
         minHeight: "8rem",
-        initialEditType: "markdown",
+        initialEditType: "wysiwyg",
         hideModeSwitch: true,
-        previewStyle: "tab",
+        previewStyle: "vertical",
         placeholder: "Leave a comment...",
         toolbarItems: [
             ["bold", "italic", "strike", "image"]
@@ -27,7 +27,6 @@ export function initCommentForm(): void {
                 });
 
                 const data = await response.json();
-                console.log("upload response:", data);
 
                 const { url } = data;
                 callback(url, "image");
