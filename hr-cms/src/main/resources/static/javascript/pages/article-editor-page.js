@@ -4,7 +4,14 @@ const editor = new toastui.Editor({
   previewStyle: 'vertical',
   initialEditType: 'wysiwyg',
   usageStatistics: false,
-  initialValue: document.getElementById("text-content").value
+  hideModeSwitch: true,
+  initialValue: document.getElementById("text-content").value,
+  toolbarItems: [
+    ['heading', 'bold', 'italic', 'strike'],
+    ['hr', 'quote'],
+    ['ul', 'ol', 'task', 'indent', 'outdent'],
+    ['table', 'image', 'link'],
+  ],
 });
 
 const getArticle = () => {
