@@ -37,7 +37,7 @@ public class ArticleEditorController {
     public String PutDraftArticle(Model model, @ModelAttribute("articleForm") Article articleForm) {
         model.addAttribute("articleForm", articleForm);
         _articleService.EnsureArticleExists(articleForm);
-        return "redirect:/article-editor-page/" + articleForm.getId().toString();
+        return "redirect:/article-editor/" + articleForm.getId().toString();
     }
 
     // method must be Post for HTML form (it does not support put)
@@ -45,6 +45,6 @@ public class ArticleEditorController {
     @PostMapping("save-published-article")
     public String PutPublishedArticle(Model model, @ModelAttribute("articleForm") Article articleForm) {
         model.addAttribute("articleForm", articleForm);
-        return "redirect:pages/article-editor-page/"  + articleForm.getId().toString();
+        return "redirect:pages/article-editor/"  + articleForm.getId().toString();
     }
 }

@@ -9,20 +9,16 @@ import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.Nullable;
 
 @Getter
+@Setter
 @SuperBuilder
-public class Article extends BaseTimedEntity {
-
-    @Setter
+public class Article{
+    private UUID id;
     private String title;
-
-    @Setter
     private String textContent;
-
-    @Setter
     @Nullable
     private OffsetDateTime updatedAt;
+    private OffsetDateTime createdAt;
 
-    @Setter
     @Builder.Default
     private PublicationStatus publicationStatus = PublicationStatus.DRAFT;
 
@@ -33,11 +29,12 @@ public class Article extends BaseTimedEntity {
             OffsetDateTime createdAt,
             @Nullable OffsetDateTime updatedAt,
             PublicationStatus publicationStatus) {
-        super(id, createdAt);
+        this.id = id;
         this.title = title;
         this.textContent = textContent;
         this.updatedAt = updatedAt;
         this.publicationStatus = publicationStatus;
+        this.createdAt = OffsetDateTime.now();
     }
 
     public Article(String title, String textContent, @Nullable PublicationStatus publicationStatus) {
@@ -49,7 +46,17 @@ public class Article extends BaseTimedEntity {
 
     public  Article() {
         super();
+        this.id = UUID.randomUUID();
     }
 
-
+    public static Article FillOutNullFields(Article article){
+        return new Article(
+                article.getId() != null ? article.getId() : UUID.randomUUID(),
+                article.getTitle(),
+                article.getTextContent(),
+                article.getCreatedAt() != null ? article.getCreatedAt() : OffsetDateTime.now(),
+                article.getUpdatedAt() != null ? article.getUpdatedAt() : OffsetDateTime.now(),
+                article.getPublicationStatus() != null ? article.getPublicationStatus() : PublicationStatus.DRAFT
+        );
+    }
 }

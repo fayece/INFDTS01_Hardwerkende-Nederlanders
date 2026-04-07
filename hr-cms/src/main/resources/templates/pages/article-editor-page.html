@@ -22,7 +22,8 @@
 
             <div>
                 <div>
-                    <span>publication status:</span><span th:text="${publicationStatus}"></span>
+                    <span>publication status:</span><span th:text="*{publicationStatus}"></span>
+                    <input th:field="*{id}" type="hidden">
                     <button type="submit" name="publicationStatus" value="DRAFT">save as draft</button>
                     <button type="submit" name="publicationStatus" value="PUBLISHED">save and publish</button>
                 </div>
@@ -35,13 +36,13 @@
                 </select>
             </label>
 
-            <div id="editor"></div>
-            <textarea th:field="*{textContent}" id="text-content" hidden></textarea>
+            <div id="editor">
+            </div>
+            <input type="hidden" th:field="*{textContent}" id="text-content">
         </form>
     </section>
 
 </main>
 <footer th:replace="~{fragments/app-wide/footer :: footer}"></footer>
--
 
 </body>

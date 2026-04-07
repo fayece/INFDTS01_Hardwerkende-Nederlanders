@@ -1,10 +1,10 @@
 const editor = new toastui.Editor({
   el: document.querySelector('#editor'),
   height: '500px',
-  initialEditType: 'markdown',
   previewStyle: 'vertical',
   initialEditType: 'wysiwyg',
-  usageStatistics: false
+  usageStatistics: false,
+  initialValue: document.getElementById("text-content").value
 });
 
 const getArticle = () => {
@@ -18,7 +18,9 @@ const getArticle = () => {
 }
 
 const editorIntoTextContent = () => {
+  console.log("adding md")
   const markdown = editor.getMarkdown();
+  console.log(markdown)
   const contentField = document.getElementById("text-content");
-  contentField.innerHTML = markdown
+  contentField.value = markdown;
 }
