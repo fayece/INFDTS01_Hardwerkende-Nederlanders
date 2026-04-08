@@ -12,4 +12,6 @@ public interface ArticleRepository {
     void Update(Article article);
 
     @Nullable Article GetById(UUID id);
+
+    Article[] GetAll();
 }

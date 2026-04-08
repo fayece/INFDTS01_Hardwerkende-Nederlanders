@@ -10,8 +10,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 public class DatabaseConfiguration {
 
     @Bean
-    public ArticleRepositoryImpl articleRepository(SqlDatabaseConnection dbCon) {
-        return new ArticleRepositoryImpl(dbCon);
+    public JdbcArticleRepositoryImpl articleRepository(SqlDatabaseConnection dbCon) {
+        return new JdbcArticleRepositoryImpl(dbCon);
     }
 
     @Bean

@@ -7,4 +7,5 @@ import java.util.UUID;
 public interface ArticleService {
     void EnsureArticleExists(Article article);
     Article GetById(UUID id);
+    Article[] GetAll();
 }

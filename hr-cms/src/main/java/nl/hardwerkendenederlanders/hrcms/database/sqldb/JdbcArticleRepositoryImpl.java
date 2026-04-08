@@ -3,6 +3,8 @@ package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import jakarta.annotation.Nullable;
@@ -13,10 +15,10 @@ import nl.hardwerkendenederlanders.hrcms.models.PublicationStatus;
 import org.springframework.jdbc.core.RowMapper;
 
 @Slf4j
-public class ArticleRepositoryImpl implements ArticleRepository {
+public class JdbcArticleRepositoryImpl implements ArticleRepository {
     private final SqlDatabaseConnection _dbCon;
 
-    public ArticleRepositoryImpl(SqlDatabaseConnection dbCon) {
+    public JdbcArticleRepositoryImpl(SqlDatabaseConnection dbCon) {
         _dbCon = dbCon;
     }
 
@@ -92,6 +94,27 @@ public class ArticleRepositoryImpl implements ArticleRepository {
             if (queryResults.next()){
                 return rowMapper().mapRow(queryResults, 1);
             }
+        }
+        catch (Exception e){
+            log.error("error: ", e);
+        }
+        return null;
+    }
+
+    @Override
+    public Article[] GetAll(){
+        try {
+            var con = _dbCon.getPreparedStatement();
+
+            PreparedStatement query = con.prepareStatement("""
+                SELECT *
+                FROM articles
+                """);
+            ArrayList<Article> articles = new ArrayList<>();
+            ResultSet queryResults = query.executeQuery();
+            while (queryResults.next())
+                    articles.add(rowMapper().mapRow(queryResults, 1));
+            return  articles.toArray(new Article[0]);
         }
         catch (Exception e){
             log.error("error: ", e);

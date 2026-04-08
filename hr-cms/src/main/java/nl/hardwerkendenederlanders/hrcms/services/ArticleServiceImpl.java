@@ -28,4 +28,8 @@ public class ArticleServiceImpl implements ArticleService{
     public Article GetById(UUID id){
         return _articleRepository.GetById(id);
     }
+
+    public  Article[] GetAll() {
+        return  _articleRepository.GetAll();
+    }
 }

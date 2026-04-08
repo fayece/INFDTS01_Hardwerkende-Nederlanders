@@ -29,7 +29,7 @@ public class ArticleAuthorRepositoryTest {
     private ArticleAuthorRepository articleAuthorRepository;
 
     @Autowired
-    private ArticleRepositoryImpl articleRepository;
+    private JdbcArticleRepositoryImpl articleRepository;
 
     @Autowired
     private JdbcUserRepository userRepository;
