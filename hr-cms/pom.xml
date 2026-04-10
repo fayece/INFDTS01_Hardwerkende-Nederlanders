@@ -102,18 +102,6 @@
             <artifactId>flyway-database-postgresql</artifactId>
         </dependency>
 
-        <!-- Frontend dependencies -->
-        <dependency>
-            <groupId>org.commonmark</groupId>
-            <artifactId>commonmark</artifactId>
-            <version>0.28.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.commonmark</groupId>
-            <artifactId>commonmark-ext-gfm-strikethrough</artifactId>
-            <version>0.28.0</version>
-        </dependency>
-
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
