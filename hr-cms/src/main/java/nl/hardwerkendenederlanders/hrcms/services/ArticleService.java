@@ -5,7 +5,7 @@ import nl.hardwerkendenederlanders.hrcms.models.Article;
 import java.util.UUID;
 
 public interface ArticleService {
-    void EnsureArticleExists(Article article);
+    void EnsureArticleExists(Article article) throws Exception;
     Article GetById(UUID id);
     Article[] GetAll();
 }

@@ -1,0 +1,6 @@
+<div th:fragment="error_modal(error_text)" class="error-modal--container">
+    <div class="error-modal--box">
+        <h1>Error Occurred</h1>
+        <p th:text="${error_text}" class="error-modal--explanation"></p>
+    </div>
+</div>

@@ -12,11 +12,11 @@
     <section class="content-section">
 
         <a th:href="@{/articles-editor-overview}">To Overview</a>
-
+        <div th:if="${param.error != null}" th:insert="~{fragments/app-wide/error-modal :: error_modal('Error while uploading article')}"></div>
         <form
             role="form"
             method="post"
-            th:action="@{/save-draft-article}"
+            th:action="@{/save-article}"
             th:object="${articleForm}"
             onsubmit="editorIntoTextContent()">
 
@@ -44,5 +44,4 @@
 
 </main>
 <footer th:replace="~{fragments/app-wide/footer :: footer}"></footer>
-
 </body>

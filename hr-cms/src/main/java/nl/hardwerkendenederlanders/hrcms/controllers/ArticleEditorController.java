@@ -1,13 +1,16 @@
 package nl.hardwerkendenederlanders.hrcms.controllers;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.services.ArticleService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLException;
 import java.util.UUID;
 
+@Slf4j
 @Controller
 public class ArticleEditorController {
     ArticleService _articleService;
@@ -33,18 +36,18 @@ public class ArticleEditorController {
 
     // method must be Post for HTML form (it does not support put)
     // save draft
-    @PostMapping("save-draft-article")
+    @PostMapping("save-article")
     public String PutDraftArticle(Model model, @ModelAttribute("articleForm") Article articleForm) {
         model.addAttribute("articleForm", articleForm);
-        _articleService.EnsureArticleExists(articleForm);
-        return "redirect:/article-editor/" + articleForm.getId().toString();
-    }
+        try{
+            _articleService.EnsureArticleExists(articleForm);
+        }
+        catch (Exception e){
+            log.error("e: ", e);
+            return "redirect:/article-editor/" + articleForm.getId().toString() + "?error=true";
 
-    // method must be Post for HTML form (it does not support put)
-    // save published
-    @PostMapping("save-published-article")
-    public String PutPublishedArticle(Model model, @ModelAttribute("articleForm") Article articleForm) {
-        model.addAttribute("articleForm", articleForm);
-        return "redirect:pages/article-editor/"  + articleForm.getId().toString();
+        }
+
+        return "redirect:/article-editor/" + articleForm.getId().toString();
     }
 }

@@ -34,48 +34,38 @@ public class JdbcArticleRepositoryImpl implements ArticleRepository {
 
 
     @Override
-    public void Create(Article article) {
-        try {
-            var con = _dbCon.getPreparedStatement();
+    public void Create(Article article) throws Exception {
+        var con = _dbCon.getPreparedStatement();
 
-            PreparedStatement query = con.prepareStatement("""
-                INSERT INTO articles (id, title, text_content, created_at, updated_at, publication_status)
-                VALUES (?, ?, ?, ?, ?, ?);
-                """);
-            query.setObject(1, article.getId());
-            query.setString(2, article.getTitle());
-            query.setString(3, article.getTextContent());
-            query.setObject(4, article.getCreatedAt());
-            query.setObject(5, article.getUpdatedAt());
-            query.setString(6, article.getPublicationStatus().toString());
-            query.execute();
-        }
-        catch (Exception e){
-            log.error("error: ", e);
-        }
+        PreparedStatement query = con.prepareStatement("""
+            INSERT INTO articles (id, title, text_content, created_at, updated_at, publication_status)
+            VALUES (?, ?, ?, ?, ?, ?);
+            """);
+        query.setObject(1, article.getId());
+        query.setString(2, article.getTitle());
+        query.setString(3, article.getTextContent());
+        query.setObject(4, article.getCreatedAt());
+        query.setObject(5, article.getUpdatedAt());
+        query.setString(6, article.getPublicationStatus().toString());
+        query.execute();
     }
 
     @Override
-    public void Update(Article article) {
-        try {
-            var con = _dbCon.getPreparedStatement();
+    public void Update(Article article) throws Exception {
+        var con = _dbCon.getPreparedStatement();
 
-            PreparedStatement query = con.prepareStatement("""
-                UPDATE articles
-                SET title = ?, text_content = ?, updated_at = ?, publication_status = ?
-                WHERE (id = ?);
-                """);
+        PreparedStatement query = con.prepareStatement("""
+            UPDATE articles
+            SET title = ?, text_content = ?, updated_at = ?, publication_status = ?
+            WHERE (id = ?);
+            """);
 
-            query.setString(1, article.getTitle());
-            query.setString(2, article.getTextContent());
-            query.setObject(3, article.getUpdatedAt());
-            query.setString(4, article.getPublicationStatus().toString());
-            query.setObject(5, article.getId());
-            query.execute();
-        }
-        catch (Exception e){
-            log.error("error: ", e);
-        }
+        query.setString(1, article.getTitle());
+        query.setString(2, article.getTextContent());
+        query.setObject(3, article.getUpdatedAt());
+        query.setString(4, article.getPublicationStatus().toString());
+        query.setObject(5, article.getId());
+        query.execute();
     }
 
     @Override

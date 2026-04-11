@@ -7,9 +7,9 @@ import java.util.UUID;
 
 public interface ArticleRepository {
 
-    void Create(Article article);
+    void Create(Article article) throws Exception;
 
-    void Update(Article article);
+    void Update(Article article) throws Exception;
 
     @Nullable Article GetById(UUID id);
 
