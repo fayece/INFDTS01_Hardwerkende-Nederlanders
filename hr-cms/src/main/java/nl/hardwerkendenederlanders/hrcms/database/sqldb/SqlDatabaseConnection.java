@@ -1,9 +1,7 @@
 package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
+import java.sql.*;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -19,14 +17,7 @@ public class SqlDatabaseConnection {
     @Value("${spring.datasource.password:#{null}}")
     private String password;
 
-    public Statement getConnection() throws Exception {
-
-        var connection = DriverManager.getConnection(url, user, password);
-
-        return connection.createStatement();
-    }
-
-    public Connection getPreparedStatement() throws Exception {
+    public Connection GetConnection() throws SQLException {
         return DriverManager.getConnection(url, user, password);
     }
 }

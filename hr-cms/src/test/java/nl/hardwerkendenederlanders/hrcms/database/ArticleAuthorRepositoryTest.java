@@ -41,12 +41,15 @@ public class ArticleAuthorRepositoryTest {
     private User author;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         article = Article.builder()
                 .title("Test Article")
                 .textContent("Test content.")
                 .build();
+
         articleRepository.Create(article);
+
+
 
         Role role = new Role("Author Role");
 

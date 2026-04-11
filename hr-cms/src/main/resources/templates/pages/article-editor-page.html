@@ -30,9 +30,9 @@
             </div>
 
             <label>title<input type="text" th:field="*{title}"></label>
-            <label>categories
-                <select>
-                    <option value="category">category</option>
+            <label>subject
+                <select th:field="*{subjectId}">
+                    <option th:each="subject: ${subjects}" th:value="${subject.getId()}" th:text="${subject.getSubjectName()}"></option>
                 </select>
             </label>
 

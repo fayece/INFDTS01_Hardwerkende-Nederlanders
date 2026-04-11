@@ -18,6 +18,8 @@ public class Article{
     @Nullable
     private OffsetDateTime updatedAt;
     private OffsetDateTime createdAt;
+    @Nullable
+    private UUID subjectId;
 
     @Builder.Default
     private PublicationStatus publicationStatus = PublicationStatus.DRAFT;
@@ -28,13 +30,15 @@ public class Article{
             String textContent,
             OffsetDateTime createdAt,
             @Nullable OffsetDateTime updatedAt,
-            PublicationStatus publicationStatus) {
+            PublicationStatus publicationStatus,
+            @Nullable UUID subjectId) {
         this.id = id;
         this.title = title;
         this.textContent = textContent;
         this.updatedAt = updatedAt;
         this.publicationStatus = publicationStatus;
         this.createdAt = OffsetDateTime.now();
+        this.subjectId = subjectId;
     }
 
     public Article(String title, String textContent, @Nullable PublicationStatus publicationStatus) {
@@ -56,7 +60,8 @@ public class Article{
                 article.getTextContent(),
                 article.getCreatedAt() != null ? article.getCreatedAt() : OffsetDateTime.now(),
                 article.getUpdatedAt() != null ? article.getUpdatedAt() : OffsetDateTime.now(),
-                article.getPublicationStatus() != null ? article.getPublicationStatus() : PublicationStatus.DRAFT
+                article.getPublicationStatus() != null ? article.getPublicationStatus() : PublicationStatus.DRAFT,
+                article.getSubjectId()
         );
     }
 }

@@ -29,34 +29,36 @@ public class JdbcArticleRepositoryImpl implements ArticleRepository {
                 rs.getString("text_content"),
                 rs.getObject("created_at", OffsetDateTime.class),
                 rs.getObject("updated_at", OffsetDateTime.class),
-                PublicationStatus.valueOf(rs.getString("publication_status")));
+                PublicationStatus.valueOf(rs.getString("publication_status")),
+                rs.getObject("subject_id", UUID.class));
     }
 
 
     @Override
     public void Create(Article article) throws Exception {
-        var con = _dbCon.getPreparedStatement();
+        var con = _dbCon.GetConnection();
 
         PreparedStatement query = con.prepareStatement("""
-            INSERT INTO articles (id, title, text_content, created_at, updated_at, publication_status)
-            VALUES (?, ?, ?, ?, ?, ?);
+            INSERT INTO articles (id, title, text_content, created_at, updated_at, publication_status, subject_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?);
             """);
         query.setObject(1, article.getId());
         query.setString(2, article.getTitle());
         query.setString(3, article.getTextContent());
         query.setObject(4, article.getCreatedAt());
         query.setObject(5, article.getUpdatedAt());
-        query.setString(6, article.getPublicationStatus().toString());
+        query.setObject(6, article.getSubjectId());
+        query.setString(7, article.getPublicationStatus().toString());
         query.execute();
     }
 
     @Override
     public void Update(Article article) throws Exception {
-        var con = _dbCon.getPreparedStatement();
+        var con = _dbCon.GetConnection();
 
         PreparedStatement query = con.prepareStatement("""
             UPDATE articles
-            SET title = ?, text_content = ?, updated_at = ?, publication_status = ?
+            SET title = ?, text_content = ?, updated_at = ?, publication_status = ?, subject_id = ?
             WHERE (id = ?);
             """);
 
@@ -64,14 +66,15 @@ public class JdbcArticleRepositoryImpl implements ArticleRepository {
         query.setString(2, article.getTextContent());
         query.setObject(3, article.getUpdatedAt());
         query.setString(4, article.getPublicationStatus().toString());
-        query.setObject(5, article.getId());
+        query.setObject(5, article.getSubjectId());
+        query.setObject(6, article.getId());
         query.execute();
     }
 
     @Override
     public @Nullable Article GetById(UUID id){
         try {
-            var con = _dbCon.getPreparedStatement();
+            var con = _dbCon.GetConnection();
 
             PreparedStatement query = con.prepareStatement("""
                 SELECT *
@@ -94,7 +97,7 @@ public class JdbcArticleRepositoryImpl implements ArticleRepository {
     @Override
     public Article[] GetAll(){
         try {
-            var con = _dbCon.getPreparedStatement();
+            var con = _dbCon.GetConnection();
 
             PreparedStatement query = con.prepareStatement("""
                 SELECT *
