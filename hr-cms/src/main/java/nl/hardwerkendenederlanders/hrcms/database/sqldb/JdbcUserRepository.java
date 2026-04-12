@@ -19,6 +19,7 @@ public class JdbcUserRepository implements UserRepository {
 
     public JdbcUserRepository(NamedParameterJdbcTemplate jdbc) {
         this.jdbc = jdbc;
+
     }
 
     private final RowMapper<User> rowMapper = (rs, rowNum) -> new User(
@@ -58,6 +59,7 @@ public class JdbcUserRepository implements UserRepository {
         return jdbc.update(sql, paramsFromUser(user)) >= 1;
     }
 
+
     @Override
     public Optional<User> findById(UUID id) {
         String sqlQuery = """
@@ -83,6 +85,7 @@ public class JdbcUserRepository implements UserRepository {
         return users.stream().findFirst();
     }
 
+    @Override
     public List<User> findByNameOrEmailPaginated(String name, int page, int amount){
         String sqlQuery = """
                 SELECT *
@@ -103,6 +106,7 @@ public class JdbcUserRepository implements UserRepository {
         return jdbc.query(sqlQuery, params, rowMapper);
     }
 
+    @Override
     public List<User> findUserOnActivityPaginated(boolean isActive, int page, int amount){
         String sqlQuery = """
                 SELECT *
@@ -121,6 +125,14 @@ public class JdbcUserRepository implements UserRepository {
         return jdbc.query(sqlQuery, params, rowMapper);
     }
 
+
+    @Override
+    public List<User> findAllUsers(){
+        String sqlQuery = "SELECT * FROM %s".formatted(TABLE);
+        return jdbc.query(sqlQuery, rowMapper);
+    }
+
+    @Override
     public List<User> findAllPaginated(Integer page, Integer amount){
         String sqlQuery = """
                 SELECT *
@@ -137,6 +149,7 @@ public class JdbcUserRepository implements UserRepository {
         return jdbc.query(sqlQuery, params, rowMapper);
     }
 
+    @Override
     public boolean updateActivityById(UUID id, boolean setActive){
         String sqlQuery = """
                 UPDATE %s

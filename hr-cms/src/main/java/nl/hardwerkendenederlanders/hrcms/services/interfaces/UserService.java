@@ -7,7 +7,9 @@ import java.util.UUID;
 
 public interface UserService {
     void insertUser(User user);
+    User findByEmail(String email);
     User findById(UUID id);
+    List<User> findAllUsers();
     void updateActivityById(UUID id, boolean setActive);
     void updateUser(User user);
     void deleteById(UUID id);

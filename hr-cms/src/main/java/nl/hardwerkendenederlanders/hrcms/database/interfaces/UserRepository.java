@@ -13,6 +13,7 @@ public interface UserRepository {
     Optional<User> findById(UUID id);
 
     Optional<User> findByEmail(String email);
+    List<User> findAllUsers();
     List<User> findAllPaginated(Integer page, Integer amount);
     boolean updateActivityById(UUID id, boolean setActive);
     List<User> findByNameOrEmailPaginated(String name, int page, int amount);
