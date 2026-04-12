@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create user</title>
+    <link rel="stylesheet"
+          th:each="cssRef : ${@cssDiscoveryService.getAllCssPaths()}"
+          th:href="${cssRef}">
+</head>
+<body>
+    <div class="create-user-page">
+        <div>header stuff</div>
+        <div>
+            <form th:action="@{/manage-users/new}" method="post">
+                <label>First name:
+                    <input type="text" name="firstName" required>
+                </label>
+                <label>Prefix:
+                    <input type="text" name="prefix" required>
+                </label>
+                <label>Last name:
+                    <input type="text" name="lastName" required>
+                </label>
+                <label>Email
+                    <input type="text" name="email" required>
+                </label>
+                <label>Password
+                    <input type="text" name="password" required>
+                </label>
+                <button type="submit">Save user</button>
+            </form>
+        </div>
+        <a th:href="@{/manage-users}">Return</a>
+
+
+    </div>
+</body>
+</html>

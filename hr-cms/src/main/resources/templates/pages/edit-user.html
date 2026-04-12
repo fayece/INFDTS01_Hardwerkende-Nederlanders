@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit user</title>
+    <link rel="stylesheet"
+          th:each="cssRef : ${@cssDiscoveryService.getAllCssPaths()}"
+          th:href="${cssRef}">
+</head>
+<body>
+<div class="create-user-page">
+    <div>header stuff</div>
+    <div>
+        <form th:action="@{/manage-users/update}" method="post">
+            <input type="hidden" name="id" th:value="${currentUser.id}">
+            <label>First name:
+                <input type="text" name="firstName" th:value="${currentUser.firstName}">
+            </label>
+            <label>Prefix:
+                <input type="text" name="prefix" th:value="${currentUser.prefix}">
+            </label>
+            <label>Last name:
+                <input type="text" name="lastName" th:value="${currentUser.lastName}">
+            </label>
+            <label>Email
+                <input type="text" name="email" th:value="${currentUser.email}">
+            </label>
+            <label>RoleId
+                <input type="text" name="roleId" th:value="${currentUser.roleId}">
+            </label>
+            <label>OrganisationId
+                <input type="text" name="organisationId" th:value="${currentUser.organizationId}">
+            </label>
+            <button type="submit">Update user</button>
+        </form>
+    </div>
+    <a th:href="@{/manage-users}">Return</a>
+
+
+</div>
+</body>
+</html>

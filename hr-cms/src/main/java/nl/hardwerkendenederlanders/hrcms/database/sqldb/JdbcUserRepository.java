@@ -1,13 +1,11 @@
 package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
 import nl.hardwerkendenederlanders.hrcms.models.User;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -51,18 +49,16 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public void insert(User user) {
+    public boolean insert(User user) {
         String sql = """
                 INSERT INTO %s (
                 id, first_name, prefix, last_name, email, password_hash, role_id, organization_id, active, created_at)
                 VALUES (
                 :id, :firstName, :prefix, :lastName, :email, :passwordHash, :roleId, :organizationId, :active, :createdAt)
                 """.formatted(TABLE);
-        jdbc.update(sql, paramsFromUser(user));
+        return jdbc.update(sql, paramsFromUser(user)) >= 1;
     }
 
-    @Override
-    public void update(User user) {}
 
     @Override
     public Optional<User> findById(UUID id) {
@@ -93,10 +89,29 @@ public class JdbcUserRepository implements UserRepository {
         String sqlQuery = """
                 SELECT *
                 FROM %s
-                WHERE first_name LIKE :name
+                WHERE first_name ILIKE :name
+                OR last_name ILIKE :name
                 """.formatted(TABLE);
 
         MapSqlParameterSource params = new MapSqlParameterSource("name","%" + name + "%");
+
+        return jdbc.query(sqlQuery, params, rowMapper);
+    }
+
+    public List<User> findByNamePaginated(String name, int page, int amount){
+        String sqlQuery = """
+                SELECT *
+                FROM %s
+                WHERE first_name ILIKE :name
+                OR last_name ILIKE :name
+                LIMIT :limit
+                OFFSET :offset
+                """.formatted(TABLE);
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("name","%" + name + "%")
+                .addValue("limit", amount)
+                .addValue("offset", page * amount);
 
         return jdbc.query(sqlQuery, params, rowMapper);
     }
@@ -120,6 +135,21 @@ public class JdbcUserRepository implements UserRepository {
         return jdbc.query(sqlQuery, rowMapper);
     }
 
+    public List<User> findAllPaginated(Integer page, Integer amount){
+        String sqlQuery = """
+                SELECT *
+                FROM %s
+                LIMIT :limit
+                OFFSET :offset
+                """.formatted(TABLE);
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("limit", amount)
+                .addValue("offset", page * amount);
+
+        return jdbc.query(sqlQuery, params, rowMapper);
+    }
+
     public boolean updateActivityById(UUID id, boolean setActive){
         String sqlQuery = """
                 UPDATE %s
@@ -134,13 +164,14 @@ public class JdbcUserRepository implements UserRepository {
         return jdbc.update(sqlQuery, params) >= 1;
     }
 
-    public boolean updateUser(User user){
+    @Override
+    public boolean update(User user){
         String sqlQuery = """
                 UPDATE %s
                 SET first_name = :firstName,
                 prefix = :prefix,
                 last_name = :lastName,
-                email_address = ":emailAddress,
+                email = :emailAddress,
                 role_id = :roleId,
                 organization_id = :organizationId,
                 active = :active
@@ -170,4 +201,5 @@ public class JdbcUserRepository implements UserRepository {
 
         return jdbc.update(sqlQuery, params) >= 1;
     }
+
 }

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Manage users</title>
+    <link rel="stylesheet"
+          th:each="cssRef : ${@cssDiscoveryService.getAllCssPaths()}"
+          th:href="${cssRef}">
+</head>
+<body>
+<div class="user-page">
+    <div class="search-bar-container">
+        <form th:action="@{/manage-users}" method="get">
+            <input type="text" name="searchName" th:value="${searchName}" class="search-bar" placeholder="Search user">
+            <button type="submit" class="search-button ">Search</button>
+        </form>
+        <a th:href="@{/manage-users/create-user}">Add new user</a>
+
+        </div>
+    <div class="user-container">
+        <h2>Users</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Edit</th>
+                    <th>Prefix</th>
+                    <th>First name</th>
+                    <th>Last name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Organisation</th>
+                    <th>Is Active</th>
+                    <th>Set active</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="user : ${users}">
+                    <td>
+                        <a th:href="@{/manage-users/edit/{id}(id=${user.getId()})}">edit</a>
+                    </td>
+                    <td th:text="${user.getPrefix()}"></td>
+                    <td th:text="${user.getFirstName()}"></td>
+                    <td th:text="${user.getLastName()}"></td>
+                    <td th:text="${user.getEmail()}"></td>
+                    <td>placeholder</td>
+                    <td>placeholder</td>
+                    <td th:text="${user.isActive()}"></td>
+                    <td>
+                        <form th:action="@{/manage-users/set-active(userId=${user.getId()}, setActive=${!user.isActive()})}" method="post">
+                        <button class="set-active-level" type="submit">Change active</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="pagination">
+            <a th:if="${currentPage > 0}"
+               th:href="@{/manage-users(page=${currentPage - 1})}">
+               Previous page
+            </a>
+            <span th:text="'Page ' + ${currentPage + 1} + '/' + ${finalPage}">
+            </span>
+            <a th:if="${currentPage < finalPage}"
+               th:href="@{/manage-users(page=${currentPage + 1})}">
+                Next page
+            </a>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
