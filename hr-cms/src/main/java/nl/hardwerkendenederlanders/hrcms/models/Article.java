@@ -11,21 +11,24 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 @Setter
 @SuperBuilder
-public class Article{
+public class Article {
     @Builder.Default
     private UUID id = UUID.randomUUID();
+
     private String title;
     private String textContent;
+
     @Nullable
     private OffsetDateTime updatedAt;
+
     @Builder.Default
     private OffsetDateTime createdAt = OffsetDateTime.now();
+
     @Nullable
     private UUID subjectId;
 
     @Builder.Default
     private PublicationStatus publicationStatus = PublicationStatus.DRAFT;
-
 
     public Article(
             UUID id,
@@ -51,12 +54,12 @@ public class Article{
         this.publicationStatus = publicationStatus != null ? publicationStatus : PublicationStatus.DRAFT;
     }
 
-    public  Article() {
+    public Article() {
         super();
         this.id = UUID.randomUUID();
     }
 
-    public static Article FillOutNullFields(Article article){
+    public static Article FillOutNullFields(Article article) {
         return new Article(
                 article.getId() != null ? article.getId() : UUID.randomUUID(),
                 article.getTitle(),
@@ -64,7 +67,6 @@ public class Article{
                 article.getCreatedAt() != null ? article.getCreatedAt() : OffsetDateTime.now(),
                 article.getUpdatedAt() != null ? article.getUpdatedAt() : OffsetDateTime.now(),
                 article.getPublicationStatus() != null ? article.getPublicationStatus() : PublicationStatus.DRAFT,
-                article.getSubjectId()
-        );
+                article.getSubjectId());
     }
 }

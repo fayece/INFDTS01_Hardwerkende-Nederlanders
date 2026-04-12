@@ -1,5 +1,7 @@
 package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
+import java.util.List;
+import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.SubjectRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Subject;
 import org.springframework.jdbc.core.RowMapper;
@@ -7,28 +9,17 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 @Service
 public class JdbcSubjectRepositoryImpl implements SubjectRepository {
     private final NamedParameterJdbcTemplate jdbc;
 
-    public  JdbcSubjectRepositoryImpl(NamedParameterJdbcTemplate namedParameterJdbcTemplate){
+    public JdbcSubjectRepositoryImpl(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.jdbc = namedParameterJdbcTemplate;
     }
 
     protected RowMapper<Subject> rowMapper() {
-        return (rs, _) -> new Subject(
-                rs.getObject("id", UUID.class),
-                rs.getString("subject_name")
-        );
+        return (rs, _) -> new Subject(rs.getObject("id", UUID.class), rs.getString("subject_name"));
     }
-
 
     @Override
     public Subject[] GetAll() {
@@ -42,7 +33,7 @@ public class JdbcSubjectRepositoryImpl implements SubjectRepository {
     }
 
     @Override
-    public void AddSubject(Subject subject){
+    public void AddSubject(Subject subject) {
         var query = """
         INSERT INTO subjects
         VALUES (:id, :subject_name);

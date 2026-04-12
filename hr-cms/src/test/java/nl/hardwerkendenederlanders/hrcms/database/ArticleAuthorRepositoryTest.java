@@ -49,8 +49,6 @@ public class ArticleAuthorRepositoryTest {
 
         articleRepository.Create(article);
 
-
-
         Role role = new Role("Author Role");
 
         roleRepository.insert(role);

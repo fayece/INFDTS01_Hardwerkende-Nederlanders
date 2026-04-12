@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class ReaderHomeController {
     private final ArticleService articleService;
 
-    public ReaderHomeController(ArticleService articleService){
+    public ReaderHomeController(ArticleService articleService) {
         this.articleService = articleService;
     }
 

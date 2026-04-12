@@ -1,13 +1,11 @@
 package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
+import jakarta.annotation.Nullable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
-
-import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import nl.hardwerkendenederlanders.hrcms.database.ArticleRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
@@ -37,10 +35,8 @@ public class JdbcArticleRepositoryImpl implements ArticleRepository {
                 rs.getObject("subject_id", UUID.class));
     }
 
-
     @Override
     public void Create(Article article) {
-
 
         String query = ("""
             INSERT INTO articles (id, title, text_content, created_at, updated_at, publication_status, subject_id)
@@ -77,7 +73,7 @@ public class JdbcArticleRepositoryImpl implements ArticleRepository {
     }
 
     @Override
-    public @Nullable Article GetById(UUID id){
+    public @Nullable Article GetById(UUID id) {
         try {
             var con = _dbCon.GetConnection();
 
@@ -89,18 +85,17 @@ public class JdbcArticleRepositoryImpl implements ArticleRepository {
                 """);
             query.setObject(1, id);
             ResultSet queryResults = query.executeQuery();
-            if (queryResults.next()){
+            if (queryResults.next()) {
                 return rowMapper().mapRow(queryResults, 1);
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             log.error("error: ", e);
         }
         return null;
     }
 
     @Override
-    public Article[] GetAll(){
+    public Article[] GetAll() {
         try {
             var con = _dbCon.GetConnection();
 
@@ -110,11 +105,9 @@ public class JdbcArticleRepositoryImpl implements ArticleRepository {
                 """);
             ArrayList<Article> articles = new ArrayList<>();
             ResultSet queryResults = query.executeQuery();
-            while (queryResults.next())
-                    articles.add(rowMapper().mapRow(queryResults, 1));
-            return  articles.toArray(new Article[0]);
-        }
-        catch (Exception e){
+            while (queryResults.next()) articles.add(rowMapper().mapRow(queryResults, 1));
+            return articles.toArray(new Article[0]);
+        } catch (Exception e) {
             log.error("error: ", e);
         }
         return null;

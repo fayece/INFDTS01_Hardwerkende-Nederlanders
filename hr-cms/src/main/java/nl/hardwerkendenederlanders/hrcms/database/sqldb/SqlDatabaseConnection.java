@@ -1,7 +1,6 @@
 package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
 import java.sql.*;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

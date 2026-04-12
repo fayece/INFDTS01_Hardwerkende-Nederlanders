@@ -1,5 +1,6 @@
 package nl.hardwerkendenederlanders.hrcms.controllers;
 
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.services.ArticleService;
@@ -8,16 +9,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.SQLException;
-import java.util.UUID;
-
 @Slf4j
 @Controller
 public class ArticleEditorController {
     ArticleService articleService;
     SubjectService subjectService;
 
-    public  ArticleEditorController(ArticleService articleService, SubjectService subjecService){
+    public ArticleEditorController(ArticleService articleService, SubjectService subjecService) {
         this.articleService = articleService;
         this.subjectService = subjecService;
     }
@@ -32,7 +30,7 @@ public class ArticleEditorController {
 
     // load exisiting article
     @GetMapping("article-editor/{articleId}")
-    public String GetArticle(Model model, @PathVariable(value="articleId")UUID id) {
+    public String GetArticle(Model model, @PathVariable(value = "articleId") UUID id) {
         Article article = articleService.GetById(id);
         model.addAttribute("articleForm", article);
         model.addAttribute("subjects", subjectService.GetAll());
@@ -44,13 +42,11 @@ public class ArticleEditorController {
     @PostMapping("save-article")
     public String PutDraftArticle(Model model, @ModelAttribute("articleForm") Article articleForm) {
         model.addAttribute("articleForm", articleForm);
-        try{
+        try {
             articleService.EnsureArticleExists(articleForm);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             log.error("e: ", e);
             return "redirect:/article-editor/" + articleForm.getId().toString() + "?error=true";
-
         }
 
         return "redirect:/article-editor/" + articleForm.getId().toString();

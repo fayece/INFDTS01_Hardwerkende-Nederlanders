@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @Controller
 public class ReaderArticleController {
     @GetMapping("article/{articleId}")
-    public String GetArticle(@PathVariable(value="articleId") String articleId) {
+    public String GetArticle(@PathVariable(value = "articleId") String articleId) {
         return "pages/article-page";
     }
 }

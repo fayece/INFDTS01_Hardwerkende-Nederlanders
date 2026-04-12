@@ -4,13 +4,12 @@ import nl.hardwerkendenederlanders.hrcms.services.ArticleService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 public class AuthorArticleOverviewController {
     private ArticleService _articleService;
 
-    public AuthorArticleOverviewController(ArticleService articleService){
+    public AuthorArticleOverviewController(ArticleService articleService) {
         _articleService = articleService;
     }
 

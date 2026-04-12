@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class SubjectServiceImpl implements SubjectService {
     private final SubjectRepository subjectRepository;
 
-    public SubjectServiceImpl(SubjectRepository subjectRepository){
+    public SubjectServiceImpl(SubjectRepository subjectRepository) {
         this.subjectRepository = subjectRepository;
     }
 
