@@ -7,21 +7,28 @@
           th:href="${cssRef}">
 </head>
 <body>
+<div th:insert="~{fragments/app-wide/admin-navbar :: navbar}" class="navbar"></div>
 <div class="user-page">
     <div class="search-bar-container">
+        <a class="manage-button-tag" th:href="@{/manage-users}">See all users</a>
+        <br>
+        <a class="manage-button-tag" th:href="@{/manage-users(sortActive=true)}">See active users</a>
+        <br>
+        <a class="manage-button-tag" th:href="@{/manage-users(sortActive=false)}">See inActive users</a>
+        <br>
+        <a class="manage-button-tag blue-button" th:href="@{/manage-users/create-user}">Add new user</a>
+        <br>
         <form th:action="@{/manage-users}" method="get">
-            <input type="text" name="searchName" th:value="${searchName}" class="search-bar" placeholder="Search user">
-            <button type="submit" class="search-button ">Search</button>
+            <input type="text" name="searchName" th:value="${searchName}" class="admin-search-bar" placeholder="Search user">
+            <button type="submit" class="search-button blue-button">Search</button>
         </form>
-        <a th:href="@{/manage-users/create-user}">Add new user</a>
-
-        </div>
+    </div>
     <div class="user-container">
         <h2>Users</h2>
-        <table>
-            <thead>
+        <table class="user-table">
+            <thead class="user-table-head">
                 <tr>
-                    <th>Edit</th>
+                    <th class="action-tr">Edit</th>
                     <th>Prefix</th>
                     <th>First name</th>
                     <th>Last name</th>
@@ -29,13 +36,13 @@
                     <th>Role</th>
                     <th>Organisation</th>
                     <th>Is Active</th>
-                    <th>Set active</th>
+                    <th class="action-tr">Set active</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="user-table-body">
                 <tr th:each="user : ${users}">
-                    <td>
-                        <a th:href="@{/manage-users/edit/{id}(id=${user.getId()})}">edit</a>
+                    <td class="action-tr">
+                        <a class="edit-user-button" th:href="@{/manage-users/edit/{id}(id=${user.getId()})}">Edit</a>
                     </td>
                     <td th:text="${user.getPrefix()}"></td>
                     <td th:text="${user.getFirstName()}"></td>
@@ -44,7 +51,7 @@
                     <td>placeholder</td>
                     <td>placeholder</td>
                     <td th:text="${user.isActive()}"></td>
-                    <td>
+                    <td class="action-tr">
                         <form th:action="@{/manage-users/set-active(userId=${user.getId()}, setActive=${!user.isActive()})}" method="post">
                         <button class="set-active-level" type="submit">Change active</button>
                         </form>
@@ -53,13 +60,13 @@
             </tbody>
         </table>
         <div class="pagination">
-            <a th:if="${currentPage > 0}"
+            <a class="blue-button" th:if="${currentPage > 0}"
                th:href="@{/manage-users(page=${currentPage - 1})}">
                Previous page
             </a>
             <span th:text="'Page ' + ${currentPage + 1} + '/' + ${finalPage}">
             </span>
-            <a th:if="${currentPage < finalPage}"
+            <a class="blue-button" th:if="${currentPage + 1 < finalPage}"
                th:href="@{/manage-users(page=${currentPage + 1})}">
                 Next page
             </a>

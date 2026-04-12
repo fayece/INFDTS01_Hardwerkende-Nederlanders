@@ -7,15 +7,16 @@
           th:href="${cssRef}">
 </head>
 <body>
+<div th:insert="~{fragments/app-wide/admin-navbar :: navbar}" class="navbar"></div>
     <div class="create-user-page">
         <div>header stuff</div>
         <div>
             <form th:action="@{/manage-users/new}" method="post">
-                <label>First name:
-                    <input type="text" name="firstName" required>
-                </label>
                 <label>Prefix:
                     <input type="text" name="prefix" required>
+                </label>
+                <label>First name:
+                    <input type="text" name="firstName" required>
                 </label>
                 <label>Last name:
                     <input type="text" name="lastName" required>
@@ -26,10 +27,10 @@
                 <label>Password
                     <input type="text" name="password" required>
                 </label>
-                <button type="submit">Save user</button>
+                <button class="blue-button" type="submit">Save user</button>
             </form>
         </div>
-        <a th:href="@{/manage-users}">Return</a>
+        <a class="blue-button" th:href="@{/manage-users}">Return</a>
 
 
     </div>

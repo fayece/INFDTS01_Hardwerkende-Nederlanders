@@ -12,11 +12,11 @@
     <div>
         <form th:action="@{/manage-users/update}" method="post">
             <input type="hidden" name="id" th:value="${currentUser.id}">
-            <label>First name:
-                <input type="text" name="firstName" th:value="${currentUser.firstName}">
-            </label>
             <label>Prefix:
                 <input type="text" name="prefix" th:value="${currentUser.prefix}">
+            </label>
+            <label>First name:
+                <input type="text" name="firstName" th:value="${currentUser.firstName}">
             </label>
             <label>Last name:
                 <input type="text" name="lastName" th:value="${currentUser.lastName}">
@@ -34,6 +34,7 @@
         </form>
     </div>
     <a th:href="@{/manage-users}">Return</a>
+    <a th:href="@{/manage-users/confirm-delete(userId=${currentUser.Id})}">Delete user</a>
 
 
 </div>

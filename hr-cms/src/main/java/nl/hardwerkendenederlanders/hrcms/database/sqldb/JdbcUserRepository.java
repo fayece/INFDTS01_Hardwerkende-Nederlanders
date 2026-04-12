@@ -123,7 +123,24 @@ public class JdbcUserRepository implements UserRepository {
                 WHERE active = :isActive
                 """.formatted(TABLE);
 
-        MapSqlParameterSource params = new MapSqlParameterSource("active", isActive);
+        MapSqlParameterSource params = new MapSqlParameterSource("isActive", isActive);
+
+        return jdbc.query(sqlQuery, params, rowMapper);
+    }
+
+    public List<User> findUserOnActivityPaginated(boolean isActive, int page, int amount){
+        String sqlQuery = """
+                SELECT *
+                FROM %s
+                WHERE active = :isActive
+                LIMIT :limit
+                OFFSET :offset
+                """.formatted(TABLE);
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("isActive", isActive)
+                .addValue("limit", amount)
+                .addValue("offset", amount * page);
 
         return jdbc.query(sqlQuery, params, rowMapper);
     }

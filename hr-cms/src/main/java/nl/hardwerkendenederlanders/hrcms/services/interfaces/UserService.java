@@ -16,5 +16,6 @@ public interface UserService {
     void deleteById(UUID id);
     List<User> findUsersOnActivity(boolean isActive);
     List<User> findUsersPaginated(int page, int amount);
+    List<User> findUserOnActivityPaginated(boolean isActive, int page, int amount);
     List<User> searchByNamePaginated(String name, int page, int amount);
 }

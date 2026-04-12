@@ -19,6 +19,7 @@ public interface UserRepository {
     List<User> findAllPaginated(Integer page, Integer amount);
     boolean updateActivityById(UUID id, boolean setActive);
     List<User> findByNamePaginated(String name, int page, int amount);
+    List<User> findUserOnActivityPaginated(boolean isActive, int page, int amount);
 
     boolean deleteById(UUID id);
 }

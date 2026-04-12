@@ -91,4 +91,8 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByNamePaginated(name, page, amount);
     }
 
+    public List<User> findUserOnActivityPaginated(boolean isActive, int page, int amount){
+        return userRepository.findUserOnActivityPaginated(isActive, page, amount);
+    }
+
 }

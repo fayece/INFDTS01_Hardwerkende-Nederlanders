@@ -21,14 +21,18 @@ public class UserController {
     }
 
     @GetMapping()
-    public String manageUserPage(@RequestParam(defaultValue = "0") Integer page , Model model, @RequestParam(required = false) String searchName){
+    public String manageUserPage(@RequestParam(defaultValue = "0") Integer page ,
+                                 Model model,
+                                 @RequestParam(required = false) String searchName,
+                                 @RequestParam(required = false) Boolean sortActive){
         List<User> users;
 
         if(searchName != null){
             users = userService.searchByNamePaginated(searchName, page, pageSize);
             model.addAttribute("searchName", searchName);
-        }
-        else{
+        } else if (sortActive != null) {
+            users = userService.findUserOnActivityPaginated(sortActive, page, pageSize);
+        } else{
             users = userService.findUsersPaginated(page, pageSize);
         }
         Integer maxPages = (int) Math.ceil(((double)((userService.findAllUsers()).size()) / pageSize));
@@ -131,5 +135,17 @@ public class UserController {
         return "redirect:/manage-users";
     }
 
+    @GetMapping("/confirm-delete")
+    public String confirmDeleteUser(@RequestParam UUID userId, Model model){
+        model.addAttribute("userToDeleteId", userId);
+        return "pages/confirm-delete-user";
+    }
+
+    @PostMapping("/delete-user")
+    public String deleteUser(@RequestParam UUID userId){
+        userService.deleteById(userId);
+
+        return "redirect:/manage-users";
+    }
 
 }
