@@ -35,13 +35,7 @@ public class JdbcArticleRepositoryImpl implements ArticleRepository {
                 rs.getObject("subject_id", UUID.class));
     }
 
-    @Override
-    public void Create(Article article) {
-
-        String query = ("""
-            INSERT INTO articles (id, title, text_content, created_at, updated_at, publication_status, subject_id)
-            VALUES (:id, :title, :text_content, :created_at, :updated_at, :publication_status, :subject_id);
-            """);
+    private MapSqlParameterSource ArticleMapper(Article article){
         MapSqlParameterSource mapping = new MapSqlParameterSource();
 
         mapping.addValue("id", article.getId());
@@ -51,65 +45,50 @@ public class JdbcArticleRepositoryImpl implements ArticleRepository {
         mapping.addValue("updated_at", article.getUpdatedAt());
         mapping.addValue("publication_status", article.getPublicationStatus().toString());
         mapping.addValue("subject_id", article.getSubjectId());
-        jdbc.update(query, mapping);
+
+        return mapping;
     }
 
     @Override
-    public void Update(Article article) throws Exception {
-        var con = _dbCon.GetConnection();
+    public void Create(Article article) {
 
-        PreparedStatement query = con.prepareStatement("""
-            UPDATE articles
-            SET title = ?, text_content = ?, updated_at = ?, publication_status = ?, subject_id = ?
-            WHERE (id = ?);
+        String query = ("""
+            INSERT INTO articles (id, title, text_content, created_at, updated_at, publication_status, subject_id)
+            VALUES (:id, :title, :text_content, :created_at, :updated_at, :publication_status, :subject_id);
             """);
-        query.setString(1, article.getTitle());
-        query.setString(2, article.getTextContent());
-        query.setObject(3, article.getUpdatedAt());
-        query.setString(4, article.getPublicationStatus().toString());
-        query.setObject(5, article.getSubjectId());
-        query.setObject(6, article.getId());
-        query.execute();
+
+        jdbc.update(query, ArticleMapper(article));
+    }
+
+    @Override
+    public void Update(Article article) {
+        String query = """
+            UPDATE articles
+            SET title = :title, text_content = :text_content, updated_at = :updated_at, publication_status = :publication_status, subject_id = :subject_id
+            WHERE (id = :id);
+            """;
+        jdbc.update(query, ArticleMapper(article));
     }
 
     @Override
     public @Nullable Article GetById(UUID id) {
-        try {
-            var con = _dbCon.GetConnection();
-
-            PreparedStatement query = con.prepareStatement("""
-                SELECT *
-                FROM articles
-                WHERE id = ?
-                LIMIT 1;
-                """);
-            query.setObject(1, id);
-            ResultSet queryResults = query.executeQuery();
-            if (queryResults.next()) {
-                return rowMapper().mapRow(queryResults, 1);
-            }
-        } catch (Exception e) {
-            log.error("error: ", e);
-        }
-        return null;
+        String query = """
+            SELECT *
+            FROM articles
+            WHERE id = :id
+            LIMIT 1;
+            """;
+        MapSqlParameterSource mapping = new MapSqlParameterSource();
+        mapping.addValue("id", id);
+        return jdbc.queryForObject(query, mapping, rowMapper());
     }
 
     @Override
     public Article[] GetAll() {
-        try {
-            var con = _dbCon.GetConnection();
-
-            PreparedStatement query = con.prepareStatement("""
-                SELECT *
-                FROM articles
-                """);
-            ArrayList<Article> articles = new ArrayList<>();
-            ResultSet queryResults = query.executeQuery();
-            while (queryResults.next()) articles.add(rowMapper().mapRow(queryResults, 1));
-            return articles.toArray(new Article[0]);
-        } catch (Exception e) {
-            log.error("error: ", e);
-        }
-        return null;
+        String query = """
+            SELECT *
+            FROM articles
+            """;
+        return jdbc.query(query, rowMapper()).toArray(new Article[0]);
     }
 }
