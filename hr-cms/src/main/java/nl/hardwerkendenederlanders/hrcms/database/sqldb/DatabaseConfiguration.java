@@ -1,6 +1,5 @@
 package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
-import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;

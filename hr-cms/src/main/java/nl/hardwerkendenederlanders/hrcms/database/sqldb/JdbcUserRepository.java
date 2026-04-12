@@ -16,10 +16,8 @@ public class JdbcUserRepository implements UserRepository {
     private final NamedParameterJdbcTemplate jdbc;
     private static final String TABLE = "users";
 
-
     public JdbcUserRepository(NamedParameterJdbcTemplate jdbc) {
         this.jdbc = jdbc;
-
     }
 
     private final RowMapper<User> rowMapper = (rs, rowNum) -> new User(
@@ -59,7 +57,6 @@ public class JdbcUserRepository implements UserRepository {
         return jdbc.update(sql, paramsFromUser(user)) >= 1;
     }
 
-
     @Override
     public Optional<User> findById(UUID id) {
         String sqlQuery = """
@@ -86,7 +83,7 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public List<User> findByNameOrEmailPaginated(String name, int page, int amount){
+    public List<User> findByNameOrEmailPaginated(String name, int page, int amount) {
         String sqlQuery = """
                 SELECT *
                 FROM %s
@@ -99,7 +96,7 @@ public class JdbcUserRepository implements UserRepository {
                 """.formatted(TABLE);
 
         MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("name","%" + name + "%")
+                .addValue("name", "%" + name + "%")
                 .addValue("limit", amount)
                 .addValue("offset", page * amount);
 
@@ -107,7 +104,7 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public List<User> findUserOnActivityPaginated(boolean isActive, int page, int amount){
+    public List<User> findUserOnActivityPaginated(boolean isActive, int page, int amount) {
         String sqlQuery = """
                 SELECT *
                 FROM %s
@@ -125,15 +122,14 @@ public class JdbcUserRepository implements UserRepository {
         return jdbc.query(sqlQuery, params, rowMapper);
     }
 
-
     @Override
-    public List<User> findAllUsers(){
+    public List<User> findAllUsers() {
         String sqlQuery = "SELECT * FROM %s".formatted(TABLE);
         return jdbc.query(sqlQuery, rowMapper);
     }
 
     @Override
-    public List<User> findAllPaginated(Integer page, Integer amount){
+    public List<User> findAllPaginated(Integer page, Integer amount) {
         String sqlQuery = """
                 SELECT *
                 FROM %s
@@ -142,30 +138,28 @@ public class JdbcUserRepository implements UserRepository {
                 OFFSET :offset
                 """.formatted(TABLE);
 
-        MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("limit", amount)
-                .addValue("offset", page * amount);
+        MapSqlParameterSource params =
+                new MapSqlParameterSource().addValue("limit", amount).addValue("offset", page * amount);
 
         return jdbc.query(sqlQuery, params, rowMapper);
     }
 
     @Override
-    public boolean updateActivityById(UUID id, boolean setActive){
+    public boolean updateActivityById(UUID id, boolean setActive) {
         String sqlQuery = """
                 UPDATE %s
                 SET active = :setActive
                 WHERE id = :id
                 """.formatted(TABLE);
 
-        MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("id", id)
-                .addValue("setActive", setActive);
+        MapSqlParameterSource params =
+                new MapSqlParameterSource().addValue("id", id).addValue("setActive", setActive);
 
         return jdbc.update(sqlQuery, params) >= 1;
     }
 
     @Override
-    public boolean update(User user){
+    public boolean update(User user) {
         String sqlQuery = """
                 UPDATE %s
                 SET first_name = :firstName,
@@ -191,7 +185,7 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public boolean deleteById(UUID id){
+    public boolean deleteById(UUID id) {
         String sqlQuery = """
                 DELETE FROM %s
                 WHERE id = :id
@@ -201,5 +195,4 @@ public class JdbcUserRepository implements UserRepository {
 
         return jdbc.update(sqlQuery, params) >= 1;
     }
-
 }

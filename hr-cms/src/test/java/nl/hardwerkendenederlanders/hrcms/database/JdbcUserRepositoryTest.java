@@ -1,12 +1,5 @@
 package nl.hardwerkendenederlanders.hrcms.database;
 
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -21,12 +14,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.test.jdbc.JdbcTestUtils;
-import org.testcontainers.containers.PostgreSQLContainer;
 
 @SpringBootTest
 class JdbcUserRepositoryTest {
@@ -41,8 +30,6 @@ class JdbcUserRepositoryTest {
     void setUp() {
         JdbcTestUtils.deleteFromTables(jdbcTemplate, "users");
     }
-
-
 
     @Test
     void insert_shouldReturnTrue() {
@@ -62,7 +49,7 @@ class JdbcUserRepositoryTest {
     }
 
     @Test
-    void findById_shouldReturnOneUserWithSameId(){
+    void findById_shouldReturnOneUserWithSameId() {
         User user = new User(
                 UUID.randomUUID(),
                 "Kim",
@@ -83,7 +70,7 @@ class JdbcUserRepositoryTest {
     }
 
     @Test
-    void findByEmail_shouldReturnOneUserWithSameEmail(){
+    void findByEmail_shouldReturnOneUserWithSameEmail() {
         User user = new User(
                 UUID.randomUUID(),
                 "Kim",
@@ -104,7 +91,7 @@ class JdbcUserRepositoryTest {
     }
 
     @Test
-    void findByNameOrEmailPaginated_shouldReturnUser(){
+    void findByNameOrEmailPaginated_shouldReturnUser() {
         User user = new User(
                 UUID.randomUUID(),
                 "Kim",
@@ -127,7 +114,7 @@ class JdbcUserRepositoryTest {
     }
 
     @Test
-    void findUserOnActivityPaginated_shouldReturnUsersOnActivity(){
+    void findUserOnActivityPaginated_shouldReturnUsersOnActivity() {
         User user = new User(
                 UUID.randomUUID(),
                 "Kim",
@@ -162,7 +149,7 @@ class JdbcUserRepositoryTest {
     }
 
     @Test
-    void findAllUsers_shouldReturnAListOfAllUsers(){
+    void findAllUsers_shouldReturnAListOfAllUsers() {
         User user = new User(
                 UUID.randomUUID(),
                 "Kim",
@@ -194,7 +181,7 @@ class JdbcUserRepositoryTest {
     }
 
     @Test
-    void updateActivityById_shouldSetActive(){
+    void updateActivityById_shouldSetActive() {
         User user = new User(
                 UUID.randomUUID(),
                 "Kim",
@@ -215,7 +202,7 @@ class JdbcUserRepositoryTest {
     }
 
     @Test
-    void update_shouldChangeAllUserFields(){
+    void update_shouldChangeAllUserFields() {
         User user = new User(
                 UUID.randomUUID(),
                 "Kim",
@@ -252,7 +239,7 @@ class JdbcUserRepositoryTest {
     }
 
     @Test
-    void deleteById_shouldReturnTrue(){
+    void deleteById_shouldReturnTrue() {
         User user = new User(
                 UUID.randomUUID(),
                 "Kim",
