@@ -7,36 +7,37 @@
           th:href="${cssRef}">
 </head>
 <body>
+<div th:insert="~{fragments/app-wide/admin-navbar :: navbar}" class="navbar"></div>
 <div class="create-user-page">
-    <div>header stuff</div>
-    <div>
-        <form th:action="@{/manage-users/update}" method="post">
+    <h2>Edit user</h2>
+    <h4>Edit or delete user</h4>
+    <div class="create-user-form-container">
+        <form class="create-user-form" th:action="@{/manage-users/update}" method="post">
             <input type="hidden" name="id" th:value="${currentUser.id}">
-            <label>Prefix:
+            <label><b>Prefix:</b>
                 <input type="text" name="prefix" th:value="${currentUser.prefix}">
             </label>
-            <label>First name:
+            <label><b>First name:</b>
                 <input type="text" name="firstName" th:value="${currentUser.firstName}">
             </label>
-            <label>Last name:
+            <label><b>Last name:</b>
                 <input type="text" name="lastName" th:value="${currentUser.lastName}">
             </label>
-            <label>Email
+            <label><b>Email:</b>
                 <input type="text" name="email" th:value="${currentUser.email}">
             </label>
-            <label>RoleId
+            <label><b>RoleId</b>
                 <input type="text" name="roleId" th:value="${currentUser.roleId}">
             </label>
-            <label>OrganisationId
+            <label><b>OrganisationId</b>
                 <input type="text" name="organisationId" th:value="${currentUser.organizationId}">
             </label>
-            <button type="submit">Update user</button>
+            <button class="create-user-button" type="submit">Update user</button>
         </form>
     </div>
-    <a th:href="@{/manage-users}">Return</a>
-    <a th:href="@{/manage-users/confirm-delete(userId=${currentUser.Id})}">Delete user</a>
-
-
+    <br>
+    <a class="return-button-admin" th:href="@{/manage-users}">Return</a>
+    <a class="delete-user-button" th:href="@{/manage-users/confirm-delete(userId=${currentUser.Id})}">Delete user</a>
 </div>
 </body>
 </html>

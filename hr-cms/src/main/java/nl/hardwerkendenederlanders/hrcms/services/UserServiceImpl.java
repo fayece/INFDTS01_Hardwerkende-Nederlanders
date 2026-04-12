@@ -6,7 +6,6 @@ import nl.hardwerkendenederlanders.hrcms.exceptions.DatabaseException;
 import nl.hardwerkendenederlanders.hrcms.exceptions.NotFoundException;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserService;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -46,14 +45,6 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new NotFoundException("User not found"));
     }
 
-    public List<User> findByName(String name){
-        return userRepository.findByName(name);
-    }
-
-    public List<User> findAllUsers(){
-        return userRepository.findAllUsers();
-    }
-
     public void updateActivityById(UUID id, boolean setActive){
         boolean updated = userRepository.updateActivityById(id, setActive);
         if(!updated){
@@ -79,16 +70,12 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public List<User> findUsersOnActivity(boolean isActive){
-        return userRepository.findUserOnActivity(isActive);
-    }
-
     public List<User> findUsersPaginated(int page, int amount){
         return userRepository.findAllPaginated(page, amount);
     }
 
     public List<User> searchByNamePaginated(String name, int page, int amount){
-        return userRepository.findByNamePaginated(name, page, amount);
+        return userRepository.findByNameOrEmailPaginated(name, page, amount);
     }
 
     public List<User> findUserOnActivityPaginated(boolean isActive, int page, int amount){

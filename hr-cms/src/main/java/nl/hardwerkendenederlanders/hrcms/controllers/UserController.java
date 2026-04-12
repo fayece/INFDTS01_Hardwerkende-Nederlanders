@@ -14,7 +14,7 @@ import java.util.UUID;
 @RequestMapping("manage-users")
 public class UserController {
     private final UserService userService;
-    private final int pageSize = 20;
+    private final int pageSize = 13;
 
     public UserController(UserService userService){
         this.userService = userService;
@@ -137,6 +137,11 @@ public class UserController {
 
     @GetMapping("/confirm-delete")
     public String confirmDeleteUser(@RequestParam UUID userId, Model model){
+        User user = userService.findById(userId);
+        model.addAttribute("userFirstName", user.getFirstName());
+        model.addAttribute("userLastName", user.getLastName());
+        model.addAttribute("userEmail", user.getEmail());
+
         model.addAttribute("userToDeleteId", userId);
         return "pages/confirm-delete-user";
     }

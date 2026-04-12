@@ -19,7 +19,6 @@ public class JdbcUserRepository implements UserRepository {
 
     public JdbcUserRepository(NamedParameterJdbcTemplate jdbc) {
         this.jdbc = jdbc;
-
     }
 
     private final RowMapper<User> rowMapper = (rs, rowNum) -> new User(
@@ -59,7 +58,6 @@ public class JdbcUserRepository implements UserRepository {
         return jdbc.update(sql, paramsFromUser(user)) >= 1;
     }
 
-
     @Override
     public Optional<User> findById(UUID id) {
         String sqlQuery = """
@@ -85,25 +83,14 @@ public class JdbcUserRepository implements UserRepository {
         return users.stream().findFirst();
     }
 
-    public List<User> findByName(String name){
+    public List<User> findByNameOrEmailPaginated(String name, int page, int amount){
         String sqlQuery = """
                 SELECT *
                 FROM %s
                 WHERE first_name ILIKE :name
                 OR last_name ILIKE :name
-                """.formatted(TABLE);
-
-        MapSqlParameterSource params = new MapSqlParameterSource("name","%" + name + "%");
-
-        return jdbc.query(sqlQuery, params, rowMapper);
-    }
-
-    public List<User> findByNamePaginated(String name, int page, int amount){
-        String sqlQuery = """
-                SELECT *
-                FROM %s
-                WHERE first_name ILIKE :name
-                OR last_name ILIKE :name
+                OR email ILIKE :name
+                ORDER BY last_name
                 LIMIT :limit
                 OFFSET :offset
                 """.formatted(TABLE);
@@ -116,23 +103,12 @@ public class JdbcUserRepository implements UserRepository {
         return jdbc.query(sqlQuery, params, rowMapper);
     }
 
-    public List<User> findUserOnActivity(boolean isActive){
-        String sqlQuery = """
-                SELECT *
-                FROM %s
-                WHERE active = :isActive
-                """.formatted(TABLE);
-
-        MapSqlParameterSource params = new MapSqlParameterSource("isActive", isActive);
-
-        return jdbc.query(sqlQuery, params, rowMapper);
-    }
-
     public List<User> findUserOnActivityPaginated(boolean isActive, int page, int amount){
         String sqlQuery = """
                 SELECT *
                 FROM %s
                 WHERE active = :isActive
+                ORDER BY last_name
                 LIMIT :limit
                 OFFSET :offset
                 """.formatted(TABLE);
@@ -145,17 +121,11 @@ public class JdbcUserRepository implements UserRepository {
         return jdbc.query(sqlQuery, params, rowMapper);
     }
 
-
-
-    public List<User> findAllUsers(){
-        String sqlQuery = "SELECT * FROM %s".formatted(TABLE);
-        return jdbc.query(sqlQuery, rowMapper);
-    }
-
     public List<User> findAllPaginated(Integer page, Integer amount){
         String sqlQuery = """
                 SELECT *
                 FROM %s
+                ORDER BY last_name
                 LIMIT :limit
                 OFFSET :offset
                 """.formatted(TABLE);

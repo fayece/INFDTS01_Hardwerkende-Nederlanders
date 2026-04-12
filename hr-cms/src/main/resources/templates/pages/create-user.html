@@ -9,28 +9,30 @@
 <body>
 <div th:insert="~{fragments/app-wide/admin-navbar :: navbar}" class="navbar"></div>
     <div class="create-user-page">
-        <div>header stuff</div>
-        <div>
-            <form th:action="@{/manage-users/new}" method="post">
-                <label>Prefix:
+        <h2>Create new user</h2>
+        <h4>You can create as many new users as you'd like and leave by pressing the return button</h4>
+        <div class="create-user-form-container">
+            <form class="create-user-form" th:action="@{/manage-users/new}" method="post">
+                <label><b>Prefix:</b>
                     <input type="text" name="prefix" required>
                 </label>
-                <label>First name:
+                <label><b>First name:</b>
                     <input type="text" name="firstName" required>
                 </label>
-                <label>Last name:
+                <label><b>Last name:</b>
                     <input type="text" name="lastName" required>
                 </label>
-                <label>Email
+                <label><b>Email</b>
                     <input type="text" name="email" required>
                 </label>
-                <label>Password
+                <label><b>Password</b>
                     <input type="text" name="password" required>
                 </label>
-                <button class="blue-button" type="submit">Save user</button>
+                <button class="create-user-button" type="submit">Save user</button>
             </form>
         </div>
-        <a class="blue-button" th:href="@{/manage-users}">Return</a>
+        <br>
+        <a class="return-button-admin" th:href="@{/manage-users}">Return</a>
 
 
     </div>
