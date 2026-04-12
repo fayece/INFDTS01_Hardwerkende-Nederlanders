@@ -17,4 +17,9 @@ public class SubjectServiceImpl implements SubjectService {
     public Subject[] GetAll() {
         return subjectRepository.GetAll();
     }
+
+    @Override
+    public void AddSubject(Subject subject) {
+        subjectRepository.AddSubject(subject);
+    }
 }

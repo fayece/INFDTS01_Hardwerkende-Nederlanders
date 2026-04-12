@@ -42,7 +42,7 @@ public class CommentRepositoryTest {
     private MediaItem mediaItem;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         article = Article.builder()
                 .title("Test Article")
                 .textContent("Test content.")

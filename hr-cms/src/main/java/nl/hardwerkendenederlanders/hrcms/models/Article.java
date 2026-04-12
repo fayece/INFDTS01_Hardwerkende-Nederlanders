@@ -12,17 +12,20 @@ import org.jetbrains.annotations.Nullable;
 @Setter
 @SuperBuilder
 public class Article{
-    private UUID id;
+    @Builder.Default
+    private UUID id = UUID.randomUUID();
     private String title;
     private String textContent;
     @Nullable
     private OffsetDateTime updatedAt;
-    private OffsetDateTime createdAt;
+    @Builder.Default
+    private OffsetDateTime createdAt = OffsetDateTime.now();
     @Nullable
     private UUID subjectId;
 
     @Builder.Default
     private PublicationStatus publicationStatus = PublicationStatus.DRAFT;
+
 
     public Article(
             UUID id,

@@ -13,13 +13,17 @@ import nl.hardwerkendenederlanders.hrcms.database.ArticleRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.PublicationStatus;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 @Slf4j
 public class JdbcArticleRepositoryImpl implements ArticleRepository {
     private final SqlDatabaseConnection _dbCon;
+    private final NamedParameterJdbcTemplate jdbc;
 
-    public JdbcArticleRepositoryImpl(SqlDatabaseConnection dbCon) {
+    public JdbcArticleRepositoryImpl(SqlDatabaseConnection dbCon, NamedParameterJdbcTemplate jdbc) {
         _dbCon = dbCon;
+        this.jdbc = jdbc;
     }
 
     protected RowMapper<Article> rowMapper() {
@@ -35,21 +39,23 @@ public class JdbcArticleRepositoryImpl implements ArticleRepository {
 
 
     @Override
-    public void Create(Article article) throws Exception {
-        var con = _dbCon.GetConnection();
+    public void Create(Article article) {
 
-        PreparedStatement query = con.prepareStatement("""
+
+        String query = ("""
             INSERT INTO articles (id, title, text_content, created_at, updated_at, publication_status, subject_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?);
+            VALUES (:id, :title, :text_content, :created_at, :updated_at, :publication_status, :subject_id);
             """);
-        query.setObject(1, article.getId());
-        query.setString(2, article.getTitle());
-        query.setString(3, article.getTextContent());
-        query.setObject(4, article.getCreatedAt());
-        query.setObject(5, article.getUpdatedAt());
-        query.setObject(6, article.getSubjectId());
-        query.setString(7, article.getPublicationStatus().toString());
-        query.execute();
+        MapSqlParameterSource mapping = new MapSqlParameterSource();
+
+        mapping.addValue("id", article.getId());
+        mapping.addValue("title", article.getTitle());
+        mapping.addValue("text_content", article.getTextContent());
+        mapping.addValue("created_at", article.getCreatedAt());
+        mapping.addValue("updated_at", article.getUpdatedAt());
+        mapping.addValue("publication_status", article.getPublicationStatus().toString());
+        mapping.addValue("subject_id", article.getSubjectId());
+        jdbc.update(query, mapping);
     }
 
     @Override
@@ -61,7 +67,6 @@ public class JdbcArticleRepositoryImpl implements ArticleRepository {
             SET title = ?, text_content = ?, updated_at = ?, publication_status = ?, subject_id = ?
             WHERE (id = ?);
             """);
-
         query.setString(1, article.getTitle());
         query.setString(2, article.getTextContent());
         query.setObject(3, article.getUpdatedAt());

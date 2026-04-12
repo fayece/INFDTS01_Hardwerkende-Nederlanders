@@ -41,7 +41,7 @@ public class ArticleAuthorRepositoryTest {
     private User author;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         article = Article.builder()
                 .title("Test Article")
                 .textContent("Test content.")

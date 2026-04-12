@@ -1,5 +1,6 @@
 package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
+import nl.hardwerkendenederlanders.hrcms.database.SubjectRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,8 +11,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 public class DatabaseConfiguration {
 
     @Bean
-    public JdbcArticleRepositoryImpl articleRepository(SqlDatabaseConnection dbCon) {
-        return new JdbcArticleRepositoryImpl(dbCon);
+    public JdbcArticleRepositoryImpl articleRepository(SqlDatabaseConnection dbCon, NamedParameterJdbcTemplate jdbc) {
+        return new JdbcArticleRepositoryImpl(dbCon, jdbc);
     }
 
     @Bean
@@ -55,5 +56,10 @@ public class DatabaseConfiguration {
     @Bean
     public UserRepository userRepository(NamedParameterJdbcTemplate jdbc) {
         return new JdbcUserRepository(jdbc);
+    }
+
+    @Bean
+    public SubjectRepository subjectRepository(NamedParameterJdbcTemplate jdbc) {
+        return new JdbcSubjectRepositoryImpl(jdbc);
     }
 }
