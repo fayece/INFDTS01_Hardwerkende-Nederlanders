@@ -84,8 +84,8 @@ public class ArticleRepositoryTest {
     }
 
     @Test
-    void findArticleById_withNonExistentId_shouldThrowException() {
-        assertThrows(Exception.class, () -> articleRepository.GetById(UUID.randomUUID()));
+    void findArticleById_withNonExistentId_shouldReturnNull() {
+        assertNull(articleRepository.GetById(UUID.randomUUID()));
     }
 
     @Test

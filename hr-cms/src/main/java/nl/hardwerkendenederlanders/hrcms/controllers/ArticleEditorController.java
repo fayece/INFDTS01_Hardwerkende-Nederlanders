@@ -32,6 +32,9 @@ public class ArticleEditorController {
     @GetMapping("article-editor/{articleId}")
     public String GetArticle(Model model, @PathVariable(value = "articleId") UUID id) {
         Article article = articleService.GetById(id);
+        if (article == null)
+            return "redirect:/error/404";
+
         model.addAttribute("articleForm", article);
         model.addAttribute("subjects", subjectService.GetAll());
         return "pages/article-editor-page";
@@ -40,7 +43,7 @@ public class ArticleEditorController {
     // method must be Post for HTML form (it does not support put)
     // save draft
     @PostMapping("save-article")
-    public String PutDraftArticle(Model model, @ModelAttribute("articleForm") Article articleForm) {
+    public String PutArticle(Model model, @ModelAttribute("articleForm") Article articleForm) {
         model.addAttribute("articleForm", articleForm);
         try {
             articleService.EnsureArticleExists(articleForm);

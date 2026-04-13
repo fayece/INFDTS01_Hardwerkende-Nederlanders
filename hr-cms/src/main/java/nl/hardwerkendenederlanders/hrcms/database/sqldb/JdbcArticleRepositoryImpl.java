@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import nl.hardwerkendenederlanders.hrcms.database.ArticleRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.PublicationStatus;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -80,7 +81,13 @@ public class JdbcArticleRepositoryImpl implements ArticleRepository {
             """;
         MapSqlParameterSource mapping = new MapSqlParameterSource();
         mapping.addValue("id", id);
-        return jdbc.queryForObject(query, mapping, rowMapper());
+        try{
+            return jdbc.queryForObject(query, mapping, rowMapper());
+        }
+        catch (EmptyResultDataAccessException erdae){
+            return null;
+        }
+
     }
 
     @Override
