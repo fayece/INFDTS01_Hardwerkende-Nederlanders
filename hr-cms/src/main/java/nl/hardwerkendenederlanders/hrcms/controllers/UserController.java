@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("manage-users")
 public class UserController {
     private final UserService userService;
-    private final int pageSize = 13;
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -27,6 +26,7 @@ public class UserController {
             @RequestParam(required = false) Boolean sortActive) {
         List<User> users;
 
+        int pageSize = 13;
         if (searchName != null) {
             users = userService.searchByNamePaginated(searchName, page, pageSize);
             model.addAttribute("searchName", searchName);
