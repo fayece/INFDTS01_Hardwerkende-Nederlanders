@@ -14,11 +14,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 @Slf4j
 public class JdbcArticleRepositoryImpl implements ArticleRepository {
-    private final SqlDatabaseConnection _dbCon;
     private final NamedParameterJdbcTemplate jdbc;
 
-    public JdbcArticleRepositoryImpl(SqlDatabaseConnection dbCon, NamedParameterJdbcTemplate jdbc) {
-        _dbCon = dbCon;
+    public JdbcArticleRepositoryImpl(NamedParameterJdbcTemplate jdbc) {
         this.jdbc = jdbc;
     }
 

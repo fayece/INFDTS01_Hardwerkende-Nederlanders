@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class AuthorArticleOverviewController {
-    private ArticleService _articleService;
+    private final ArticleService _articleService;
 
     public AuthorArticleOverviewController(ArticleService articleService) {
         _articleService = articleService;

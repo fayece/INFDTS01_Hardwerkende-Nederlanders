@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
-    private ArticleRepository _articleRepository;
+    private final ArticleRepository _articleRepository;
 
     public ArticleServiceImpl(ArticleRepository articleRepository) {
         _articleRepository = articleRepository;
