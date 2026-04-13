@@ -1,5 +1,9 @@
 package nl.hardwerkendenederlanders.hrcms.services;
 
+import static org.mockito.Mockito.*;
+
+import java.sql.SQLException;
+import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.ArticleRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import org.junit.jupiter.api.Test;
@@ -7,11 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.sql.SQLException;
-import java.util.UUID;
-
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ArticleServiceImplTest {
@@ -23,7 +22,7 @@ public class ArticleServiceImplTest {
     private ArticleServiceImpl articleService;
 
     @Test
-    void ensureCreated_AddArticleWhenNotExists_ShouldAddArticle() throws SQLException{
+    void ensureCreated_AddArticleWhenNotExists_ShouldAddArticle() throws SQLException {
         UUID article_id = UUID.randomUUID();
         Article article1 = Article.builder()
                 .id(article_id)

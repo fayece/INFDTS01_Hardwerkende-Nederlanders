@@ -32,8 +32,7 @@ public class ArticleEditorController {
     @GetMapping("article-editor/{articleId}")
     public String GetArticle(Model model, @PathVariable(value = "articleId") UUID id) {
         Article article = articleService.GetById(id);
-        if (article == null)
-            return "redirect:/error/404";
+        if (article == null) return "redirect:/error/404";
 
         model.addAttribute("articleForm", article);
         model.addAttribute("subjects", subjectService.GetAll());

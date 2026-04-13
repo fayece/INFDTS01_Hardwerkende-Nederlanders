@@ -2,18 +2,13 @@ package nl.hardwerkendenederlanders.hrcms.database;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.util.UUID;
-import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcArticleRepositoryImpl;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.PublicationStatus;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -110,10 +105,10 @@ public class ArticleRepositoryTest {
     void addArticle_invalidTitleTooShort_shouldThrowSQLException() {
         // article too short -> invalid
         Article article = Article.builder()
-            .title("")
-            .textContent("sample text")
-            .publicationStatus(PublicationStatus.PUBLISHED)
-            .build();
+                .title("")
+                .textContent("sample text")
+                .publicationStatus(PublicationStatus.PUBLISHED)
+                .build();
         assertThrows(DataIntegrityViolationException.class, () -> articleRepository.Create(article));
     }
 
@@ -138,46 +133,46 @@ public class ArticleRepositoryTest {
                 .build();
         assertThrows(DataIntegrityViolationException.class, () -> articleRepository.Create(article));
     }
-//    @Test
-//    void deleteArticleById_withExistingArticle_shouldRemoveArticle() {
-//        Article article = Article.builder()
-//                .title("Delete Test Article")
-//                .textContent("This article will be deleted")
-//                .build();
-//        articleRepository.Create(article);
-//
-//        Article retrieved = articleRepository.GetById(article.getId());
-//        assertNotNull(retrieved);
-//
-//        articleRepository.delete(article.getId());
-//
-//        assertThrows(Exception.class, () -> articleRepository.GetById(article.getId()));
-//    }
+    //    @Test
+    //    void deleteArticleById_withExistingArticle_shouldRemoveArticle() {
+    //        Article article = Article.builder()
+    //                .title("Delete Test Article")
+    //                .textContent("This article will be deleted")
+    //                .build();
+    //        articleRepository.Create(article);
+    //
+    //        Article retrieved = articleRepository.GetById(article.getId());
+    //        assertNotNull(retrieved);
+    //
+    //        articleRepository.delete(article.getId());
+    //
+    //        assertThrows(Exception.class, () -> articleRepository.GetById(article.getId()));
+    //    }
 
-//    @Test
-//    void findAllArticlesPaged_withValidPaginationData_shouldReturnCorrectCount() {
-//        for (int i = 0; i < 15; i++) {
-//            Article article = Article.builder()
-//                    .title("Article " + i)
-//                    .textContent("Content for article " + i)
-//                    .build();
-//            articleRepository.Create(article);
-//        }
-//
-//        var page1 = articleRepository.findAllPaged(1, 10);
-//        var page2 = articleRepository.findAllPaged(2, 10);
-//
-//        assertEquals(10, page1.size());
-//        assertEquals(5, page2.size());
-//    }
-//
-//    static Stream<Arguments> invalidPaginationData() {
-//        return Stream.of(Arguments.of(0, 0), Arguments.of(1, 0), Arguments.of(1, -1), Arguments.of(0, -1));
-//    }
-//
-//    @ParameterizedTest
-//    @MethodSource("invalidPaginationData")
-//    void findAllArticlesPaged_withInvalidLimit_shouldThrowException(int offset, int limit) {
-//        assertThrows(IllegalArgumentException.class, () -> articleRepository.findAllPaged(offset, limit));
-//    }
+    //    @Test
+    //    void findAllArticlesPaged_withValidPaginationData_shouldReturnCorrectCount() {
+    //        for (int i = 0; i < 15; i++) {
+    //            Article article = Article.builder()
+    //                    .title("Article " + i)
+    //                    .textContent("Content for article " + i)
+    //                    .build();
+    //            articleRepository.Create(article);
+    //        }
+    //
+    //        var page1 = articleRepository.findAllPaged(1, 10);
+    //        var page2 = articleRepository.findAllPaged(2, 10);
+    //
+    //        assertEquals(10, page1.size());
+    //        assertEquals(5, page2.size());
+    //    }
+    //
+    //    static Stream<Arguments> invalidPaginationData() {
+    //        return Stream.of(Arguments.of(0, 0), Arguments.of(1, 0), Arguments.of(1, -1), Arguments.of(0, -1));
+    //    }
+    //
+    //    @ParameterizedTest
+    //    @MethodSource("invalidPaginationData")
+    //    void findAllArticlesPaged_withInvalidLimit_shouldThrowException(int offset, int limit) {
+    //        assertThrows(IllegalArgumentException.class, () -> articleRepository.findAllPaged(offset, limit));
+    //    }
 }

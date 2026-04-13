@@ -1,10 +1,7 @@
 package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
 import jakarta.annotation.Nullable;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import nl.hardwerkendenederlanders.hrcms.database.ArticleRepository;
@@ -36,7 +33,7 @@ public class JdbcArticleRepositoryImpl implements ArticleRepository {
                 rs.getObject("subject_id", UUID.class));
     }
 
-    private MapSqlParameterSource ArticleMapper(Article article){
+    private MapSqlParameterSource ArticleMapper(Article article) {
         MapSqlParameterSource mapping = new MapSqlParameterSource();
 
         mapping.addValue("id", article.getId());
@@ -81,13 +78,11 @@ public class JdbcArticleRepositoryImpl implements ArticleRepository {
             """;
         MapSqlParameterSource mapping = new MapSqlParameterSource();
         mapping.addValue("id", id);
-        try{
+        try {
             return jdbc.queryForObject(query, mapping, rowMapper());
-        }
-        catch (EmptyResultDataAccessException erdae){
+        } catch (EmptyResultDataAccessException erdae) {
             return null;
         }
-
     }
 
     @Override
