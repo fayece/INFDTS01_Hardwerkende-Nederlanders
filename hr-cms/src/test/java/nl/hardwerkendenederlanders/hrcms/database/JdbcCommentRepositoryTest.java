@@ -52,7 +52,7 @@ public class JdbcCommentRepositoryTest extends CommentRepositoryContractTest {
                 .title("Test Article")
                 .textContent("Test content.")
                 .build();
-        articleRepository.Create(article);
+        articleRepository.insert(article);
         this.articleId = article.getId();
 
         String uniqueRoleName = "Author Role " + UUID.randomUUID();

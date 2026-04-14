@@ -3,7 +3,7 @@ package nl.hardwerkendenederlanders.hrcms.services.interfaces;
 import nl.hardwerkendenederlanders.hrcms.models.Subject;
 
 public interface SubjectService {
-    Subject[] GetAll();
+    Subject[] findAll();
 
-    void AddSubject(Subject subject);
+    void insert(Subject subject);
 }

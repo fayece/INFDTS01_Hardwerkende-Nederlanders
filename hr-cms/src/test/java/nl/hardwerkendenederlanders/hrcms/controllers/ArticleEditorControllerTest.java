@@ -7,7 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
-import nl.hardwerkendenederlanders.hrcms.services.ArticleService;
+import nl.hardwerkendenederlanders.hrcms.services.interfaces.ArticleService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.SubjectService;
 import org.junit.jupiter.api.Test;
 import org.springframework.ui.ConcurrentModel;
@@ -16,7 +16,7 @@ public class ArticleEditorControllerTest {
     private final ArticleService articleService = mock(ArticleService.class);
     private final SubjectService subjectService = mock(SubjectService.class);
 
-    private final ArticleEditorController controller = new ArticleEditorController(articleService, subjectService);
+    private final EditorArticleController controller = new EditorArticleController(articleService, subjectService);
 
     @Test
     void WriteArticle_SaveAsDraft_UserIsRedirectedToPageWithIdOfArticle() {
@@ -28,23 +28,23 @@ public class ArticleEditorControllerTest {
                 .title("article title")
                 .textContent("text content")
                 .build();
-        when(articleService.GetById(any())).thenReturn(article);
+        when(articleService.findById(any())).thenReturn(article);
 
         // act
-        String redirect = controller.PutArticle(new ConcurrentModel(), article);
+        String redirect = controller.putArticle(new ConcurrentModel(), article);
 
         // assert
-        assertEquals("redirect:/article-editor/" + id.toString(), redirect);
+        assertEquals("redirect:/article/editor/" + id.toString(), redirect);
     }
 
     @Test
     void LoadArticle_UnknownArticle_Returns404Page() {
         // arrange
         UUID id = UUID.randomUUID();
-        when(articleService.GetById(any())).thenReturn(null);
+        when(articleService.findById(any())).thenReturn(null);
 
         // act
-        String page = controller.GetArticle(new ConcurrentModel(), id);
+        String page = controller.getArticle(new ConcurrentModel(), id);
 
         // assert
         assertEquals("redirect:/error/404", page);
@@ -56,10 +56,10 @@ public class ArticleEditorControllerTest {
         UUID id = UUID.randomUUID();
         Article article = Article.builder().id(id).build();
 
-        when(articleService.GetById(any())).thenReturn(article);
+        when(articleService.findById(any())).thenReturn(article);
 
         // act
-        String page = controller.GetArticle(new ConcurrentModel(), id);
+        String page = controller.getArticle(new ConcurrentModel(), id);
 
         // assert
         assertEquals("pages/article-editor-page", page);
@@ -68,7 +68,7 @@ public class ArticleEditorControllerTest {
     @Test
     void NewArticle_ReturnsPage() {
         // act
-        String page = controller.GetArticle(new ConcurrentModel());
+        String page = controller.getArticle(new ConcurrentModel());
         // assert
         assertEquals("pages/article-editor-page", page);
     }

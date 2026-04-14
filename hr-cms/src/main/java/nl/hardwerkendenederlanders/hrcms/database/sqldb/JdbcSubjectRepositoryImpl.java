@@ -22,7 +22,7 @@ public class JdbcSubjectRepositoryImpl implements SubjectRepository {
     }
 
     @Override
-    public Subject[] GetAll() {
+    public Subject[] findAll() {
         String query = """
             SELECT *
             FROM subjects
@@ -33,7 +33,7 @@ public class JdbcSubjectRepositoryImpl implements SubjectRepository {
     }
 
     @Override
-    public void AddSubject(Subject subject) {
+    public void insert(Subject subject) {
         var query = """
         INSERT INTO subjects
         VALUES (:id, :subject_name);

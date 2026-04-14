@@ -48,7 +48,7 @@ public class ArticleAuthorRepositoryTest {
                 .textContent("Test content.")
                 .build();
 
-        articleRepository.Create(article);
+        articleRepository.insert(article);
 
         Role role = new Role("Author Role");
 

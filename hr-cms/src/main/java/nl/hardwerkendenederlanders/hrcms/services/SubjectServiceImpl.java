@@ -14,12 +14,12 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
-    public Subject[] GetAll() {
-        return subjectRepository.GetAll();
+    public Subject[] findAll() {
+        return subjectRepository.findAll();
     }
 
     @Override
-    public void AddSubject(Subject subject) {
-        subjectRepository.AddSubject(subject);
+    public void insert(Subject subject) {
+        subjectRepository.insert(subject);
     }
 }

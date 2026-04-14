@@ -2,6 +2,7 @@ package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
 import jakarta.annotation.Nullable;
 import java.time.OffsetDateTime;
+import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import nl.hardwerkendenederlanders.hrcms.database.ArticleRepository;
@@ -46,7 +47,7 @@ public class JdbcArticleRepositoryImpl implements ArticleRepository {
     }
 
     @Override
-    public void Create(Article article) {
+    public void insert(Article article) {
 
         String query = ("""
             INSERT INTO articles (id, title, text_content, created_at, updated_at, publication_status, subject_id)
@@ -57,7 +58,7 @@ public class JdbcArticleRepositoryImpl implements ArticleRepository {
     }
 
     @Override
-    public void Update(Article article) {
+    public void update(Article article) {
         String query = """
             UPDATE articles
             SET title = :title, text_content = :text_content, updated_at = :updated_at, publication_status = :publication_status, subject_id = :subject_id
@@ -67,7 +68,7 @@ public class JdbcArticleRepositoryImpl implements ArticleRepository {
     }
 
     @Override
-    public @Nullable Article GetById(UUID id) {
+    public @Nullable Article findById(UUID id) {
         String query = """
             SELECT *
             FROM articles
@@ -84,11 +85,33 @@ public class JdbcArticleRepositoryImpl implements ArticleRepository {
     }
 
     @Override
-    public Article[] GetAll() {
+    public Article[] findAllPaged(int limit, int offset) {
+        if (limit <= 0)
+            throw new IllegalArgumentException(
+                    "findAllPages was called with an limit of " + limit + " the minimum is 1");
+        if (offset <= 0)
+            throw new IllegalArgumentException(
+                    "findAllPages was called with a offset of " + offset + " the minimum is 1");
+
         String query = """
-            SELECT *
-            FROM articles
-            """;
-        return jdbc.query(query, rowMapper()).toArray(new Article[0]);
+         SELECT * FROM articles
+         ORDER BY created_at DESC
+         LIMIT :limit
+         OFFSET :offset;
+         """;
+        MapSqlParameterSource mapping = new MapSqlParameterSource();
+        mapping.addValue("limit", limit);
+        mapping.addValue("offset", (offset - 1) * limit);
+        return jdbc.query(query, mapping, rowMapper()).toArray(new Article[0]);
+    }
+
+    @Override
+    public void delete(UUID id) {
+        String query = """
+                DELETE
+                FROM articles
+                WHERE id = :id
+                """;
+        jdbc.update(query, Map.of("id", id));
     }
 }

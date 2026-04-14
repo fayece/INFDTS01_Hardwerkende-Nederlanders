@@ -4,8 +4,8 @@ import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentUnavailableException;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.PagedComments;
-import nl.hardwerkendenederlanders.hrcms.services.ArticleService;
 import nl.hardwerkendenederlanders.hrcms.services.CommentServiceImpl;
+import nl.hardwerkendenederlanders.hrcms.services.interfaces.ArticleService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +26,7 @@ public class ReaderArticleController {
 
     @GetMapping("/{articleId}")
     public String getArticle(@PathVariable UUID articleId, Model model) {
-        Article article = articleService.GetById(articleId);
+        Article article = articleService.findById(articleId);
 
         if (article == null) {
             return "error/404";

@@ -7,12 +7,14 @@ import nl.hardwerkendenederlanders.hrcms.models.Article;
 
 public interface ArticleRepository {
 
-    void Create(Article article) throws SQLException;
+    void insert(Article article) throws SQLException;
 
-    void Update(Article article) throws SQLException;
+    void update(Article article) throws SQLException;
 
     @Nullable
-    Article GetById(UUID id);
+    Article findById(UUID id);
 
-    Article[] GetAll();
+    Article[] findAllPaged(int limit, int offset);
+
+    void delete(UUID id);
 }

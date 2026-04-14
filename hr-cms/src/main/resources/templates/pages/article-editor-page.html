@@ -3,7 +3,7 @@
     <link rel="stylesheet" th:href="${cssRef}" th:each="cssRef: ${@cssDiscoveryService.getAllCssPaths()}">
 
     <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
-    <script th:src = "@{/javascript/pages/article-editor-page.js}" defer></script>
+    <script th:src = "@{/js/pages/article-editor-page.js}" defer></script>
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
 </head>
 <body>
@@ -11,12 +11,12 @@
 <main class="standard-page-layout">
     <section class="content-section">
 
-        <a th:href="@{/articles-editor-overview}">To Overview</a>
+        <a th:href="@{/article/editor/overview}">To Overview</a>
         <div th:if="${param.error != null}" th:insert="~{fragments/app-wide/error-modal :: error_modal('Error while uploading article')}"></div>
         <form
             role="form"
             method="post"
-            th:action="@{/save-article}"
+            th:action="@{/article/editor/save}"
             th:object="${articleForm}"
             onsubmit="editorIntoTextContent()">
 

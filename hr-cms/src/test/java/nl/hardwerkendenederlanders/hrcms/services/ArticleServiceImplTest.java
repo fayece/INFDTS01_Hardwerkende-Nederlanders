@@ -29,10 +29,10 @@ public class ArticleServiceImplTest {
                 .title("article title")
                 .textContent("just some text")
                 .build();
-        when(articleRepository.GetById(article_id)).thenReturn(null);
-        articleService.EnsureArticleExists(article1);
+        when(articleRepository.findById(article_id)).thenReturn(null);
+        articleService.ensureArticleExists(article1);
 
-        verify(articleRepository, times(1)).Create(any());
+        verify(articleRepository, times(1)).insert(any());
     }
 
     @Test
@@ -43,9 +43,9 @@ public class ArticleServiceImplTest {
                 .title("More")
                 .textContent("Moore's law")
                 .build();
-        when(articleRepository.GetById(article_id)).thenReturn(article2);
-        articleService.EnsureArticleExists(article2);
+        when(articleRepository.findById(article_id)).thenReturn(article2);
+        articleService.ensureArticleExists(article2);
 
-        verify(articleRepository, times(1)).Update(any());
+        verify(articleRepository, times(1)).update(any());
     }
 }

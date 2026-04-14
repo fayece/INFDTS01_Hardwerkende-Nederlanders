@@ -3,7 +3,7 @@ package nl.hardwerkendenederlanders.hrcms.database;
 import nl.hardwerkendenederlanders.hrcms.models.Subject;
 
 public interface SubjectRepository {
-    Subject[] GetAll();
+    Subject[] findAll();
 
-    void AddSubject(Subject subject);
+    void insert(Subject subject);
 }

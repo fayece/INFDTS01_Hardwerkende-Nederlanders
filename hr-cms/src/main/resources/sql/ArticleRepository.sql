@@ -14,8 +14,7 @@ WHERE id = :id;
 -- name: findById
 SELECT * FROM articles WHERE id = :id;
 
--- name: deleteById
-DELETE FROM articles WHERE id = :id;
+
 
 -- name: findAllPaged
 SELECT * FROM articles
