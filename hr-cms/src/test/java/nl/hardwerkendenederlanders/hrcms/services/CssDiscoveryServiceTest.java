@@ -17,6 +17,6 @@ public class CssDiscoveryServiceTest {
     @Test
     public void mainCssIsReturned() throws IOException {
         Set<String> all_paths = _discoveryChannel.getAllCssPaths();
-        assertTrue(all_paths.contains("css/main.css"));
+        assertTrue(all_paths.contains("/css/main.css"));
     }
 }

@@ -89,4 +89,11 @@ public class User {
         this.active = active;
         this.createdAt = createdAt;
     }
+
+    public String getFullName() {
+        if (prefix == null || prefix.trim().isEmpty()) {
+            return firstName + " " + lastName;
+        }
+        return firstName + " " + prefix + " " + lastName;
+    }
 }

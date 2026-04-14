@@ -2,6 +2,7 @@ package nl.hardwerkendenederlanders.hrcms.database;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
@@ -67,7 +68,8 @@ public class ArticleAuthorRepositoryTest {
         ArticleAuthor articleAuthor = new ArticleAuthor(article.getId(), author.getId());
 
         articleAuthorRepository.insert(articleAuthor);
-        ArticleAuthor retrieved = articleAuthorRepository.findById(articleAuthor.getId());
+        ArticleAuthor retrieved =
+                articleAuthorRepository.findById(articleAuthor.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(articleAuthor.getId(), retrieved.getId());
@@ -80,7 +82,8 @@ public class ArticleAuthorRepositoryTest {
         ArticleAuthor articleAuthor = new ArticleAuthor(article.getId(), author.getId());
 
         articleAuthorRepository.insert(articleAuthor);
-        ArticleAuthor retrieved = articleAuthorRepository.findById(articleAuthor.getId());
+        ArticleAuthor retrieved =
+                articleAuthorRepository.findById(articleAuthor.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(articleAuthor.getId(), retrieved.getId());
@@ -89,8 +92,9 @@ public class ArticleAuthorRepositoryTest {
     }
 
     @Test
-    void findArticleAuthorById_withNonExistentId_shouldThrowException() {
-        assertThrows(RuntimeException.class, () -> articleAuthorRepository.findById(UUID.randomUUID()));
+    void findArticleAuthorById_withNonExistentId_shouldReturnEmptyOptional() {
+        Optional<ArticleAuthor> result = articleAuthorRepository.findById(UUID.randomUUID());
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -100,7 +104,8 @@ public class ArticleAuthorRepositoryTest {
         articleAuthorRepository.insert(articleAuthor);
         articleAuthorRepository.delete(articleAuthor.getId());
 
-        assertThrows(Exception.class, () -> articleAuthorRepository.findById(articleAuthor.getId()));
+        Optional<ArticleAuthor> result = articleAuthorRepository.findById(articleAuthor.getId());
+        assertTrue(result.isEmpty());
     }
 
     @Test

@@ -3,12 +3,14 @@ package nl.hardwerkendenederlanders.hrcms.database;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.OffsetDateTime;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.ArticleRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.PublicationStatus;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -16,6 +18,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -25,6 +29,14 @@ public class ArticleRepositoryTest {
 
     @Autowired
     private ArticleRepository articleRepository;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @BeforeEach
+    void setUp() {
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "articles");
+    }
 
     @Test
     void insertArticle_withValidArticle_shouldPersistAndRetrieve() {
@@ -36,7 +48,7 @@ public class ArticleRepositoryTest {
                 Article.builder().title(title).textContent(textContent).build();
 
         articleRepository.insert(article);
-        Article retrieved = articleRepository.findById(article.getId());
+        Article retrieved = articleRepository.findById(article.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(article.getId(), retrieved.getId());
@@ -59,7 +71,8 @@ public class ArticleRepositoryTest {
         article.setUpdatedAt(OffsetDateTime.now());
         articleRepository.update(article);
 
-        Article retrieved = articleRepository.findById(article.getId());
+        Article retrieved = articleRepository.findById(article.getId()).orElse(null);
+        assertNotNull(retrieved);
         assertEquals("Updated Title", retrieved.getTitle());
         assertEquals("Updated content", retrieved.getTextContent());
         assertEquals(PublicationStatus.PUBLISHED, retrieved.getPublicationStatus());
@@ -73,7 +86,7 @@ public class ArticleRepositoryTest {
                 .build();
         articleRepository.insert(article);
 
-        Article retrieved = articleRepository.findById(article.getId());
+        Article retrieved = articleRepository.findById(article.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(article.getId(), retrieved.getId());
@@ -82,8 +95,9 @@ public class ArticleRepositoryTest {
     }
 
     @Test
-    void findArticleById_withNonExistentId_shouldThrowException() {
-        assertThrows(Exception.class, () -> articleRepository.findById(UUID.randomUUID()));
+    void findArticleById_withNonExistentId_shouldReturnEmptyOptional() {
+        Optional<Article> result = articleRepository.findById(UUID.randomUUID());
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -94,12 +108,13 @@ public class ArticleRepositoryTest {
                 .build();
         articleRepository.insert(article);
 
-        Article retrieved = articleRepository.findById(article.getId());
+        Article retrieved = articleRepository.findById(article.getId()).orElse(null);
         assertNotNull(retrieved);
 
         articleRepository.delete(article.getId());
 
-        assertThrows(Exception.class, () -> articleRepository.findById(article.getId()));
+        Optional<Article> result = articleRepository.findById(article.getId());
+        assertTrue(result.isEmpty());
     }
 
     @Test
