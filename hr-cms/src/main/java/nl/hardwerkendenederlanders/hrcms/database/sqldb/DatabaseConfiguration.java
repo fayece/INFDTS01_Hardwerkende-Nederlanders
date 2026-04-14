@@ -22,13 +22,13 @@ public class DatabaseConfiguration {
     }
 
     @Bean
-    public CommentRepository commentRepository(NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
-        return new CommentRepository(jdbc, resourceLoader);
+    public JdbcCommentRepository commentRepository(NamedParameterJdbcTemplate jdbc) {
+        return new JdbcCommentRepository(jdbc);
     }
 
     @Bean
-    public MediaItemRepository mediaItemRepository(NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
-        return new MediaItemRepository(jdbc, resourceLoader);
+    public JdbcMediaRepository mediaItemRepository(NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
+        return new JdbcMediaRepository(jdbc);
     }
 
     @Bean

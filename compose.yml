@@ -16,6 +16,8 @@ services:
         condition: service_healthy
     mem_limit: 500mb
     cpus: 1
+    volumes:
+      - uploads:/app/uploads/media
 
   db:
     image: postgres:18.2-trixie
@@ -23,8 +25,8 @@ services:
     env_file: ".env"
     restart: always
     environment:
-      POSTGRES_USER : ${DB_USERNAME}
-      POSTGRES_PASSWORD : ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     volumes:
       - pgdata:/var/lib/postgresql
@@ -40,3 +42,4 @@ services:
 
 volumes:
   pgdata:
+  uploads:
