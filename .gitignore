@@ -35,3 +35,4 @@ replay_pid*
 /hr-cms/qodana-results
 .env.local
 /hr-cms/uploads
+/uploads
