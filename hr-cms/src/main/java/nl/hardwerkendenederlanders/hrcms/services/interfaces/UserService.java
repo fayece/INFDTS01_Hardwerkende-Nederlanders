@@ -24,4 +24,10 @@ public interface UserService {
     List<User> findUserOnActivityPaginated(boolean isActive, int page, int amount);
 
     List<User> searchByNamePaginated(String name, int page, int amount);
+
+    int countByActive(boolean active);
+
+    int countAll();
+
+    int countByNameOrEmailPaginated(String name);
 }

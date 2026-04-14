@@ -92,4 +92,19 @@ public class UserServiceImpl implements UserService {
     public List<User> findUserOnActivityPaginated(boolean isActive, int page, int amount) {
         return userRepository.findUserOnActivityPaginated(isActive, page, amount);
     }
+
+    @Override
+    public int countByActive(boolean active) {
+        return userRepository.countByActive(active);
+    }
+
+    @Override
+    public int countAll() {
+        return userRepository.countAll();
+    }
+
+    @Override
+    public int countByNameOrEmailPaginated(String name) {
+        return userRepository.countByNameOrEmailPaginated(name);
+    }
 }

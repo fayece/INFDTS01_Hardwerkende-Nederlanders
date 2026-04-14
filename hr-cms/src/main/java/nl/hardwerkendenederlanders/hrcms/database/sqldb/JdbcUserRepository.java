@@ -104,6 +104,21 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
+    public int countByNameOrEmailPaginated(String name) {
+        String sqlQuery = """
+                SELECT COUNT(*)
+                FROM %s
+                WHERE first_name ILIKE :name
+                OR last_name ILIKE :name
+                OR email ILIKE :name
+                """.formatted(TABLE);
+
+        MapSqlParameterSource params = new MapSqlParameterSource().addValue("name", "%" + name + "%");
+
+        return jdbc.queryForObject(sqlQuery, params, Integer.class);
+    }
+
+    @Override
     public List<User> findUserOnActivityPaginated(boolean isActive, int page, int amount) {
         String sqlQuery = """
                 SELECT *
@@ -194,5 +209,28 @@ public class JdbcUserRepository implements UserRepository {
         MapSqlParameterSource params = new MapSqlParameterSource().addValue("id", id);
 
         return jdbc.update(sqlQuery, params) >= 1;
+    }
+
+    @Override
+    public int countByActive(boolean active) {
+        String sqlQuery = """
+                SELECT COUNT(*)
+                FROM %s
+                WHERE active = :active
+                """.formatted(TABLE);
+
+        MapSqlParameterSource params = new MapSqlParameterSource("active", active);
+
+        return jdbc.queryForObject(sqlQuery, params, Integer.class);
+    }
+
+    @Override
+    public int countAll() {
+        String sqlQuery = """
+                SELECT COUNT(*)
+                FROM %s
+                """.formatted(TABLE);
+
+        return jdbc.queryForObject(sqlQuery, new MapSqlParameterSource(), Integer.class);
     }
 }

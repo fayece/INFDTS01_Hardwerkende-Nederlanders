@@ -25,4 +25,10 @@ public interface UserRepository {
     List<User> findUserOnActivityPaginated(boolean isActive, int page, int amount);
 
     boolean deleteById(UUID id);
+
+    int countByActive(boolean active);
+
+    int countAll();
+
+    int countByNameOrEmailPaginated(String name);
 }

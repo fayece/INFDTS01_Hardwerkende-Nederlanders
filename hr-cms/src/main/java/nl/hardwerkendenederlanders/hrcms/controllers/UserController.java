@@ -25,17 +25,20 @@ public class UserController {
             @RequestParam(required = false) String searchName,
             @RequestParam(required = false) Boolean sortActive) {
         List<User> users;
+        int maxPages = 1;
 
         int pageSize = 13;
         if (searchName != null) {
             users = userService.searchByNamePaginated(searchName, page, pageSize);
             model.addAttribute("searchName", searchName);
+            maxPages = (int) Math.ceil(((double) userService.countByNameOrEmailPaginated(searchName)) / pageSize);
         } else if (sortActive != null) {
             users = userService.findUserOnActivityPaginated(sortActive, page, pageSize);
+            maxPages = (int) Math.ceil(((double) userService.countByActive(sortActive)) / pageSize);
         } else {
             users = userService.findUsersPaginated(page, pageSize);
+            maxPages = (int) Math.ceil(((double) userService.countAll()) / pageSize);
         }
-        Integer maxPages = (int) Math.ceil(((double) ((userService.findAllUsers()).size()) / pageSize));
 
         model.addAttribute("users", users);
         model.addAttribute("currentPage", page);
