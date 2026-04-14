@@ -1,9 +1,9 @@
 package nl.hardwerkendenederlanders.hrcms.database;
 
+import java.sql.SQLException;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.ArticleRepository;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.RoleRepository;
 import nl.hardwerkendenederlanders.hrcms.models.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,12 +47,12 @@ public class JdbcCommentRepositoryTest extends CommentRepositoryContractTest {
     }
 
     @BeforeEach
-    void setupDatabasePrerequisites() {
+    void setupDatabasePrerequisites() throws SQLException {
         Article article = Article.builder()
                 .title("Test Article")
                 .textContent("Test content.")
                 .build();
-        articleRepository.insert(article);
+        articleRepository.Create(article);
         this.articleId = article.getId();
 
         String uniqueRoleName = "Author Role " + UUID.randomUUID();

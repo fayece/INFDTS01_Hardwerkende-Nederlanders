@@ -3,7 +3,6 @@ package nl.hardwerkendenederlanders.hrcms.database;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.OffsetDateTime;
-import java.util.Optional;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcArticleRepositoryImpl;
@@ -15,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -68,6 +69,7 @@ public class ArticleRepositoryTest {
 
         Article retrieved = articleRepository.GetById(article.getId());
 
+        assertNotNull(retrieved);
         assertEquals("Updated Title", retrieved.getTitle());
         assertEquals("Updated content", retrieved.getTextContent());
         assertEquals(PublicationStatus.PUBLISHED, retrieved.getPublicationStatus());
@@ -83,6 +85,7 @@ public class ArticleRepositoryTest {
 
         Article retrieved = articleRepository.GetById(article.getId());
 
+        assertNotNull(retrieved);
         assertEquals(article.getId(), retrieved.getId());
         assertEquals("Find By ID Test", retrieved.getTitle());
         assertEquals("Content for find by id test", retrieved.getTextContent());

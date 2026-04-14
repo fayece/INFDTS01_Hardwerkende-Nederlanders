@@ -34,6 +34,7 @@ class GlobalExceptionHandlerTest {
         when(ex.getAction().name()).thenReturn("UPDATE");
         when(ex.getComponentName()).thenReturn("Prefix");
         when(ex.getRedirectTarget()).thenReturn("/settings/profile");
+        when(ex.getReason()).thenReturn("Please try again later");
 
         RedirectAttributes redirectAttributes = mock(RedirectAttributes.class);
 
