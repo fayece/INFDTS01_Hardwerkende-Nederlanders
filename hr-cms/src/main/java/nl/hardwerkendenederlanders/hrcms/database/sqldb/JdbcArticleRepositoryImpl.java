@@ -22,14 +22,15 @@ public class JdbcArticleRepositoryImpl implements ArticleRepository {
     }
 
     protected RowMapper<Article> rowMapper() {
-        return (rs, _) -> new Article(
-                rs.getObject("id", UUID.class),
-                rs.getString("title"),
-                rs.getString("text_content"),
-                rs.getObject("created_at", OffsetDateTime.class),
-                rs.getObject("updated_at", OffsetDateTime.class),
-                PublicationStatus.valueOf(rs.getString("publication_status")),
-                rs.getObject("subject_id", UUID.class));
+        return (rs, _) -> Article.builder()
+                .id(rs.getObject("id", UUID.class))
+                .title(rs.getString("title"))
+                .textContent(rs.getString("text_content"))
+                .createdAt(rs.getObject("created_at", OffsetDateTime.class))
+                .updatedAt(rs.getObject("updated_at", OffsetDateTime.class))
+                .publicationStatus(PublicationStatus.valueOf(rs.getString("publication_status")))
+                .subjectId(rs.getObject("subject_id", UUID.class))
+                .build();
     }
 
     private MapSqlParameterSource ArticleMapper(Article article) {
@@ -50,10 +51,10 @@ public class JdbcArticleRepositoryImpl implements ArticleRepository {
     public void insert(Article article) {
 
         String query = ("""
-            INSERT INTO articles (id, title, text_content, created_at, updated_at, publication_status, subject_id)
+
+                INSERT INTO articles (id, title, text_content, created_at, updated_at, publication_status, subject_id)
             VALUES (:id, :title, :text_content, :created_at, :updated_at, :publication_status, :subject_id);
             """);
-
         jdbc.update(query, ArticleMapper(article));
     }
 

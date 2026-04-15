@@ -2,6 +2,7 @@ package nl.hardwerkendenederlanders.hrcms.controllers;
 
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentActionException;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.ArticleService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.SubjectService;
@@ -13,18 +14,18 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/article/editor")
 @Controller
 public class EditorArticleController {
-    ArticleService articleService;
-    SubjectService subjectService;
+    private final ArticleService articleService;
+    private final SubjectService subjectService;
 
-    public EditorArticleController(ArticleService articleService, SubjectService subjecService) {
+    public EditorArticleController(ArticleService articleService, SubjectService subjectService) {
         this.articleService = articleService;
-        this.subjectService = subjecService;
+        this.subjectService = subjectService;
     }
 
     // start empty editor
     @GetMapping("")
     public String getArticle(Model model) {
-        model.addAttribute("articleForm", new Article());
+        model.addAttribute("articleForm", Article.builder().build());
         model.addAttribute("subjects", subjectService.findAll());
         return "pages/article-editor-page";
     }
@@ -45,11 +46,15 @@ public class EditorArticleController {
     @PostMapping("/save")
     public String putArticle(Model model, @ModelAttribute("articleForm") Article articleForm) {
         model.addAttribute("articleForm", articleForm);
+
         try {
             articleService.ensureArticleExists(articleForm);
-        } catch (Exception e) {
-            log.error("e: ", e);
-            return "redirect:/article/editor/" + articleForm.getId().toString() + "?error=true";
+        } catch (ComponentActionException e) {
+            if (e.getAction() == ComponentActionException.Action.CREATE) {
+                return "redirect:/article/editor?error=INSERT";
+            } else {
+                return "redirect:/article/editor/" + articleForm.getId().toString() + "?error=UPDATE";
+            }
         }
 
         return "redirect:/article/editor/" + articleForm.getId().toString();

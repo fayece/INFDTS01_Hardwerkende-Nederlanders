@@ -12,7 +12,8 @@
     <section class="content-section">
 
         <a th:href="@{/article/editor/overview}">To Overview</a>
-        <div th:if="${param.error != null}" th:insert="~{fragments/app-wide/error-modal :: error_modal('Error while uploading article')}"></div>
+        <div th:if="${param.error != null && param.error[0] == 'UPDATE'}" th:insert="~{fragments/app-wide/error-modal :: error_modal('Error while updating article' )}"></div>
+        <div th:if="${param.error != null && param.error[0] == 'INSERT'}" th:insert="~{fragments/app-wide/error-modal :: error_modal('Error while insterting article')}"></div>
         <form
             role="form"
             method="post"

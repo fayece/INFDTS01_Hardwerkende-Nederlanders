@@ -24,4 +24,11 @@ public class ComponentActionException extends RuntimeException {
         this.redirectTarget = redirectTarget;
         this.reason = reason;
     }
+
+    /**
+     * Create a ComponentActionException without specifying a reason for failure.
+     */
+    public ComponentActionException(String componentName, Action action, String redirectTarget, Throwable cause) {
+        this(componentName, action, redirectTarget, cause, "Failure reason not specified. Second time's the charm?");
+    }
 }

@@ -9,15 +9,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("article/editor")
 @Controller
 public class EditorArticleOverviewController {
-    private final ArticleService _articleService;
+    private final ArticleService articleService;
 
     public EditorArticleOverviewController(ArticleService articleService) {
-        _articleService = articleService;
+        this.articleService = articleService;
     }
 
     @GetMapping("/overview")
     public String GetArticleEditorOverview(Model model) {
-        model.addAttribute("articles", _articleService.findAllPaged(20, 1));
+        model.addAttribute("articles", articleService.findAllPaged(20, 1));
         return "pages/article-editor-overview";
     }
 }
