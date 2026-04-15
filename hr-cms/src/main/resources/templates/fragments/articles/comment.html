@@ -1,6 +1,6 @@
 <div th:fragment="comment" class="comment" xmlns="http://www.w3.org/1999/html">
     <span class="author-name" th:text="${comment.authorName ?: 'Unknown User'}"></span>
-    <div class="comment-body" th:attr="data-markdown=${comment.commentBody}"></div>
+    <div class="comment-body" th:data-markdown="${comment.commentBody}"></div>
 
     <div class="comment-footer">
         <small class="local-time"
@@ -15,8 +15,8 @@
         </button>
     </div>
 
-
     <div class="replies-container" th:id="'replies-for-' + ${comment.id}"></div>
+
     <button class="load-replies-button"
             th:if="${comment.hasReplies}"
             th:data-parent-id="${comment.id}">

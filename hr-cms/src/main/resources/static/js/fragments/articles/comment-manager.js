@@ -185,15 +185,19 @@ const handleShowReplyForm = (button) => {
     const container = document.getElementById(`replies-for-${commentId}`);
     if (container.querySelector(".reply-form-container")) return;
 
-    container.insertAdjacentHTML('afterbegin', `
-        <div class="reply-form-container">
-            <div id="reply-editor-${commentId}"></div>
-            <div>
-                <button type="button" class="submit-reply" data-parent-id="${commentId}" data-article-id="${articleId}">Post Reply</button>
-                <button type="button" class="cancel-reply" data-parent-id="${commentId}">Cancel</button>
-            </div>
-        </div>
-    `);
+    const template = document.getElementById("reply-form-template");
+    const clone = template.content.cloneNode(true);
+
+    clone.querySelector(".reply-editor-target").id = `reply-editor-${commentId}`;
+
+    const submitBtn = clone.querySelector(".submit-reply");
+    submitBtn.dataset.parentId = commentId;
+    submitBtn.dataset.articleId = articleId;
+
+    const cancelBtn = clone.querySelector(".cancel-reply");
+    cancelBtn.dataset.parentId = commentId;
+
+    container.prepend(clone);
 
     activeEditors[commentId] = createEditor(`reply-editor-${commentId}`, "Write your reply...");
 };

@@ -2,13 +2,13 @@
     <div class="comment-section--inner">
         <h2>Comments</h2>
 
-        <div th:if="${errorMessage}" class="error-container">
-            <p th:text="${errorMessage}"></p>
-        </div>
-
         <form class="comment-section--create"
               th:action="@{/comment/article/{articleId}/new(articleId=${articleId})}"
               method="post">
+
+            <div th:if="${errorMessage}" class="error-container">
+                <p th:text="${errorMessage}"></p>
+            </div>
 
             <div id="comment-editor"></div>
             <input type="hidden" name="commentBody" id="commentBody">
@@ -22,12 +22,24 @@
                 <div th:replace="~{fragments/articles/comment :: comment(comment=${comment})}"></div>
             </li>
         </ul>
+
         <button th:if="${hasMore}"
-                th:attr="data-article-id=${articleId}, data-offset=${offset}"
+                th:data-article-id="${articleId}"
+                th:data-offset="${offset}"
                 class="comment-section--load-more"
                 id="load-more-comments">
             Show more comments
         </button>
+
+        <template id="reply-form-template">
+            <div class="reply-form-container">
+                <div class="reply-editor-target"></div>
+                <div>
+                    <button type="button" class="submit-reply">Post Reply</button>
+                    <button type="button" class="cancel-reply">Cancel</button>
+                </div>
+            </div>
+        </template>
     </div>
 </section>
 
