@@ -14,10 +14,10 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 @Slf4j
-public class JdbcArticleRepositoryImpl implements ArticleRepository {
+public class JdbcArticleRepository implements ArticleRepository {
     private final NamedParameterJdbcTemplate jdbc;
 
-    public JdbcArticleRepositoryImpl(NamedParameterJdbcTemplate jdbc) {
+    public JdbcArticleRepository(NamedParameterJdbcTemplate jdbc) {
         this.jdbc = jdbc;
     }
 

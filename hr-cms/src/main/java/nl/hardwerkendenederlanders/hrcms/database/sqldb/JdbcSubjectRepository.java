@@ -10,10 +10,10 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
-public class JdbcSubjectRepositoryImpl implements SubjectRepository {
+public class JdbcSubjectRepository implements SubjectRepository {
     private final NamedParameterJdbcTemplate jdbc;
 
-    public JdbcSubjectRepositoryImpl(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    public JdbcSubjectRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.jdbc = namedParameterJdbcTemplate;
     }
 
