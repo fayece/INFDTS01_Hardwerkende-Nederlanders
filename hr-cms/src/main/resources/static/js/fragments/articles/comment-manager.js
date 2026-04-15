@@ -15,40 +15,69 @@ const initializeNewContent = (targetElement) => {
     renderMarkdown(targetElement);
 };
 
-const createEditor = (elementId, placeholder, minHeight = "auto") => {
-    return new window.toastui.Editor({
-        el: document.getElementById(elementId),
-        height: "auto",
-        minHeight: minHeight,
-        initialEditType: "wysiwyg",
-        hideModeSwitch: true,
-        previewStyle: "vertical",
-        placeholder: placeholder,
-        toolbarItems: [["bold", "italic", "strike", "image"]],
-        hooks: {
-            addImageBlobHook: async (blob, callback) => {
-                const formData = new FormData();
-                formData.append("file", blob);
-                try {
-                    const response = await fetch("/media/upload", {
-                        method: "POST",
-                        body: formData
-                    });
-                    const data = await response.json();
-                    callback(data.url, "image");
-                } catch (error) {
-                    console.error("Image upload failed", error);
-                    alert("Failed to upload image.");
-                }
-            }
-        }
-    });
+const extractHtmlFragment = (htmlString, selector) => {
+    return new DOMParser().parseFromString(htmlString, "text/html").querySelector(selector);
 };
 
-const extractHtmlFragment = (htmlString, selector) => {
-    const doc = new DOMParser().parseFromString(htmlString, "text/html");
-    return doc.querySelector(selector);
+const isFullPageHtml = (html) => {
+    const lower = html.toLowerCase();
+    return lower.startsWith("<!doctype html>") || lower.includes("<body");
 };
+
+const setButtonLoading = (button, loadingText) => {
+    if (!button) return () => {};
+    const originalText = button.textContent;
+    button.textContent = loadingText;
+    button.disabled = true;
+    return () => {
+        button.textContent = originalText;
+        button.disabled = false;
+    };
+};
+
+const postUrlEncoded = (url, body) => fetch(url, {
+    method: "POST",
+    headers: {"Content-Type": "application/x-www-form-urlencoded"},
+    body
+});
+
+const displayServerError = (html, target) => {
+    const errorEl = extractHtmlFragment(html, ".error-container");
+    if (!errorEl) return false;
+
+    let existing = target.firstElementChild?.matches(".error-container")
+        ? target.firstElementChild
+        : null;
+
+    if (!existing) {
+        existing = document.createElement("div");
+        existing.className = "error-container";
+        target.insertAdjacentElement("afterbegin", existing);
+    }
+
+    existing.innerHTML = errorEl.innerHTML;
+    return true;
+};
+
+const createEditor = (elementId, placeholder, minHeight = "auto") => new window.toastui.Editor({
+    el: document.getElementById(elementId),
+    height: "auto",
+    minHeight: minHeight,
+    initialEditType: "wysiwyg",
+    hideModeSwitch: true,
+    previewStyle: "vertical",
+    placeholder: placeholder,
+    toolbarItems: [["bold", "italic", "strike", "image"]],
+    hooks: {
+        addImageBlobHook: async (blob, callback) => {
+            const formData = new FormData();
+            formData.append("file", blob);
+            const res = await fetch("/media/upload", { method: "POST", body: formData }).catch(() => null);
+            if (!res || !res.ok) return alert("Failed to upload image.");
+            callback((await res.json()).url, "image");
+        }
+    }
+});
 
 export const initCommentForm = () => {
     const form = document.querySelector(".comment-section--create");
@@ -62,44 +91,44 @@ export const initCommentForm = () => {
         const markdown = editor.getMarkdown().trim();
         if (!markdown) return;
 
-        const hiddenInput = document.getElementById("commentBody");
-        hiddenInput.value = markdown;
+        form.commentBody.value = markdown;
 
-        try {
-            const response = await fetch(form.action, {
-                method: "POST",
-                body: new URLSearchParams(new FormData(form)),
-                headers: { "Content-Type": "application/x-www-form-urlencoded" }
-            });
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const restoreButton = setButtonLoading(submitBtn, "Posting...");
+        const response = await postUrlEncoded(form.action, new URLSearchParams(new FormData(form))).catch(() => null);
 
-            const html = await response.text();
-            const errorEl = extractHtmlFragment(html, ".error-container");
-
-            if (errorEl) {
-                const existing = document.querySelector(".error-container");
-                if (existing) existing.replaceWith(errorEl);
-                else form.insertAdjacentElement("beforebegin", errorEl);
-                return;
-            }
-
-            editor.setMarkdown("");
-            const newComment = extractHtmlFragment(html, ".comment");
-            const list = document.querySelector(".comment-section--list");
-
-            if (newComment && list) {
-                const li = document.createElement("li");
-                li.appendChild(newComment);
-                list.prepend(li);
-
-                initializeNewContent(li);
-
-                const loadMoreBtn = document.getElementById("load-more-comments");
-                if (loadMoreBtn) {
-                    loadMoreBtn.dataset.offset = String(Number(loadMoreBtn.dataset.offset) + 1);
-                }
-            }
-        } catch (error) {
+        if (!response) {
+            alert("Network error. Please try again later.");
+            return restoreButton();
         }
+
+        const html = await response.text();
+
+        if (displayServerError(html, form)) return restoreButton();
+
+        if (!response.ok) {
+            alert("Failed to post comment. Please try again.");
+            return restoreButton();
+        }
+
+        if (isFullPageHtml(html)) {
+            alert("Your session may have expired or an error occurred. Please copy your text and refresh the page.");
+            return restoreButton();
+        }
+
+        editor.setMarkdown("");
+        const newComment = extractHtmlFragment(html, ".comment");
+        const list = document.querySelector(".comment-section--list");
+
+        if (newComment && list) {
+            const li = document.createElement("li");
+            li.appendChild(newComment);
+            list.prepend(li);
+            initializeNewContent(li);
+        }
+
+        const loadMoreBtn = document.getElementById("load-more-comments");
+        if (loadMoreBtn) loadMoreBtn.dataset.offset = String(Number(loadMoreBtn.dataset.offset) + 1);
     });
 };
 
@@ -108,78 +137,48 @@ export const initReplyInteractions = () => {
         const target = event.target;
 
         const loadBtn = target.closest(".load-replies-button");
-        if (loadBtn) {
-            await handleLoadReplies(loadBtn);
-            return;
-        }
+        if (loadBtn) return handleLoadReplies(loadBtn);
 
         const replyBtn = target.closest(".reply-button");
-        if (replyBtn) {
-            handleShowReplyForm(replyBtn);
-            return;
-        }
+        if (replyBtn) return handleShowReplyForm(replyBtn);
 
         const cancelBtn = target.closest(".cancel-reply");
         if (cancelBtn) {
             const commentId = cancelBtn.dataset.parentId;
             cancelBtn.closest(".reply-form-container").remove();
 
-            const container = document.getElementById(`replies-for-${commentId}`);
-            if (container) {
-                const errorMsg = container.querySelector(".error-container");
-                if (errorMsg) errorMsg.remove();
-            }
-
             if (commentId) delete activeEditors[commentId];
-            return;
         }
 
         const submitBtn = target.closest(".submit-reply");
-        if (submitBtn) { await handleSubmitReply(submitBtn); }
+        if (submitBtn) return handleSubmitReply(submitBtn);
     });
 };
 
 const handleLoadReplies = async (button) => {
     const parentId = button.dataset.parentId;
-    const repliesContainer = document.getElementById(`replies-for-${parentId}`);
-    if (!parentId || !repliesContainer) return;
+    const container = document.getElementById(`replies-for-${parentId}`);
+    if (!parentId || !container) return;
 
-    const originalText = button.textContent;
-    button.textContent = "Loading replies...";
-    button.disabled = true;
+    const restoreButton = setButtonLoading(button, "Loading replies...");
+    const response = await fetch(`/comment/${parentId}/replies`).catch(() => null);
 
-    try {
-        const response = await fetch(`/comment/${parentId}/replies`);
-        if (!response.ok) {
-            button.textContent = "Error loading replies";
-            button.disabled = false;
-            setTimeout(() => { button.textContent = originalText; }, 3000);
-            return;
-        }
-
-        const html = await response.text();
-
-        [...repliesContainer.children]
-            .forEach(child => {
-            if (!child.classList.contains("reply-form-container")) child.remove();
-        });
-
-        repliesContainer.insertAdjacentHTML('beforeend', html);
-
-        button.style.display = "none";
-
-        initializeNewContent(repliesContainer);
-    } catch (error) {
-        button.textContent = "Network error. Please try again later.";
-        button.disabled = false;
-        setTimeout(() => { button.textContent = originalText; }, 3000);
+    if (!response || !response.ok) {
+        button.textContent = "Error loading replies";
+        return setTimeout(restoreButton, 3000);
     }
+
+    [...container.children].forEach(c => c.matches(".reply-form-container") || c.remove());
+
+    container.insertAdjacentHTML('beforeend', await response.text());
+    button.style.display = "none";
+    initializeNewContent(container);
 };
 
 const handleShowReplyForm = (button) => {
     const commentId = button.dataset.commentId;
-    const articleElement = button.closest('[data-article-id]') || document.querySelector('[data-article-id]');
-    const articleId = articleElement ? articleElement.dataset.articleId : null;
+    const articleId = button.closest('[data-article-id]')?.dataset.articleId
+        || document.querySelector('[data-article-id]')?.dataset.articleId;
 
     if (!articleId) return alert("An error occurred. Please refresh the page.");
 
@@ -201,74 +200,45 @@ const handleShowReplyForm = (button) => {
 
 const handleSubmitReply = async (button) => {
     const commentId = button.dataset.parentId;
-    const articleId = button.dataset.articleId;
     const editor = activeEditors[commentId];
-
     if (!editor) return;
+
     const markdown = editor.getMarkdown().trim();
     if (!markdown) return;
 
-    const originalText = button.textContent;
-    button.textContent = "Posting...";
-    button.disabled = true;
+    const restoreButton = setButtonLoading(button, "Posting...");
+    const payload = new URLSearchParams({ commentBody: markdown, parentCommentId: commentId });
+    const response = await postUrlEncoded(`/comment/article/${button.dataset.articleId}/new`, payload).catch(() => null);
 
-    try {
-        const response = await fetch(`/comment/article/${articleId}/new`, {
-            method: "POST",
-            headers: {"Content-Type": "application/x-www-form-urlencoded"},
-            body: new URLSearchParams({ "commentBody": markdown, "parentCommentId": commentId })
-        });
-
-        if (response.ok) {
-            const html = await response.text();
-
-            const errorEl = extractHtmlFragment(html, ".error-container");
-            if (errorEl) {
-                const container = document.getElementById(`replies-for-${commentId}`);
-                let existing = container.querySelector(".error-container");
-
-                if (!existing) {
-                    existing = document.createElement("div");
-                    existing.className = "error-container";
-                    container.insertAdjacentElement("afterbegin", existing);
-                }
-
-                existing.innerHTML = errorEl.innerHTML;
-
-                button.textContent = originalText;
-                button.disabled = false;
-                return;
-            }
-
-            if (html.trim().toLowerCase().startsWith("<!doctype html>") || html.toLowerCase().includes("<body")) {
-                alert("Your session may have expired or an error occurred. Please copy your text and refresh the page.");
-                button.textContent = originalText;
-                button.disabled = false;
-                return;
-            }
-
-            const newReply = extractHtmlFragment(html, ".comment");
-
-            if (newReply) {
-                const container = document.getElementById(`replies-for-${commentId}`);
-                container.querySelector(".reply-form-container").remove();
-                container.appendChild(newReply);
-
-                delete activeEditors[commentId];
-                initializeNewContent(newReply);
-            } else {
-                alert("Failed to load the new reply. Please refresh the page.");
-                button.textContent = originalText;
-                button.disabled = false;
-            }
-        } else {
-            alert("Failed to post reply. Please try again.");
-            button.textContent = originalText;
-            button.disabled = false;
-        }
-    } catch (error) {
+    if (!response) {
         alert("Network error. Please check your connection.");
-        button.textContent = originalText;
-        button.disabled = false;
+        return restoreButton();
+    }
+
+    const html = await response.text();
+    const container = document.getElementById(`replies-for-${commentId}`);
+    const replyFormContainer = container.querySelector(".reply-form-container");
+
+    if (displayServerError(html, replyFormContainer)) return restoreButton();
+
+    if (!response.ok) {
+        alert("Failed to post reply. Please try again.");
+        return restoreButton();
+    }
+
+    if (isFullPageHtml(html)) {
+        alert("Your session may have expired. Please copy your text and refresh.");
+        return restoreButton();
+    }
+
+    const newReply = extractHtmlFragment(html, ".comment");
+    if (newReply) {
+        container.querySelector(".reply-form-container").remove();
+        container.appendChild(newReply);
+        delete activeEditors[commentId];
+        initializeNewContent(newReply);
+    } else {
+        alert("Failed to load the new reply. Please refresh the page.");
+        restoreButton();
     }
 };
