@@ -99,7 +99,6 @@ export const initCommentForm = () => {
                 }
             }
         } catch (error) {
-            console.error("Error submitting comment:", error);
         }
     });
 };
@@ -124,6 +123,13 @@ export const initReplyInteractions = () => {
         if (cancelBtn) {
             const commentId = cancelBtn.dataset.parentId;
             cancelBtn.closest(".reply-form-container").remove();
+
+            const container = document.getElementById(`replies-for-${commentId}`);
+            if (container) {
+                const errorMsg = container.querySelector(".error-container");
+                if (errorMsg) errorMsg.remove();
+            }
+
             if (commentId) delete activeEditors[commentId];
             return;
         }
@@ -151,7 +157,15 @@ const handleLoadReplies = async (button) => {
             return;
         }
 
-        repliesContainer.innerHTML = await response.text();
+        const html = await response.text();
+
+        [...repliesContainer.children]
+            .forEach(child => {
+            if (!child.classList.contains("reply-form-container")) child.remove();
+        });
+
+        repliesContainer.insertAdjacentHTML('beforeend', html);
+
         button.style.display = "none";
 
         initializeNewContent(repliesContainer);
@@ -207,7 +221,33 @@ const handleSubmitReply = async (button) => {
 
         if (response.ok) {
             const html = await response.text();
-            const newReply = extractHtmlFragment(html, ".comment"); // Use shared DOM parser!
+
+            const errorEl = extractHtmlFragment(html, ".error-container");
+            if (errorEl) {
+                const container = document.getElementById(`replies-for-${commentId}`);
+                let existing = container.querySelector(".error-container");
+
+                if (!existing) {
+                    existing = document.createElement("div");
+                    existing.className = "error-container";
+                    container.insertAdjacentElement("afterbegin", existing);
+                }
+
+                existing.innerHTML = errorEl.innerHTML;
+
+                button.textContent = originalText;
+                button.disabled = false;
+                return;
+            }
+
+            if (html.trim().toLowerCase().startsWith("<!doctype html>") || html.toLowerCase().includes("<body")) {
+                alert("Your session may have expired or an error occurred. Please copy your text and refresh the page.");
+                button.textContent = originalText;
+                button.disabled = false;
+                return;
+            }
+
+            const newReply = extractHtmlFragment(html, ".comment");
 
             if (newReply) {
                 const container = document.getElementById(`replies-for-${commentId}`);
@@ -216,6 +256,10 @@ const handleSubmitReply = async (button) => {
 
                 delete activeEditors[commentId];
                 initializeNewContent(newReply);
+            } else {
+                alert("Failed to load the new reply. Please refresh the page.");
+                button.textContent = originalText;
+                button.disabled = false;
             }
         } else {
             alert("Failed to post reply. Please try again.");
