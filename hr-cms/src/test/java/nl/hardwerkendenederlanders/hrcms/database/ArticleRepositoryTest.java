@@ -3,11 +3,10 @@ package nl.hardwerkendenederlanders.hrcms.database;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.OffsetDateTime;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.ArticleRepository;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcArticleRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.PublicationStatus;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +17,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ArticleRepositoryTest {
 
     @Autowired
-    private ArticleRepository articleRepository;
+    private JdbcArticleRepository articleRepository;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -48,7 +48,7 @@ public class ArticleRepositoryTest {
                 Article.builder().title(title).textContent(textContent).build();
 
         articleRepository.insert(article);
-        Article retrieved = articleRepository.findById(article.getId()).orElse(null);
+        Article retrieved = articleRepository.findById(article.getId());
 
         assertNotNull(retrieved);
         assertEquals(article.getId(), retrieved.getId());
@@ -71,7 +71,8 @@ public class ArticleRepositoryTest {
         article.setUpdatedAt(OffsetDateTime.now());
         articleRepository.update(article);
 
-        Article retrieved = articleRepository.findById(article.getId()).orElse(null);
+        Article retrieved = articleRepository.findById(article.getId());
+
         assertNotNull(retrieved);
         assertEquals("Updated Title", retrieved.getTitle());
         assertEquals("Updated content", retrieved.getTextContent());
@@ -86,7 +87,7 @@ public class ArticleRepositoryTest {
                 .build();
         articleRepository.insert(article);
 
-        Article retrieved = articleRepository.findById(article.getId()).orElse(null);
+        Article retrieved = articleRepository.findById(article.getId());
 
         assertNotNull(retrieved);
         assertEquals(article.getId(), retrieved.getId());
@@ -95,9 +96,59 @@ public class ArticleRepositoryTest {
     }
 
     @Test
-    void findArticleById_withNonExistentId_shouldReturnEmptyOptional() {
-        Optional<Article> result = articleRepository.findById(UUID.randomUUID());
-        assertTrue(result.isEmpty());
+    void findArticleById_withNonExistentId_shouldReturnNull() {
+        assertNull(articleRepository.findById(UUID.randomUUID()));
+    }
+
+    @Test
+    void getAllArticles_withTwoArticles_shouldReturnArticles() {
+        Article article1 = Article.builder()
+                .title("Article 1")
+                .textContent("it sure is an article")
+                .build();
+        articleRepository.insert(article1);
+        Article article2 = Article.builder()
+                .title("Article 2")
+                .textContent("it sure is another article")
+                .build();
+        articleRepository.insert(article2);
+
+        Article[] articles = articleRepository.findAllPaged(100, 1);
+        assertEquals("Article 1", articles[1].getTitle());
+        assertEquals("Article 2", articles[0].getTitle());
+    }
+
+    @Test
+    void addArticle_invalidTitleTooShort_shouldThrowSQLException() {
+        // article too short -> invalid
+        Article article = Article.builder()
+                .title("")
+                .textContent("sample text")
+                .publicationStatus(PublicationStatus.PUBLISHED)
+                .build();
+        assertThrows(DataIntegrityViolationException.class, () -> articleRepository.insert(article));
+    }
+
+    @Test
+    void addArticle_validTitleWhenInDraft_IsAddedToDb() {
+        // an article without title is allowed when in draft
+        Article article = Article.builder()
+                .title("")
+                .textContent("sample text")
+                .publicationStatus(PublicationStatus.DRAFT)
+                .build();
+        assertDoesNotThrow(() -> articleRepository.insert(article));
+    }
+
+    @Test
+    void addArticle_invalidTextContentTooShort_shouldThrowSQLException() {
+        // text content too short -> invalid
+        Article article = Article.builder()
+                .title("really good title")
+                .textContent("")
+                .publicationStatus(PublicationStatus.PUBLISHED)
+                .build();
+        assertThrows(DataIntegrityViolationException.class, () -> articleRepository.insert(article));
     }
 
     @Test
@@ -108,13 +159,12 @@ public class ArticleRepositoryTest {
                 .build();
         articleRepository.insert(article);
 
-        Article retrieved = articleRepository.findById(article.getId()).orElse(null);
+        Article retrieved = articleRepository.findById(article.getId());
         assertNotNull(retrieved);
 
         articleRepository.delete(article.getId());
 
-        Optional<Article> result = articleRepository.findById(article.getId());
-        assertTrue(result.isEmpty());
+        assertNull(articleRepository.findById(article.getId()));
     }
 
     @Test
@@ -127,11 +177,11 @@ public class ArticleRepositoryTest {
             articleRepository.insert(article);
         }
 
-        var page1 = articleRepository.findAllPaged(1, 10);
-        var page2 = articleRepository.findAllPaged(2, 10);
+        var page1 = articleRepository.findAllPaged(10, 1);
+        var page2 = articleRepository.findAllPaged(10, 2);
 
-        assertEquals(10, page1.size());
-        assertEquals(5, page2.size());
+        assertEquals(10, page1.length);
+        assertEquals(5, page2.length);
     }
 
     static Stream<Arguments> invalidPaginationData() {

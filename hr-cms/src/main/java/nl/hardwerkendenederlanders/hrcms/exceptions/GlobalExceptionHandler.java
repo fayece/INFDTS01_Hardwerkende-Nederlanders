@@ -27,8 +27,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ComponentActionException.class)
     public String handleComponentAction(ComponentActionException ex, RedirectAttributes redirectAttributes) {
         String errorMessage = String.format(
-                "Could not %s your %s. Please try again later.",
-                ex.getAction().name().toLowerCase(), ex.getComponentName());
+                "Could not %s your %s. %s.",
+                ex.getAction().name().toLowerCase(), ex.getComponentName(), ex.getReason());
 
         redirectAttributes.addFlashAttribute("errorMessage", errorMessage);
         return "redirect:" + ex.getRedirectTarget();

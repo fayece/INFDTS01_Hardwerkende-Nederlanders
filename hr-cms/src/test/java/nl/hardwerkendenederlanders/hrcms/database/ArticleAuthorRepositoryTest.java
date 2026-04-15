@@ -30,7 +30,7 @@ public class ArticleAuthorRepositoryTest {
     private ArticleAuthorRepository articleAuthorRepository;
 
     @Autowired
-    private ArticleRepository articleRepository;
+    private JdbcArticleRepository articleRepository;
 
     @Autowired
     private JdbcUserRepository userRepository;
@@ -47,6 +47,7 @@ public class ArticleAuthorRepositoryTest {
                 .title("Test Article")
                 .textContent("Test content.")
                 .build();
+
         articleRepository.insert(article);
 
         Role role = new Role("Author Role");

@@ -14,11 +14,21 @@ public class ComponentActionException extends RuntimeException {
     private final String componentName;
     private final Action action;
     private final String redirectTarget;
+    private final String reason;
 
-    public ComponentActionException(String componentName, Action action, String redirectTarget, Throwable cause) {
+    public ComponentActionException(
+            String componentName, Action action, String redirectTarget, Throwable cause, String reason) {
         super("Failed to " + action.name().toLowerCase() + " component: " + componentName, cause);
         this.componentName = componentName;
         this.action = action;
         this.redirectTarget = redirectTarget;
+        this.reason = reason;
+    }
+
+    /**
+     * Create a ComponentActionException without specifying a reason for failure.
+     */
+    public ComponentActionException(String componentName, Action action, String redirectTarget, Throwable cause) {
+        this(componentName, action, redirectTarget, cause, "Failure reason not specified. Second time's the charm?");
     }
 }
