@@ -2,10 +2,19 @@
     <span class="author-name" th:text="${comment.authorName ?: 'Unknown User'}"></span>
     <div class="comment-body" th:attr="data-markdown=${comment.commentBody}"></div>
 
-    <small class="local-time"
-           th:data-timestamp="${comment.createdAt}"
-           th:text="${#temporals.format(comment.createdAt, 'dd-MM-yyyy HH:mm')}">
-    </small>
+    <div class="comment-footer">
+        <small class="local-time"
+               th:data-timestamp="${comment.createdAt}"
+               th:text="${#temporals.format(comment.createdAt, 'dd-MM-yyyy HH:mm')}">
+        </small>
+        <button type="button"
+                class="reply-button"
+                th:data-comment-id="${comment.id}"
+                th:data-article-id="${articleId}">
+            ↵ Reply
+        </button>
+    </div>
+
 
     <div class="replies-container" th:id="'replies-for-' + ${comment.id}"></div>
     <button class="load-replies-button"
