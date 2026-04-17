@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ConflictException;
-import nl.hardwerkendenederlanders.hrcms.exceptions.DatabaseException;
 import nl.hardwerkendenederlanders.hrcms.exceptions.NotFoundException;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserService;
@@ -35,10 +34,7 @@ public class UserServiceTest {
                 OffsetDateTime.now());
 
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
-        when(userRepository.insert(user)).thenReturn(true);
-
         userService.insertUser(user);
-
         verify(userRepository).insert(user);
     }
 
@@ -57,29 +53,8 @@ public class UserServiceTest {
                 OffsetDateTime.now());
 
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-
         assertThrows(ConflictException.class, () -> userService.insertUser(user));
-
         verify(userRepository, never()).insert(any());
-    }
-
-    @Test
-    void insertUser_failThrowsDbException() {
-        User user = new User(
-                UUID.randomUUID(),
-                "Kim",
-                null,
-                "Possible",
-                "kp@example.com",
-                "hashedPassword",
-                null,
-                null,
-                true,
-                OffsetDateTime.now());
-
-        when(userRepository.insert(user)).thenReturn(false);
-
-        assertThrows(DatabaseException.class, () -> userService.insertUser(user));
     }
 
     @Test
@@ -192,10 +167,7 @@ public class UserServiceTest {
                 OffsetDateTime.now());
 
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
-        when(userRepository.update(user)).thenReturn(true);
-
         userService.updateUser(user);
-
         verify(userRepository).findByEmail(user.getEmail());
         verify(userRepository).update(user);
     }
@@ -232,40 +204,20 @@ public class UserServiceTest {
     }
 
     @Test
-    void updateUser_failDbFailsThrowsException() {
-        User user = new User(
-                UUID.randomUUID(),
-                "Kim",
-                null,
-                "Possible",
-                "kp@example.com",
-                "hashedPassword",
-                null,
-                null,
-                true,
-                OffsetDateTime.now());
-
-        when(userRepository.update(user)).thenReturn(false);
-
-        assertThrows(DatabaseException.class, () -> userService.updateUser(user));
-    }
-
-    @Test
-    void deleteById_successReturnsTrue() {
+    void deleteById_successDoesNotThrow() {
         UUID id = UUID.randomUUID();
+        UUID currentUserId = UUID.randomUUID();
 
-        when(userRepository.deleteById(id)).thenReturn(true);
-        assertDoesNotThrow(() -> userService.deleteById(id));
+        assertDoesNotThrow(() -> userService.deleteById(id, currentUserId));
 
         verify(userRepository).deleteById(id);
     }
 
     @Test
-    void deleteById_failThrowsException() {
+    void deleteById_failsThrows() {
         UUID id = UUID.randomUUID();
 
-        when(userRepository.deleteById(id)).thenReturn(false);
-        assertThrows(DatabaseException.class, () -> userService.deleteById(id));
+        assertThrows(ConflictException.class, () -> userService.deleteById(id, id));
     }
 
     @Test

@@ -1,8 +1,6 @@
 package nl.hardwerkendenederlanders.hrcms.database;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -32,7 +30,7 @@ class JdbcUserRepositoryTest {
     }
 
     @Test
-    void insert_shouldReturnTrue() {
+    void insert_shouldInsertUser() {
         User user = new User(
                 UUID.randomUUID(),
                 "Kim",
@@ -45,7 +43,9 @@ class JdbcUserRepositoryTest {
                 true,
                 OffsetDateTime.now());
 
-        assertTrue(repository.insert(user));
+        repository.insert(user);
+        Optional<User> fromDb = repository.findById(user.getId());
+        assertEquals(user.getId(), fromDb.get().getId());
     }
 
     @Test
@@ -239,7 +239,7 @@ class JdbcUserRepositoryTest {
     }
 
     @Test
-    void deleteById_shouldReturnTrue() {
+    void deleteById_shouldReturnOptionalEmpty() {
         User user = new User(
                 UUID.randomUUID(),
                 "Kim",
@@ -253,7 +253,8 @@ class JdbcUserRepositoryTest {
                 OffsetDateTime.now());
 
         repository.insert(user);
+        repository.deleteById(user.getId());
 
-        assertTrue(repository.deleteById(user.getId()));
+        assertEquals(Optional.empty(), repository.findById(user.getId()));
     }
 }

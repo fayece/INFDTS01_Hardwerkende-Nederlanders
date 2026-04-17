@@ -47,14 +47,14 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public boolean insert(User user) {
+    public void insert(User user) {
         String sql = """
                 INSERT INTO %s (
                 id, first_name, prefix, last_name, email, password_hash, role_id, organization_id, active, created_at)
                 VALUES (
                 :id, :firstName, :prefix, :lastName, :email, :passwordHash, :roleId, :organizationId, :active, :createdAt)
                 """.formatted(TABLE);
-        return jdbc.update(sql, paramsFromUser(user)) >= 1;
+        jdbc.update(sql, paramsFromUser(user));
     }
 
     @Override
@@ -160,7 +160,7 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public boolean updateActivityById(UUID id, boolean setActive) {
+    public void updateActivityById(UUID id, boolean setActive) {
         String sqlQuery = """
                 UPDATE %s
                 SET active = :setActive
@@ -170,11 +170,11 @@ public class JdbcUserRepository implements UserRepository {
         MapSqlParameterSource params =
                 new MapSqlParameterSource().addValue("id", id).addValue("setActive", setActive);
 
-        return jdbc.update(sqlQuery, params) >= 1;
+        jdbc.update(sqlQuery, params);
     }
 
     @Override
-    public boolean update(User user) {
+    public void update(User user) {
         String sqlQuery = """
                 UPDATE %s
                 SET first_name = :firstName,
@@ -196,11 +196,11 @@ public class JdbcUserRepository implements UserRepository {
                 .addValue("active", user.isActive())
                 .addValue("id", user.getId());
 
-        return jdbc.update(sqlQuery, params) >= 1;
+        jdbc.update(sqlQuery, params);
     }
 
     @Override
-    public boolean deleteById(UUID id) {
+    public void deleteById(UUID id) {
         String sqlQuery = """
                 DELETE FROM %s
                 WHERE id = :id
@@ -208,7 +208,7 @@ public class JdbcUserRepository implements UserRepository {
 
         MapSqlParameterSource params = new MapSqlParameterSource().addValue("id", id);
 
-        return jdbc.update(sqlQuery, params) >= 1;
+        jdbc.update(sqlQuery, params);
     }
 
     @Override

@@ -13,11 +13,11 @@
         <h4>You can create as many new users as you'd like and leave by pressing the return button</h4>
         <div class="create-user-form-container">
             <form class="create-user-form" th:action="@{/manage-users/new}" method="post">
-                <label><b>Prefix:</b>
-                    <input type="text" name="prefix" required>
-                </label>
                 <label><b>First name:</b>
                     <input type="text" name="firstName" required>
+                </label>
+                <label><b>Prefix:</b>
+                    <input type="text" name="prefix">
                 </label>
                 <label><b>Last name:</b>
                     <input type="text" name="lastName" required>

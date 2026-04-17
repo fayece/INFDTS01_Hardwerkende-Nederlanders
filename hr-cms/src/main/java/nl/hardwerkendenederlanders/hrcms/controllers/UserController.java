@@ -1,21 +1,27 @@
 package nl.hardwerkendenederlanders.hrcms.controllers;
 
+import jakarta.servlet.http.HttpSession;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserService;
+import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
+@Validated
 @RequestMapping("manage-users")
 public class UserController {
     private final UserService userService;
+    private final UserSessionService userSessionService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserSessionService userSessionService) {
         this.userService = userService;
+        this.userSessionService = userSessionService;
     }
 
     @GetMapping()
@@ -83,6 +89,8 @@ public class UserController {
                 null,
                 true,
                 OffsetDateTime.now());
+
+        validateUserAttributes(toInsert);
         userService.insertUser(toInsert);
         model.addAttribute("inserted", true);
         return "pages/create-user";
@@ -99,7 +107,6 @@ public class UserController {
             @RequestParam(required = false) UUID organisationId,
             Model model) {
         User currentUser = userService.findById(id);
-
         if (prefix != null) {
             currentUser.setPrefix(prefix);
         }
@@ -118,6 +125,8 @@ public class UserController {
         if (organisationId != null) {
             currentUser.setOrganizationId(organisationId);
         }
+
+        validateUserAttributes(currentUser);
 
         userService.updateUser(currentUser);
         return "redirect:/manage-users"; // or a successpage -> manage-users
@@ -142,9 +151,33 @@ public class UserController {
     }
 
     @PostMapping("/delete-user")
-    public String deleteUser(@RequestParam UUID userId) {
-        userService.deleteById(userId);
+    public String deleteUser(@RequestParam UUID userId, HttpSession session) {
+        UUID currentUserId = userSessionService.getLoggedInUser(session);
+        userService.deleteById(userId, currentUserId);
 
         return "redirect:/manage-users";
+    }
+
+    public void validateUserAttributes(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("user is null");
+        }
+
+        String firstName = user.getFirstName();
+        String lastName = user.getLastName();
+        String email = user.getEmail();
+
+        if (user.getId() == null) {
+            throw new IllegalArgumentException("user id is required");
+        }
+        if (firstName == null || firstName.isBlank() || firstName.length() < 2) {
+            throw new IllegalArgumentException("first name should be at least 2 characters long");
+        }
+        if (lastName == null || lastName.isBlank() || lastName.length() < 2) {
+            throw new IllegalArgumentException("last name should be at least 2 characters long");
+        }
+        if (email == null || email.isBlank() || !email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            throw new IllegalArgumentException("invalid email address");
+        }
     }
 }

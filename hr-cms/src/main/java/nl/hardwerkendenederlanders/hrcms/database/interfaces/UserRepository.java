@@ -6,9 +6,9 @@ import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 
 public interface UserRepository {
-    boolean insert(User user);
+    void insert(User user);
 
-    boolean update(User user);
+    void update(User user);
 
     Optional<User> findById(UUID id);
 
@@ -18,13 +18,13 @@ public interface UserRepository {
 
     List<User> findAllPaginated(Integer page, Integer amount);
 
-    boolean updateActivityById(UUID id, boolean setActive);
+    void updateActivityById(UUID id, boolean setActive);
 
     List<User> findByNameOrEmailPaginated(String name, int page, int amount);
 
     List<User> findUserOnActivityPaginated(boolean isActive, int page, int amount);
 
-    boolean deleteById(UUID id);
+    void deleteById(UUID id);
 
     int countByActive(boolean active);
 

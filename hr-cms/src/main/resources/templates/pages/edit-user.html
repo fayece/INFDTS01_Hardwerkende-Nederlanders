@@ -14,11 +14,11 @@
     <div class="create-user-form-container">
         <form class="create-user-form" th:action="@{/manage-users/update}" method="post">
             <input type="hidden" name="id" th:value="${currentUser.id}">
-            <label><b>Prefix:</b>
-                <input type="text" name="prefix" th:value="${currentUser.prefix}">
-            </label>
             <label><b>First name:</b>
                 <input type="text" name="firstName" th:value="${currentUser.firstName}">
+            </label>
+            <label><b>Prefix:</b>
+                <input type="text" name="prefix" th:value="${currentUser.prefix}">
             </label>
             <label><b>Last name:</b>
                 <input type="text" name="lastName" th:value="${currentUser.lastName}">

@@ -5,12 +5,13 @@ import java.util.Optional;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ConflictException;
-import nl.hardwerkendenederlanders.hrcms.exceptions.DatabaseException;
 import nl.hardwerkendenederlanders.hrcms.exceptions.NotFoundException;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserService;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -21,7 +22,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void insertUser(User user) {
+    @Transactional
+    public void insertUser(@NonNull User user) {
         Optional<User> alreadyExists = userRepository.findByEmail(user.getEmail());
         if (alreadyExists.isPresent()) {
             throw new ConflictException("email address already taken");
@@ -31,8 +33,7 @@ public class UserServiceImpl implements UserService {
         String hash = encoder.encode(user.getPasswordHash());
         user.setPasswordHash(hash);
 
-        boolean inserted = userRepository.insert(user);
-        if (!inserted) throw new DatabaseException("Insert failed");
+        userRepository.insert(user);
     }
 
     @Override
@@ -52,30 +53,25 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateActivityById(UUID id, boolean setActive) {
-        boolean updated = userRepository.updateActivityById(id, setActive);
-        if (!updated) {
-            throw new DatabaseException("Couldn't update activity");
-        }
+        userRepository.updateActivityById(id, setActive);
     }
 
     @Override
-    public void updateUser(User user) {
+    @Transactional
+    public void updateUser(@NonNull User user) {
         Optional<User> alreadyExists = userRepository.findByEmail(user.getEmail());
         if (alreadyExists.isPresent() && alreadyExists.get().getId() != user.getId()) {
             throw new ConflictException("Email address already taken");
         }
-        boolean updated = userRepository.update(user);
-        if (!updated) {
-            throw new DatabaseException("Couldn't update user");
-        }
+        userRepository.update(user);
     }
 
     @Override
-    public void deleteById(UUID id) {
-        boolean deleted = userRepository.deleteById(id);
-        if (!deleted) {
-            throw new DatabaseException("Couldn't delete user");
+    public void deleteById(UUID id, UUID currentUserId) {
+        if (id == currentUserId) {
+            throw new ConflictException("Cannot delete your own account when logged in");
         }
+        userRepository.deleteById(id);
     }
 
     @Override

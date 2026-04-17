@@ -17,7 +17,7 @@ public interface UserService {
 
     void updateUser(User user);
 
-    void deleteById(UUID id);
+    void deleteById(UUID id, UUID currentUserId);
 
     List<User> findUsersPaginated(int page, int amount);
 

@@ -3,11 +3,13 @@ package nl.hardwerkendenederlanders.hrcms.controllers;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import jakarta.servlet.http.HttpSession;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserService;
+import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.ui.ConcurrentModel;
@@ -16,7 +18,8 @@ import org.springframework.ui.Model;
 class UserControllerTest {
 
     private final UserService userService = mock(UserService.class);
-    private final UserController userController = new UserController(userService);
+    private final UserSessionService userSessionService = mock(UserSessionService.class);
+    private final UserController userController = new UserController(userService, userSessionService);
 
     @Test
     void manageUserPage_default() {
@@ -24,7 +27,7 @@ class UserControllerTest {
         List<User> users = List.of(mock(User.class), mock(User.class));
 
         when(userService.findUsersPaginated(0, 13)).thenReturn(users);
-        when(userService.findAllUsers()).thenReturn(users);
+        when(userService.countAll()).thenReturn(users.size());
 
         String result = userController.manageUserPage(0, model, null, null);
 
@@ -34,7 +37,7 @@ class UserControllerTest {
         assertEquals(1, model.getAttribute("finalPage"));
 
         verify(userService).findUsersPaginated(0, 13);
-        verify(userService).findAllUsers();
+        verify(userService).countAll();
     }
 
     @Test
@@ -43,15 +46,18 @@ class UserControllerTest {
         List<User> users = List.of(mock(User.class));
 
         when(userService.searchByNamePaginated("Kim", 0, 13)).thenReturn(users);
-        when(userService.findAllUsers()).thenReturn(users);
+        when(userService.countByNameOrEmailPaginated("Kim")).thenReturn(users.size());
 
         String result = userController.manageUserPage(0, model, "Kim", null);
 
         assertEquals("pages/manage-users", result);
         assertEquals(users, model.getAttribute("users"));
         assertEquals("Kim", model.getAttribute("searchName"));
+        assertEquals(0, model.getAttribute("currentPage"));
+        assertEquals(1, model.getAttribute("finalPage"));
 
         verify(userService).searchByNamePaginated("Kim", 0, 13);
+        verify(userService).countByNameOrEmailPaginated("Kim");
     }
 
     @Test
@@ -60,14 +66,17 @@ class UserControllerTest {
         List<User> users = List.of(mock(User.class));
 
         when(userService.findUserOnActivityPaginated(true, 0, 13)).thenReturn(users);
-        when(userService.findAllUsers()).thenReturn(users);
+        when(userService.countByActive(true)).thenReturn(users.size());
 
         String result = userController.manageUserPage(0, model, null, true);
 
         assertEquals("pages/manage-users", result);
         assertEquals(users, model.getAttribute("users"));
+        assertEquals(0, model.getAttribute("currentPage"));
+        assertEquals(1, model.getAttribute("finalPage"));
 
         verify(userService).findUserOnActivityPaginated(true, 0, 13);
+        verify(userService).countByActive(true);
     }
 
     @Test
@@ -104,6 +113,7 @@ class UserControllerTest {
         String result = userController.editUser(id, model);
 
         assertEquals("redirect:/manage-users", result);
+        verify(userService).findById(id);
     }
 
     @Test
@@ -129,6 +139,18 @@ class UserControllerTest {
     }
 
     @Test
+    void createNewUser_invalidFirstName_throws() {
+        Model model = new ConcurrentModel();
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> userController.createNewUser("K", "", "Possible", "kp@example.com", "secret", model));
+
+        assertEquals("first name should be at least 2 characters long", exception.getMessage());
+        verify(userService, never()).insertUser(any());
+    }
+
+    @Test
     void updateUser_success() {
         Model model = new ConcurrentModel();
 
@@ -144,6 +166,7 @@ class UserControllerTest {
 
         assertEquals("redirect:/manage-users", result);
 
+        verify(userService).findById(id);
         verify(userService).updateUser(user);
 
         assertEquals("de", user.getPrefix());
@@ -184,15 +207,43 @@ class UserControllerTest {
         assertEquals("Possible", model.getAttribute("userLastName"));
         assertEquals("kp@example.com", model.getAttribute("userEmail"));
         assertEquals(id, model.getAttribute("userToDeleteId"));
+
+        verify(userService).findById(id);
     }
 
     @Test
     void deleteUser_success() {
-        UUID id = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+        UUID currentUserId = UUID.randomUUID();
 
-        String result = userController.deleteUser(id);
+        HttpSession session = mock(HttpSession.class);
+
+        when(userSessionService.getLoggedInUser(session)).thenReturn(currentUserId);
+
+        String result = userController.deleteUser(userId, session);
 
         assertEquals("redirect:/manage-users", result);
-        verify(userService).deleteById(id);
+        verify(userSessionService).getLoggedInUser(session);
+        verify(userService).deleteById(userId, currentUserId);
+    }
+
+    @Test
+    void deleteUser_fail() {
+        UUID userId = UUID.randomUUID();
+        UUID currentUserId = UUID.randomUUID();
+
+        HttpSession session = mock(HttpSession.class);
+
+        when(userSessionService.getLoggedInUser(session)).thenReturn(currentUserId);
+        doThrow(new IllegalArgumentException("cannot delete current user"))
+                .when(userService)
+                .deleteById(userId, currentUserId);
+
+        IllegalArgumentException exception =
+                assertThrows(IllegalArgumentException.class, () -> userController.deleteUser(userId, session));
+
+        assertEquals("cannot delete current user", exception.getMessage());
+        verify(userSessionService).getLoggedInUser(session);
+        verify(userService).deleteById(userId, currentUserId);
     }
 }

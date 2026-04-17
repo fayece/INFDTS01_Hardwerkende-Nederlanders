@@ -29,8 +29,8 @@
             <thead class="user-table-head">
                 <tr>
                     <th class="action-tr">Edit</th>
-                    <th>Prefix</th>
                     <th>First name</th>
+                    <th>Prefix</th>
                     <th>Last name</th>
                     <th>Email</th>
                     <th>Role</th>
@@ -44,8 +44,8 @@
                     <td class="action-tr">
                         <a class="edit-user-button" th:href="@{/manage-users/edit/{id}(id=${user.getId()})}">Edit</a>
                     </td>
-                    <td th:text="${user.getPrefix()}"></td>
                     <td th:text="${user.getFirstName()}"></td>
+                    <td th:text="${user.getPrefix()}"></td>
                     <td th:text="${user.getLastName()}"></td>
                     <td th:text="${user.getEmail()}"></td>
                     <td>placeholder</td>
