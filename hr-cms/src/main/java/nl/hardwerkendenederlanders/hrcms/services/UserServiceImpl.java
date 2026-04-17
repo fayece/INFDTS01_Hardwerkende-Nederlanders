@@ -80,7 +80,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void updateUser(@NonNull User user) {
         Optional<User> alreadyExists = userRepository.findByEmail(user.getEmail());
-        if (alreadyExists.isPresent() && !java.util.Objects.equals(alreadyExists.get().getId(), user.getId())) {
+        if (alreadyExists.isPresent()
+                && !java.util.Objects.equals(alreadyExists.get().getId(), user.getId())) {
             throw new ConflictException("Email address already taken");
         }
         userRepository.update(user);
