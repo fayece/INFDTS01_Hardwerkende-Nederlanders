@@ -7,6 +7,8 @@ import nl.hardwerkendenederlanders.hrcms.models.User;
 public interface UserService {
     void insertUser(User user);
 
+    void insertUser(String firstName, String prefix, String lastName, String email, String password);
+
     User findByEmail(String email);
 
     User findById(UUID id);
@@ -16,6 +18,9 @@ public interface UserService {
     void updateActivityById(UUID id, boolean setActive);
 
     void updateUser(User user);
+
+    void updateUser(
+            UUID id, String firstName, String prefix, String lastName, String email, UUID roleId, UUID organisationId);
 
     void deleteById(UUID id, UUID currentUserId);
 

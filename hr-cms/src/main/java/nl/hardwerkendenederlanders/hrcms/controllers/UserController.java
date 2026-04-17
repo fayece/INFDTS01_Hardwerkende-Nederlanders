@@ -1,7 +1,6 @@
 package nl.hardwerkendenederlanders.hrcms.controllers;
 
 import jakarta.servlet.http.HttpSession;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.models.User;
@@ -73,25 +72,13 @@ public class UserController {
     @PostMapping("/new")
     public String createNewUser(
             @RequestParam String firstName,
-            @RequestParam String prefix,
+            @RequestParam(required = false) String prefix,
             @RequestParam String lastName,
             @RequestParam String email,
             @RequestParam String password,
             Model model) {
-        User toInsert = new User(
-                UUID.randomUUID(),
-                firstName,
-                prefix,
-                lastName,
-                email,
-                password,
-                null,
-                null,
-                true,
-                OffsetDateTime.now());
 
-        validateUserAttributes(toInsert);
-        userService.insertUser(toInsert);
+        userService.insertUser(firstName, prefix, lastName, email, password);
         model.addAttribute("inserted", true);
         return "pages/create-user";
     }
@@ -99,36 +86,14 @@ public class UserController {
     @PostMapping("/update")
     public String updateUser(
             @RequestParam UUID id,
-            @RequestParam(required = false) String prefix,
             @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String prefix,
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) UUID roleId,
             @RequestParam(required = false) UUID organisationId,
             Model model) {
-        User currentUser = userService.findById(id);
-        if (prefix != null) {
-            currentUser.setPrefix(prefix);
-        }
-        if (firstName != null) {
-            currentUser.setFirstName(firstName);
-        }
-        if (lastName != null) {
-            currentUser.setLastName(lastName);
-        }
-        if (email != null) {
-            currentUser.setEmail(email);
-        }
-        if (roleId != null) {
-            currentUser.setRoleId(roleId);
-        }
-        if (organisationId != null) {
-            currentUser.setOrganizationId(organisationId);
-        }
-
-        validateUserAttributes(currentUser);
-
-        userService.updateUser(currentUser);
+        userService.updateUser(id, firstName, prefix, lastName, email, roleId, organisationId);
         return "redirect:/manage-users"; // or a successpage -> manage-users
     }
 
@@ -156,28 +121,5 @@ public class UserController {
         userService.deleteById(userId, currentUserId);
 
         return "redirect:/manage-users";
-    }
-
-    public void validateUserAttributes(User user) {
-        if (user == null) {
-            throw new IllegalArgumentException("user is null");
-        }
-
-        String firstName = user.getFirstName();
-        String lastName = user.getLastName();
-        String email = user.getEmail();
-
-        if (user.getId() == null) {
-            throw new IllegalArgumentException("user id is required");
-        }
-        if (firstName == null || firstName.isBlank() || firstName.length() < 2) {
-            throw new IllegalArgumentException("first name should be at least 2 characters long");
-        }
-        if (lastName == null || lastName.isBlank() || lastName.length() < 2) {
-            throw new IllegalArgumentException("last name should be at least 2 characters long");
-        }
-        if (email == null || email.isBlank() || !email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-            throw new IllegalArgumentException("invalid email address");
-        }
     }
 }

@@ -1,5 +1,6 @@
 package nl.hardwerkendenederlanders.hrcms.services;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,6 +38,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
+    public void insertUser(String firstName, String prefix, String lastName, String email, String password) {
+        User toInsert = new User(
+                UUID.randomUUID(),
+                firstName,
+                prefix,
+                lastName,
+                email,
+                password,
+                null,
+                null,
+                true,
+                OffsetDateTime.now());
+
+        validateUserAttributes(toInsert);
+        insertUser(toInsert);
+    }
+
+    @Override
     public User findById(UUID id) {
         return userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
     }
@@ -64,6 +84,35 @@ public class UserServiceImpl implements UserService {
             throw new ConflictException("Email address already taken");
         }
         userRepository.update(user);
+    }
+
+    @Override
+    @Transactional
+    public void updateUser(
+            UUID id, String firstName, String prefix, String lastName, String email, UUID roleId, UUID organisationId) {
+        User currentUser = findById(id);
+        if (firstName != null) {
+            currentUser.setFirstName(firstName);
+        }
+        if (prefix != null) {
+            currentUser.setPrefix(prefix);
+        }
+        if (lastName != null) {
+            currentUser.setLastName(lastName);
+        }
+        if (email != null) {
+            currentUser.setEmail(email);
+        }
+        if (roleId != null) {
+            currentUser.setRoleId(roleId);
+        }
+        if (organisationId != null) {
+            currentUser.setOrganizationId(organisationId);
+        }
+
+        validateUserAttributes(currentUser);
+
+        updateUser(currentUser);
     }
 
     @Override
@@ -102,5 +151,28 @@ public class UserServiceImpl implements UserService {
     @Override
     public int countByNameOrEmailPaginated(String name) {
         return userRepository.countByNameOrEmailPaginated(name);
+    }
+
+    public void validateUserAttributes(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("user is null");
+        }
+
+        String firstName = user.getFirstName();
+        String lastName = user.getLastName();
+        String email = user.getEmail();
+
+        if (user.getId() == null) {
+            throw new IllegalArgumentException("user id is required");
+        }
+        if (firstName == null || firstName.isBlank() || firstName.length() < 2) {
+            throw new IllegalArgumentException("first name should be at least 2 characters long");
+        }
+        if (lastName == null || lastName.isBlank() || lastName.length() < 2) {
+            throw new IllegalArgumentException("last name should be at least 2 characters long");
+        }
+        if (email == null || email.isBlank() || !email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            throw new IllegalArgumentException("invalid email address");
+        }
     }
 }
