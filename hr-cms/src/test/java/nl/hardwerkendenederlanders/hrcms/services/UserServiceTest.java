@@ -336,4 +336,56 @@ public class UserServiceTest {
 
         verify(userRepository).findUserOnActivityPaginated(true, 0, 10);
     }
+
+    @Test
+    void validateUserAttributes_nullUser_throws() {
+        UserServiceImpl service = new UserServiceImpl(userRepository);
+
+        IllegalArgumentException exception =
+                assertThrows(IllegalArgumentException.class, () -> service.validateUserAttributes(null));
+
+        assertEquals("user is null", exception.getMessage());
+    }
+
+    @Test
+    void validateUserAttributes_invalidEmail_throws() {
+        User user = new User(
+                UUID.randomUUID(),
+                "Kim",
+                null,
+                "Possible",
+                "invalid-email",
+                "hashedPassword",
+                null,
+                null,
+                true,
+                OffsetDateTime.now());
+
+        UserServiceImpl service = new UserServiceImpl(userRepository);
+
+        IllegalArgumentException exception =
+                assertThrows(IllegalArgumentException.class, () -> service.validateUserAttributes(user));
+
+        assertEquals("invalid email address", exception.getMessage());
+    }
+
+    @Test
+    void insertUser_withParams_success() {
+        when(userRepository.findByEmail("kp@example.com")).thenReturn(Optional.empty());
+
+        userService.insertUser("Kim", null, "Possible", "kp@example.com", "secret");
+
+        verify(userRepository).findByEmail("kp@example.com");
+        verify(userRepository).insert(any(User.class));
+    }
+
+    @Test
+    void insertUser_withParams_invalidFirstName_throws() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> userService.insertUser("K", null, "Possible", "kp@example.com", "secret"));
+
+        verify(userRepository, never()).findByEmail(any());
+        verify(userRepository, never()).insert(any());
+    }
 }

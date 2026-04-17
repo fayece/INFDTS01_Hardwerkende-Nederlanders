@@ -4,14 +4,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import jakarta.servlet.http.HttpSession;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
 
@@ -125,29 +123,7 @@ class UserControllerTest {
         assertEquals("pages/create-user", result);
         assertEquals(true, model.getAttribute("inserted"));
 
-        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
-        verify(userService).insertUser(captor.capture());
-
-        User user = captor.getValue();
-        assertEquals("Kim", user.getFirstName());
-        assertEquals("", user.getPrefix());
-        assertEquals("Possible", user.getLastName());
-        assertEquals("kp@example.com", user.getEmail());
-        assertTrue(user.isActive());
-        assertNotNull(user.getId());
-        assertNotNull(user.getCreatedAt());
-    }
-
-    @Test
-    void createNewUser_invalidFirstName_throws() {
-        Model model = new ConcurrentModel();
-
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> userController.createNewUser("K", "", "Possible", "kp@example.com", "secret", model));
-
-        assertEquals("first name should be at least 2 characters long", exception.getMessage());
-        verify(userService, never()).insertUser(any());
+        verify(userService).insertUser("Kim", "", "Possible", "kp@example.com", "secret");
     }
 
     @Test
@@ -158,23 +134,11 @@ class UserControllerTest {
         UUID roleId = UUID.randomUUID();
         UUID orgId = UUID.randomUUID();
 
-        User user = new User(id, "Old", null, "Name", "old@test.com", "pass", null, null, true, OffsetDateTime.now());
-
-        when(userService.findById(id)).thenReturn(user);
-
-        String result = userController.updateUser(id, "de", "New", "Name", "new@test.com", roleId, orgId, model);
+        String result = userController.updateUser(id, "New", "de", "Name", "new@test.com", roleId, orgId, model);
 
         assertEquals("redirect:/manage-users", result);
 
-        verify(userService).findById(id);
-        verify(userService).updateUser(user);
-
-        assertEquals("de", user.getPrefix());
-        assertEquals("New", user.getFirstName());
-        assertEquals("Name", user.getLastName());
-        assertEquals("new@test.com", user.getEmail());
-        assertEquals(roleId, user.getRoleId());
-        assertEquals(orgId, user.getOrganizationId());
+        verify(userService).updateUser(id, "New", "de", "Name", "new@test.com", roleId, orgId);
     }
 
     @Test
