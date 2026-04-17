@@ -26,9 +26,9 @@ public interface UserRepository {
 
     void deleteById(UUID id);
 
-    int countByActive(boolean active);
+    Integer countByActive(boolean active);
 
-    int countAll();
+    Integer countAll();
 
-    int countByNameOrEmailPaginated(String name);
+    Integer countByNameOrEmailPaginated(String name);
 }

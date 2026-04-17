@@ -104,7 +104,7 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public int countByNameOrEmailPaginated(String name) {
+    public Integer countByNameOrEmailPaginated(String name) {
         String sqlQuery = """
                 SELECT COUNT(*)
                 FROM %s
@@ -212,7 +212,7 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public int countByActive(boolean active) {
+    public Integer countByActive(boolean active) {
         String sqlQuery = """
                 SELECT COUNT(*)
                 FROM %s
@@ -225,7 +225,7 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public int countAll() {
+    public Integer countAll() {
         String sqlQuery = """
                 SELECT COUNT(*)
                 FROM %s

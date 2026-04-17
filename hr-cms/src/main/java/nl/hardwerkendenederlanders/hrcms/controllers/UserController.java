@@ -30,7 +30,7 @@ public class UserController {
             @RequestParam(required = false) String searchName,
             @RequestParam(required = false) Boolean sortActive) {
         List<User> users;
-        int maxPages = 1;
+        int maxPages;
 
         int pageSize = 13;
         if (searchName != null) {
