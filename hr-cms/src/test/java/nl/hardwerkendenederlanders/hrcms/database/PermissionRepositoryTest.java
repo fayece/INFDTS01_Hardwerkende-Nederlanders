@@ -2,6 +2,7 @@ package nl.hardwerkendenederlanders.hrcms.database;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
@@ -30,7 +31,7 @@ public class PermissionRepositoryTest {
 
         permissionRepository.insert(permission);
 
-        Permission retrieved = permissionRepository.findById(permission.getId());
+        Permission retrieved = permissionRepository.findById(permission.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(permission.getId(), retrieved.getId());
@@ -46,7 +47,7 @@ public class PermissionRepositoryTest {
 
         permissionRepository.insert(permission);
 
-        Permission retrieved = permissionRepository.findById(permission.getId());
+        Permission retrieved = permissionRepository.findById(permission.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(permission.getId(), retrieved.getId());
@@ -57,8 +58,9 @@ public class PermissionRepositoryTest {
     }
 
     @Test
-    void findPermissionById_withNonExistingId_shouldThrowException() {
-        assertThrows(Exception.class, () -> permissionRepository.findById(UUID.randomUUID()));
+    void findPermissionById_withNonExistingId_shouldReturnEmptyOptional() {
+        Optional<Permission> result = permissionRepository.findById(UUID.randomUUID());
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -68,7 +70,8 @@ public class PermissionRepositoryTest {
         permissionRepository.insert(permission);
         permissionRepository.delete(permission.getId());
 
-        assertThrows(Exception.class, () -> permissionRepository.findById(permission.getId()));
+        Optional<Permission> result = permissionRepository.findById(permission.getId());
+        assertTrue(result.isEmpty());
     }
 
     @Test

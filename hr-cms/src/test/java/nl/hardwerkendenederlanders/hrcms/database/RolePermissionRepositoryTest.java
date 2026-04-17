@@ -2,6 +2,7 @@ package nl.hardwerkendenederlanders.hrcms.database;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
@@ -53,7 +54,8 @@ public class RolePermissionRepositoryTest {
 
         rolePermissionRepository.insert(rolePermission);
 
-        RolePermission retrieved = rolePermissionRepository.findById(rolePermission.getId());
+        RolePermission retrieved =
+                rolePermissionRepository.findById(rolePermission.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(rolePermission.getId(), retrieved.getId());
@@ -67,7 +69,8 @@ public class RolePermissionRepositoryTest {
 
         rolePermissionRepository.insert(rolePermission);
 
-        RolePermission retrieved = rolePermissionRepository.findById(rolePermission.getId());
+        RolePermission retrieved =
+                rolePermissionRepository.findById(rolePermission.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(rolePermission.getId(), retrieved.getId());
@@ -76,8 +79,9 @@ public class RolePermissionRepositoryTest {
     }
 
     @Test
-    void findRolePermissionById_withNonExistingId_shouldThrowException() {
-        assertThrows(Exception.class, () -> rolePermissionRepository.findById(UUID.randomUUID()));
+    void findRolePermissionById_withNonExistingId_shouldReturnEmptyOptional() {
+        Optional<RolePermission> result = rolePermissionRepository.findById(UUID.randomUUID());
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -87,7 +91,8 @@ public class RolePermissionRepositoryTest {
         rolePermissionRepository.insert(rolePermission);
         rolePermissionRepository.delete(rolePermission.getId());
 
-        assertThrows(Exception.class, () -> rolePermissionRepository.findById(rolePermission.getId()));
+        Optional<RolePermission> result = rolePermissionRepository.findById(rolePermission.getId());
+        assertTrue(result.isEmpty());
     }
 
     @Test

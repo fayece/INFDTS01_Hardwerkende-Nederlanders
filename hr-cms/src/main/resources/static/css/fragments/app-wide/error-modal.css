@@ -1,0 +1,15 @@
+.error-modal--container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.error-modal--box {
+    background-color: var(--background);
+    border-radius: 1rem;
+
+}
+
+.error-modal--explanation {
+    color: red
+}
