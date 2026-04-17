@@ -3,6 +3,7 @@ package nl.hardwerkendenederlanders.hrcms.database;
 import jakarta.annotation.Nullable;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
+import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleWithSubject;
 
 public interface ArticleRepository {
 
@@ -15,5 +16,9 @@ public interface ArticleRepository {
 
     Article[] findAllPaged(int limit, int offset);
 
+    Article[] findNewPublished(int limit, int offset);
+
     void delete(UUID id);
+
+    ArticleWithSubject findArticleWithSubject(UUID id);
 }

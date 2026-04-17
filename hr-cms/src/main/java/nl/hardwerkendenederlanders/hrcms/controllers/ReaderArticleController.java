@@ -3,6 +3,7 @@ package nl.hardwerkendenederlanders.hrcms.controllers;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentUnavailableException;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
+import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleWithSubject;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.PagedComments;
 import nl.hardwerkendenederlanders.hrcms.services.CommentServiceImpl;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.ArticleService;
@@ -26,13 +27,14 @@ public class ReaderArticleController {
 
     @GetMapping("/{articleId}")
     public String getArticle(@PathVariable UUID articleId, Model model) {
-        Article article = articleService.findById(articleId);
+        ArticleWithSubject articleWithSubject = articleService.findArticleWithSubjectById(articleId);
 
-        if (article == null) {
+        if (articleWithSubject == null) {
             return "error/404";
         }
 
-        model.addAttribute("article", article);
+        model.addAttribute("article", articleWithSubject.article());
+        model.addAttribute("subject", articleWithSubject.subjectName());
 
         try {
             PagedComments result = commentService.getTopLevelComments(articleId, 0, 10);

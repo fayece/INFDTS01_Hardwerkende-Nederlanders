@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import nl.hardwerkendenederlanders.hrcms.database.ArticleRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.PublicationStatus;
+import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleWithSubject;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -45,6 +46,13 @@ public class JdbcArticleRepository implements ArticleRepository {
         mapping.addValue("subject_id", article.getSubjectId());
 
         return mapping;
+    }
+
+    private RowMapper<ArticleWithSubject> articleAndSubjectMapper() {
+        return (rs, rowNum) -> new ArticleWithSubject(
+            rowMapper().mapRow(rs, rowNum),
+            rs.getString("subject_name")
+        );
     }
 
     @Override
@@ -103,6 +111,30 @@ public class JdbcArticleRepository implements ArticleRepository {
         MapSqlParameterSource mapping = new MapSqlParameterSource();
         mapping.addValue("limit", limit);
         mapping.addValue("offset", (offset - 1) * limit);
+
+        return jdbc.query(query, mapping, rowMapper()).toArray(new Article[0]);
+    }
+
+    @Override
+    public Article[] findNewPublished(int limit, int offset) {
+        if (limit <= 0)
+            throw new IllegalArgumentException(
+                    "findAllPages was called with an limit of " + limit + " the minimum is 1");
+        if (offset <= 0)
+            throw new IllegalArgumentException(
+                    "findAllPages was called with a offset of " + offset + " the minimum is 1");
+
+        String query = """
+         SELECT *
+         FROM articles
+         WHERE publication_status = 'PUBLISHED'
+         ORDER BY created_at DESC
+         LIMIT :limit
+         OFFSET :offset;
+         """;
+        MapSqlParameterSource mapping = new MapSqlParameterSource();
+        mapping.addValue("limit", limit);
+        mapping.addValue("offset", (offset - 1) * limit);
         return jdbc.query(query, mapping, rowMapper()).toArray(new Article[0]);
     }
 
@@ -114,5 +146,21 @@ public class JdbcArticleRepository implements ArticleRepository {
                 WHERE id = :id
                 """;
         jdbc.update(query, Map.of("id", id));
+    }
+
+    public @Nullable ArticleWithSubject findArticleWithSubject(UUID id){
+        String query = """
+                SELECT *
+                FROM articles AS a
+                LEFT JOIN subjects s ON a.subject_id = s.id
+                WHERE a.id = :id;
+                """;
+        MapSqlParameterSource mapping = new MapSqlParameterSource();
+        mapping.addValue("id", id);
+        try {
+            return jdbc.queryForObject(query, mapping, articleAndSubjectMapper());
+        } catch (EmptyResultDataAccessException erdae) {
+            return null;
+        }
     }
 }

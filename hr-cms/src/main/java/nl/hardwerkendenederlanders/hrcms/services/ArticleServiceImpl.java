@@ -1,10 +1,12 @@
 package nl.hardwerkendenederlanders.hrcms.services;
 
+import java.time.OffsetDateTime;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.ArticleRepository;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentActionException;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.PublicationStatus;
+import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleWithSubject;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.ArticleService;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ public class ArticleServiceImpl implements ArticleService {
             if (articleRepository.findById(article.getId()) == null) {
                 articleRepository.insert(article);
             } else {
+                article.setUpdatedAt(OffsetDateTime.now());
                 articleRepository.update(article);
             }
         } catch (DataAccessException dae) {
@@ -47,5 +50,15 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public Article[] findAllPaged(int pageSize, int page) {
         return articleRepository.findAllPaged(pageSize, page);
+    }
+
+    @Override
+    public Article[] findNewPublished(int pageSize, int page) {
+        return articleRepository.findNewPublished(pageSize, page);
+    }
+
+    @Override
+    public ArticleWithSubject findArticleWithSubjectById(UUID id) {
+        return articleRepository.findArticleWithSubject(id);
     }
 }
