@@ -1,8 +1,7 @@
 package nl.hardwerkendenederlanders.hrcms.controllers;
 
 import jakarta.servlet.http.HttpSession;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
@@ -26,23 +25,29 @@ public class UserController {
     @GetMapping()
     public String manageUserPage(
             @RequestParam(defaultValue = "0") Integer page,
-            Model model,
             @RequestParam(required = false) String searchName,
-            @RequestParam(required = false) Boolean sortActive) {
-        List<User> users;
-        int maxPages;
+            @RequestParam(required = false) Boolean sortActive,
+            Model model,
+            HttpSession session) {
+        List<User> users = userService.getUsers(page, searchName, sortActive);
+        int maxPages = userService.getMaxPages(searchName, sortActive);
 
-        int pageSize = 13;
+        @SuppressWarnings("unchecked")
+        ArrayDeque<String> recentSearches = (ArrayDeque<String>) session.getAttribute("recentSearches");
+
+        if (recentSearches == null) {
+            recentSearches = new ArrayDeque<>();
+        }
+
         if (searchName != null) {
-            users = userService.searchByNamePaginated(searchName, page, pageSize);
             model.addAttribute("searchName", searchName);
-            maxPages = (int) Math.ceil(((double) userService.countByNameOrEmailPaginated(searchName)) / pageSize);
-        } else if (sortActive != null) {
-            users = userService.findUserOnActivityPaginated(sortActive, page, pageSize);
-            maxPages = (int) Math.ceil(((double) userService.countByActive(sortActive)) / pageSize);
-        } else {
-            users = userService.findUsersPaginated(page, pageSize);
-            maxPages = (int) Math.ceil(((double) userService.countAll()) / pageSize);
+            recentSearches.remove(searchName);
+            recentSearches.addFirst(searchName);
+            int maxSearches = 5;
+            while (recentSearches.size() > maxSearches) {
+                recentSearches.removeLast();
+            }
+            session.setAttribute("recentSearches", recentSearches);
         }
 
         model.addAttribute("users", users);

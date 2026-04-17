@@ -19,8 +19,13 @@
         <a class="manage-button-tag blue-button" th:href="@{/manage-users/create-user}">Add new user</a>
         <br>
         <form th:action="@{/manage-users}" method="get">
-            <input type="text" name="searchName" th:value="${searchName}" class="admin-search-bar" placeholder="Search user">
+            <input type="text" name="searchName" th:value="${searchName}" class="admin-search-bar" placeholder="Search user" list="recentList">
             <button type="submit" class="search-button blue-button">Search</button>
+            <datalist id="recentList">
+                <option th:each="item : ${session.recentSearches}"
+                        th:value="${item}">
+                </option>
+            </datalist>
         </form>
     </div>
     <div class="user-container">

@@ -20,6 +20,84 @@ public class UserServiceTest {
     private final UserService userService = new UserServiceImpl(userRepository);
 
     @Test
+    void getUsers_withSearchName_returnsSearchResults() {
+        List<User> users = List.of(mock(User.class));
+
+        when(userRepository.findByNameOrEmailPaginated("Kim", 0, 13)).thenReturn(users);
+
+        List<User> result = userService.getUsers(0, "Kim", null);
+
+        assertEquals(users, result);
+        verify(userRepository).findByNameOrEmailPaginated("Kim", 0, 13);
+        verify(userRepository, never()).findUserOnActivityPaginated(anyBoolean(), anyInt(), anyInt());
+        verify(userRepository, never()).findAllPaginated(anyInt(), anyInt());
+    }
+
+    @Test
+    void getUsers_withSortActive_returnsFilteredResults() {
+        List<User> users = List.of(mock(User.class));
+
+        when(userRepository.findUserOnActivityPaginated(true, 0, 13)).thenReturn(users);
+
+        List<User> result = userService.getUsers(0, null, true);
+
+        assertEquals(users, result);
+        verify(userRepository).findUserOnActivityPaginated(true, 0, 13);
+        verify(userRepository, never()).findByNameOrEmailPaginated(anyString(), anyInt(), anyInt());
+        verify(userRepository, never()).findAllPaginated(anyInt(), anyInt());
+    }
+
+    @Test
+    void getUsers_withoutSearchOrSort_returnsAllUsers() {
+        List<User> users = List.of(mock(User.class), mock(User.class));
+
+        when(userRepository.findAllPaginated(0, 13)).thenReturn(users);
+
+        List<User> result = userService.getUsers(0, null, null);
+
+        assertEquals(users, result);
+        verify(userRepository).findAllPaginated(0, 13);
+        verify(userRepository, never()).findByNameOrEmailPaginated(anyString(), anyInt(), anyInt());
+        verify(userRepository, never()).findUserOnActivityPaginated(anyBoolean(), anyInt(), anyInt());
+    }
+
+    @Test
+    void getMaxPages_withSearchName_returnsCalculatedPages() {
+        when(userRepository.countByNameOrEmailPaginated("Kim")).thenReturn(14);
+
+        int result = userService.getMaxPages("Kim", null);
+
+        assertEquals(2, result);
+        verify(userRepository).countByNameOrEmailPaginated("Kim");
+        verify(userRepository, never()).countByActive(anyBoolean());
+        verify(userRepository, never()).countAll();
+    }
+
+    @Test
+    void getMaxPages_withSortActive_returnsCalculatedPages() {
+        when(userRepository.countByActive(true)).thenReturn(26);
+
+        int result = userService.getMaxPages(null, true);
+
+        assertEquals(2, result);
+        verify(userRepository).countByActive(true);
+        verify(userRepository, never()).countByNameOrEmailPaginated(anyString());
+        verify(userRepository, never()).countAll();
+    }
+
+    @Test
+    void getMaxPages_withoutSearchOrSort_returnsCalculatedPages() {
+        when(userRepository.countAll()).thenReturn(27);
+
+        int result = userService.getMaxPages(null, null);
+
+        assertEquals(3, result);
+        verify(userRepository).countAll();
+        verify(userRepository, never()).countByNameOrEmailPaginated(anyString());
+        verify(userRepository, never()).countByActive(anyBoolean());
+    }
+
+    @Test
     void insertUser_success() {
         User user = new User(
                 UUID.randomUUID(),

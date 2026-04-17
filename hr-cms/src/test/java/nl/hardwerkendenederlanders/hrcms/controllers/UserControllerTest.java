@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import jakarta.servlet.http.HttpSession;
+import java.util.ArrayDeque;
 import java.util.List;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.models.User;
@@ -22,31 +23,37 @@ class UserControllerTest {
     @Test
     void manageUserPage_default() {
         Model model = new ConcurrentModel();
+        HttpSession session = mock(HttpSession.class);
         List<User> users = List.of(mock(User.class), mock(User.class));
 
-        when(userService.findUsersPaginated(0, 13)).thenReturn(users);
-        when(userService.countAll()).thenReturn(users.size());
+        when(userService.getUsers(0, null, null)).thenReturn(users);
+        when(userService.getMaxPages(null, null)).thenReturn(1);
+        when(session.getAttribute("recentSearches")).thenReturn(null);
 
-        String result = userController.manageUserPage(0, model, null, null);
+        String result = userController.manageUserPage(0, null, null, model, session);
 
         assertEquals("pages/manage-users", result);
         assertEquals(users, model.getAttribute("users"));
         assertEquals(0, model.getAttribute("currentPage"));
         assertEquals(1, model.getAttribute("finalPage"));
 
-        verify(userService).findUsersPaginated(0, 13);
-        verify(userService).countAll();
+        verify(userService).getUsers(0, null, null);
+        verify(userService).getMaxPages(null, null);
+        verify(session).getAttribute("recentSearches");
+        verify(session, never()).setAttribute(eq("recentSearches"), any());
     }
 
     @Test
     void manageUserPage_withSearchName() {
         Model model = new ConcurrentModel();
+        HttpSession session = mock(HttpSession.class);
         List<User> users = List.of(mock(User.class));
 
-        when(userService.searchByNamePaginated("Kim", 0, 13)).thenReturn(users);
-        when(userService.countByNameOrEmailPaginated("Kim")).thenReturn(users.size());
+        when(userService.getUsers(0, "Kim", null)).thenReturn(users);
+        when(userService.getMaxPages("Kim", null)).thenReturn(1);
+        when(session.getAttribute("recentSearches")).thenReturn(null);
 
-        String result = userController.manageUserPage(0, model, "Kim", null);
+        String result = userController.manageUserPage(0, "Kim", null, model, session);
 
         assertEquals("pages/manage-users", result);
         assertEquals(users, model.getAttribute("users"));
@@ -54,27 +61,33 @@ class UserControllerTest {
         assertEquals(0, model.getAttribute("currentPage"));
         assertEquals(1, model.getAttribute("finalPage"));
 
-        verify(userService).searchByNamePaginated("Kim", 0, 13);
-        verify(userService).countByNameOrEmailPaginated("Kim");
+        verify(userService).getUsers(0, "Kim", null);
+        verify(userService).getMaxPages("Kim", null);
+        verify(session).getAttribute("recentSearches");
+        verify(session).setAttribute(eq("recentSearches"), any(ArrayDeque.class));
     }
 
     @Test
     void manageUserPage_withSortActive() {
         Model model = new ConcurrentModel();
+        HttpSession session = mock(HttpSession.class);
         List<User> users = List.of(mock(User.class));
 
-        when(userService.findUserOnActivityPaginated(true, 0, 13)).thenReturn(users);
-        when(userService.countByActive(true)).thenReturn(users.size());
+        when(userService.getUsers(0, null, true)).thenReturn(users);
+        when(userService.getMaxPages(null, true)).thenReturn(1);
+        when(session.getAttribute("recentSearches")).thenReturn(null);
 
-        String result = userController.manageUserPage(0, model, null, true);
+        String result = userController.manageUserPage(0, null, true, model, session);
 
         assertEquals("pages/manage-users", result);
         assertEquals(users, model.getAttribute("users"));
         assertEquals(0, model.getAttribute("currentPage"));
         assertEquals(1, model.getAttribute("finalPage"));
 
-        verify(userService).findUserOnActivityPaginated(true, 0, 13);
-        verify(userService).countByActive(true);
+        verify(userService).getUsers(0, null, true);
+        verify(userService).getMaxPages(null, true);
+        verify(session).getAttribute("recentSearches");
+        verify(session, never()).setAttribute(eq("recentSearches"), any());
     }
 
     @Test

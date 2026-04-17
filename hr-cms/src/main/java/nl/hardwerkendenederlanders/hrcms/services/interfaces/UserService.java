@@ -5,6 +5,10 @@ import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 
 public interface UserService {
+    List<User> getUsers(int page, String searchName, Boolean sortActive);
+
+    int getMaxPages(String searchName, Boolean sortActive);
+
     void insertUser(User user);
 
     void insertUser(String firstName, String prefix, String lastName, String email, String password);

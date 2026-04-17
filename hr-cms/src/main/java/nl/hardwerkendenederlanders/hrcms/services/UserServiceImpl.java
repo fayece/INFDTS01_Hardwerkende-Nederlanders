@@ -17,9 +17,28 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final int pageSize = 13;
 
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    public List<User> getUsers(int page, String searchName, Boolean sortActive) {
+        if (searchName != null) {
+            return userRepository.findByNameOrEmailPaginated(searchName, page, pageSize);
+        } else if (sortActive != null) {
+            return userRepository.findUserOnActivityPaginated(sortActive, page, pageSize);
+        }
+        return userRepository.findAllPaginated(page, pageSize);
+    }
+
+    public int getMaxPages(String searchName, Boolean sortActive) {
+        if (searchName != null) {
+            return (int) Math.ceil(((double) countByNameOrEmailPaginated(searchName)) / pageSize);
+        } else if (sortActive != null) {
+            return (int) Math.ceil(((double) countByActive(sortActive)) / pageSize);
+        }
+        return (int) Math.ceil(((double) countAll()) / pageSize);
     }
 
     @Override
