@@ -5,11 +5,13 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 
-@SuperBuilder
+@Builder
 @Getter
-public class MediaItem extends BaseTimedEntity {
+public class MediaItem {
+
+    @Builder.Default
+    private final UUID id = UUID.randomUUID();
 
     @Setter
     private String url;
@@ -18,15 +20,6 @@ public class MediaItem extends BaseTimedEntity {
     @Builder.Default
     private MediaType mediaType = MediaType.IMAGE;
 
-    public MediaItem(UUID id, String url, MediaType mediaType, OffsetDateTime createdAt) {
-        super(id, createdAt);
-        this.url = url;
-        this.mediaType = mediaType;
-    }
-
-    public MediaItem(String url, MediaType mediaType) {
-        super();
-        this.url = url;
-        this.mediaType = mediaType;
-    }
+    @Builder.Default
+    private final OffsetDateTime createdAt = OffsetDateTime.now();
 }

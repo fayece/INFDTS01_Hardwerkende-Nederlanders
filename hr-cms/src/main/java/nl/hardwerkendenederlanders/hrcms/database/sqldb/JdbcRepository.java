@@ -2,10 +2,7 @@ package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import nl.hardwerkendenederlanders.hrcms.database.DatabaseRepository;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -37,9 +34,10 @@ public abstract class JdbcRepository<T> implements DatabaseRepository<T> {
     }
 
     @SuppressWarnings("SqlSourceToSinkFlow")
-    public T findById(UUID id) {
+    public Optional<T> findById(UUID id) {
 
-        return jdbc.queryForObject(getQuery("findById"), Map.of("id", id), rowMapper());
+        return jdbc.query(getQuery("findById"), Map.of("id", id), rowMapper()).stream()
+                .findFirst();
     }
 
     @SuppressWarnings("SqlSourceToSinkFlow")

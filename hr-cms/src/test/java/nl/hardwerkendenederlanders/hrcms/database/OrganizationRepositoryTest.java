@@ -2,6 +2,7 @@ package nl.hardwerkendenederlanders.hrcms.database;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
@@ -30,7 +31,8 @@ public class OrganizationRepositoryTest {
         Organization organization = new Organization("Test Organization");
         organizationRepository.insert(organization);
 
-        Organization retrieved = organizationRepository.findById(organization.getId());
+        Organization retrieved =
+                organizationRepository.findById(organization.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(organization.getId(), retrieved.getId());
@@ -46,7 +48,8 @@ public class OrganizationRepositoryTest {
         organization.setOrgName(newOrgName);
         organizationRepository.update(organization);
 
-        Organization updated = organizationRepository.findById(organization.getId());
+        Organization updated =
+                organizationRepository.findById(organization.getId()).orElse(null);
 
         assertNotNull(updated);
         assertEquals(organization.getId(), updated.getId());
@@ -58,7 +61,8 @@ public class OrganizationRepositoryTest {
         Organization organization = new Organization("Test Organization");
         organizationRepository.insert(organization);
 
-        Organization found = organizationRepository.findById(organization.getId());
+        Organization found =
+                organizationRepository.findById(organization.getId()).orElse(null);
 
         assertNotNull(found);
         assertEquals(organization.getId(), found.getId());
@@ -66,8 +70,9 @@ public class OrganizationRepositoryTest {
     }
 
     @Test
-    void findOrganizationById_withNonExistingId_shouldReturnNull() {
-        assertThrows(Exception.class, () -> organizationRepository.findById(UUID.randomUUID()));
+    void findOrganizationById_withNonExistingId_shouldReturnEmptyOptional() {
+        Optional<Organization> result = organizationRepository.findById(UUID.randomUUID());
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -77,7 +82,8 @@ public class OrganizationRepositoryTest {
 
         organizationRepository.delete(organization.getId());
 
-        assertThrows(Exception.class, () -> organizationRepository.findById(organization.getId()));
+        Optional<Organization> result = organizationRepository.findById(organization.getId());
+        assertTrue(result.isEmpty());
     }
 
     @Test

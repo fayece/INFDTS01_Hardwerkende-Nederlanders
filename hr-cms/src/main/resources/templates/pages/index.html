@@ -6,7 +6,7 @@
     <div th:insert="~{fragments/app-wide/navbar :: navbar}" class="navbar"></div>
     <main class="standard-page-layout">
         <h1>Your Personal Feed</h1>
-        <div th:replace="~{fragments/articles/article-list :: article-list(articles=${articles})}"></div>
+        <div th:replace="~{fragments/articles/article-list :: article-list(articles=${articles}, url=${'/article/'})}"></div>
     </main>
     <footer th:replace="~{fragments/app-wide/footer :: footer}"></footer>
 </body>

@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import jakarta.servlet.http.HttpSession;
 import java.time.OffsetDateTime;
+import java.util.Optional;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import org.junit.jupiter.api.Test;
@@ -33,20 +34,19 @@ class UserSessionServiceImplTest {
 
         when(session.getAttribute("userId")).thenReturn(id);
 
-        UUID result = service.getLoggedInUser(session);
-
-        assertEquals(id, result);
+        Optional<UUID> result = service.getLoggedInUser(session);
+        assertTrue(result.isPresent());
+        assertEquals(id, result.get());
     }
 
     @Test
-    void getLoggedInUser_whenNotLoggedIn_throwsException() {
+    void getLoggedInUser_whenNotLoggedIn_returnsEmptyOptional() {
         HttpSession session = mock(HttpSession.class);
 
         when(session.getAttribute("userId")).thenReturn(null);
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> service.getLoggedInUser(session));
-
-        assertEquals("Not logged in", exception.getMessage());
+        Optional<UUID> result = service.getLoggedInUser(session);
+        assertTrue(result.isEmpty());
     }
 
     @Test

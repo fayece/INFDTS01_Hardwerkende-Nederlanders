@@ -1,6 +1,25 @@
-<div th:fragment="comment">
-    <span th:insert="~{fragments/users/username :: username}"></span>
-    <p>This must be one of the finest texts ever put to parchment. I shall live no day in the ways of old for I am now enlightened.
-        Indeed, my light shall dissipate over continents. my deepest gratitude is yours to keep. </p>
-<!--    <div th:insert="~{fragments/articles/comment :: comment}" ></div>-->
+<div th:fragment="comment" class="comment" xmlns="http://www.w3.org/1999/html">
+    <span class="author-name" th:text="${comment.authorName ?: 'Unknown User'}"></span>
+    <div class="comment-body" th:data-markdown="${comment.commentBody}"></div>
+
+    <div class="comment-footer">
+        <small class="local-time"
+               th:data-timestamp="${comment.createdAt}"
+               th:text="${#temporals.format(comment.createdAt, 'dd-MM-yyyy HH:mm')}">
+        </small>
+        <button type="button"
+                class="reply-button"
+                th:data-comment-id="${comment.id}"
+                th:data-article-id="${articleId}">
+            ↵ Reply
+        </button>
+    </div>
+
+    <div class="replies-container" th:id="'replies-for-' + ${comment.id}"></div>
+
+    <button class="load-replies-button"
+            th:if="${comment.hasReplies}"
+            th:data-parent-id="${comment.id}">
+        View Replies
+    </button>
 </div>

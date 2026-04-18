@@ -2,11 +2,13 @@ package nl.hardwerkendenederlanders.hrcms.database;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.RoleRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Role;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -14,6 +16,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -24,13 +28,21 @@ public class RoleRepositoryTest {
     @Autowired
     private RoleRepository roleRepository;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @BeforeEach
+    void setUp() {
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "roles");
+    }
+
     @Test
     void insertRole_withValidRole_shouldPersistAndRetrieve() {
         Role role = new Role("Editor");
 
         roleRepository.insert(role);
 
-        Role retrieved = roleRepository.findById(role.getId());
+        Role retrieved = roleRepository.findById(role.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(role.getId(), retrieved.getId());
@@ -47,7 +59,7 @@ public class RoleRepositoryTest {
         role.setRoleName("Senior Editor");
         roleRepository.update(role);
 
-        Role retrieved = roleRepository.findById(role.getId());
+        Role retrieved = roleRepository.findById(role.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(role.getId(), retrieved.getId());
@@ -60,7 +72,7 @@ public class RoleRepositoryTest {
 
         roleRepository.insert(role);
 
-        Role retrieved = roleRepository.findById(role.getId());
+        Role retrieved = roleRepository.findById(role.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(role.getId(), retrieved.getId());
@@ -69,8 +81,9 @@ public class RoleRepositoryTest {
     }
 
     @Test
-    void findRoleById_withNonExistingId_shouldThrowException() {
-        assertThrows(Exception.class, () -> roleRepository.findById(UUID.randomUUID()));
+    void findRoleById_withNonExistingId_shouldReturnEmptyOptional() {
+        Optional<Role> result = roleRepository.findById(UUID.randomUUID());
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -80,7 +93,8 @@ public class RoleRepositoryTest {
         roleRepository.insert(role);
         roleRepository.delete(role.getId());
 
-        assertThrows(Exception.class, () -> roleRepository.findById(role.getId()));
+        Optional<Role> result = roleRepository.findById(role.getId());
+        assertTrue(result.isEmpty());
     }
 
     @Test

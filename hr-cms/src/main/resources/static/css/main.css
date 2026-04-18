@@ -1,9 +1,15 @@
 :root {
     --background: #e9eaf0;
     --edge: #cacad9;
+    --text-light: #707070;
     --text: #1f1f21;
     --accent: #FF8237;
+    --accent-light: #ffa76a;
     --radius-small: 0.4rem;
+
+    --warning: #e65c5c;
+    --warning-light: #e69c9c;
+    --warning-background: #f2c9c9;
 }
 
 body {
