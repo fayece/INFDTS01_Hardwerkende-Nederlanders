@@ -2,6 +2,8 @@ package nl.hardwerkendenederlanders.hrcms.controllers;
 
 import jakarta.servlet.http.HttpSession;
 import java.util.*;
+
+import nl.hardwerkendenederlanders.hrcms.exceptions.ConflictException;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
@@ -9,6 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.naming.ConfigurationException;
 
 @Controller
 @Validated
@@ -83,9 +87,14 @@ public class UserController {
             @RequestParam String password,
             Model model) {
 
-        userService.insertUser(firstName, prefix, lastName, email, password);
-        model.addAttribute("inserted", true);
-        return "pages/create-user";
+        try{
+            userService.insertUser(firstName, prefix, lastName, email, password);
+            model.addAttribute("inserted", true);
+            return "pages/create-user";
+        }catch(ConflictException | IllegalArgumentException e){
+            model.addAttribute("errorMessage", e.getMessage());
+            return "pages/create-user";
+        }
     }
 
     @PostMapping("/update")
@@ -98,8 +107,17 @@ public class UserController {
             @RequestParam(required = false) UUID roleId,
             @RequestParam(required = false) UUID organisationId,
             Model model) {
-        userService.updateUser(id, firstName, prefix, lastName, email, roleId, organisationId);
-        return "redirect:/manage-users"; // or a successpage -> manage-users
+        try{
+            userService.updateUser(id, firstName, prefix, lastName, email, roleId, organisationId);
+            return "redirect:/manage-users";
+        }
+        catch(ConflictException | IllegalArgumentException e){
+            model.addAttribute("errorMessage", e.getMessage());
+            User currentUser = userService.findById(id);
+            model.addAttribute("currentUser", currentUser);
+            model.addAttribute("currentUserId", id);
+            return "pages/edit-user";
+        }
     }
 
     @PostMapping("/set-active")
@@ -122,8 +140,8 @@ public class UserController {
 
     @PostMapping("/delete-user")
     public String deleteUser(@RequestParam UUID userId, HttpSession session) {
-        UUID currentUserId = userSessionService.getLoggedInUser(session);
-        userService.deleteById(userId, currentUserId);
+        Optional<UUID> currentUserId = userSessionService.getLoggedInUser(session);
+        userService.deleteById(userId, currentUserId.get());
 
         return "redirect:/manage-users";
     }

@@ -11,6 +11,7 @@
 <div class="create-user-page">
     <h2>Edit user</h2>
     <h4>Edit or delete user</h4>
+    <div th:if="${errorMessage}" th:text="${errorMessage}" class="error-container"></div>
     <div class="create-user-form-container">
         <form class="create-user-form" th:action="@{/manage-users/update}" method="post">
             <input type="hidden" name="id" th:value="${currentUser.id}">

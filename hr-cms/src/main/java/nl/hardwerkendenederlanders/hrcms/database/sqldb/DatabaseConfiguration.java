@@ -1,5 +1,8 @@
 package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
+import nl.hardwerkendenederlanders.hrcms.database.ArticleRepository;
+import nl.hardwerkendenederlanders.hrcms.database.CommentRepository;
+import nl.hardwerkendenederlanders.hrcms.database.MediaRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
@@ -10,7 +13,7 @@ public class DatabaseConfiguration {
 
     @Bean
     public ArticleRepository articleRepository(NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
-        return new ArticleRepository(jdbc, resourceLoader);
+        return new JdbcArticleRepository(jdbc);
     }
 
     @Bean
@@ -21,12 +24,12 @@ public class DatabaseConfiguration {
 
     @Bean
     public CommentRepository commentRepository(NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
-        return new CommentRepository(jdbc, resourceLoader);
+        return new JdbcCommentRepository(jdbc);
     }
 
     @Bean
-    public MediaItemRepository mediaItemRepository(NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
-        return new MediaItemRepository(jdbc, resourceLoader);
+    public MediaRepository mediaItemRepository(NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
+        return new JdbcMediaRepository(jdbc);
     }
 
     @Bean
