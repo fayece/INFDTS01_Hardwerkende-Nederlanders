@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.IntStream;
 import nl.hardwerkendenederlanders.hrcms.database.CommentRepository;
@@ -97,7 +98,7 @@ class CommentServiceImplTest {
 
         CommentWithAuthor savedRecord = new CommentWithAuthor(inputComment, "John Doe", 0);
 
-        when(userSessionService.getLoggedInUser(session)).thenReturn(userId);
+        when(userSessionService.getLoggedInUser(session)).thenReturn(Optional.of(userId));
         when(commentRepository.insertReturning(any(Comment.class))).thenReturn(savedRecord);
 
         CommentViewDto result = commentService.postComment(inputComment, session);
@@ -112,7 +113,7 @@ class CommentServiceImplTest {
         HttpSession session = mock(HttpSession.class);
         Comment comment = Comment.builder().articleId(UUID.randomUUID()).build();
 
-        when(userSessionService.getLoggedInUser(session)).thenThrow(new RuntimeException("Unexpected error"));
+        when(commentRepository.insertReturning(any(Comment.class))).thenThrow(new RuntimeException("DB error"));
 
         ComponentActionException ex =
                 assertThrows(ComponentActionException.class, () -> commentService.postComment(comment, session));
