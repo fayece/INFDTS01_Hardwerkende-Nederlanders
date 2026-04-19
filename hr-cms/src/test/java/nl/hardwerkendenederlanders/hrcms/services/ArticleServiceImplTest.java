@@ -5,18 +5,24 @@ import static org.mockito.Mockito.*;
 import java.sql.SQLException;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.ArticleRepository;
+import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleAuthorRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
+import nl.hardwerkendenederlanders.hrcms.models.ArticleAuthor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import nl.hardwerkendenederlanders.hrcms.models.ArticleAuthor;
 
 @ExtendWith(MockitoExtension.class)
 public class ArticleServiceImplTest {
 
     @Mock
     private ArticleRepository articleRepository;
+    @Mock
+    private ArticleAuthorRepository authorRepo;
 
     @InjectMocks
     private ArticleServiceImpl articleService;
@@ -30,7 +36,8 @@ public class ArticleServiceImplTest {
                 .textContent("just some text")
                 .build();
         when(articleRepository.findById(article_id)).thenReturn(null);
-        articleService.ensureArticleExists(article1);
+        doNothing().when(authorRepo).ensureInsert(any());
+        articleService.ensureArticleExists(article1, UUID.randomUUID());
 
         verify(articleRepository, times(1)).insert(any());
     }
@@ -44,7 +51,8 @@ public class ArticleServiceImplTest {
                 .textContent("Moore's law")
                 .build();
         when(articleRepository.findById(article_id)).thenReturn(article2);
-        articleService.ensureArticleExists(article2);
+        doNothing().when(authorRepo).ensureInsert(any());
+        articleService.ensureArticleExists(article2, UUID.randomUUID());
 
         verify(articleRepository, times(1)).update(any());
     }

@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import nl.hardwerkendenederlanders.hrcms.database.ArticleRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.PublicationStatus;
-import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleWithSubject;
+import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleWithSubjectAndViewsDto;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -48,10 +48,11 @@ public class JdbcArticleRepository implements ArticleRepository {
         return mapping;
     }
 
-    private RowMapper<ArticleWithSubject> articleAndSubjectMapper() {
-        return (rs, rowNum) -> new ArticleWithSubject(
+    private RowMapper<ArticleWithSubjectAndViewsDto> articleAndSubjectMapper() {
+        return (rs, rowNum) -> new ArticleWithSubjectAndViewsDto(
             rowMapper().mapRow(rs, rowNum),
-            rs.getString("subject_name")
+            rs.getString("subject_name"),
+            rs.getInt("view_count")
         );
     }
 
@@ -148,12 +149,14 @@ public class JdbcArticleRepository implements ArticleRepository {
         jdbc.update(query, Map.of("id", id));
     }
 
-    public @Nullable ArticleWithSubject findArticleWithSubject(UUID id){
+    public @Nullable ArticleWithSubjectAndViewsDto findArticleWithSubject(UUID id){
         String query = """
-                SELECT *
+                SELECT *, count(a.id) as viewer_count
                 FROM articles AS a
                 LEFT JOIN subjects s ON a.subject_id = s.id
-                WHERE a.id = :id;
+                LEFT JOIN article_viewers av ON av.article_id = a.id
+                WHERE a.id = :id
+                GROUP BY a.id;
                 """;
         MapSqlParameterSource mapping = new MapSqlParameterSource();
         mapping.addValue("id", id);

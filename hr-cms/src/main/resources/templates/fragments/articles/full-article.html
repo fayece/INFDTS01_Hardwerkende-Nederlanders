@@ -1,7 +1,16 @@
-<div th:fragment="full-article(article, subject)" class="content-section">
+<div th:fragment="full-article(article, subject, authors)" class="content-section">
     <h1 th:text="${article.Title}"></h1>
     <span th:insert="~{fragments/articles/likes-dislikes :: likes-dislikes}"></span>
-    <span th:insert="~{fragments/users/username :: username}"></span>
+    <ul class="full-article__author-list">
+        <li th:each="author: ${authors}">
+            <div th:insert="~{fragments/users/username :: username(
+                firstname=${author.firstName},
+                prefix=${author.prefix},
+                lastname=${author.lastName})}">
+            </div>
+        </li>
+
+    </ul>
     <div th:text="'Subject:'+ (${subject} != null ? ${subject} : 'Undefined')"></div>
     <div th:text="'Created On: ' + ${#temporals.format(article.createdAt, 'dd-MM-yyyy')}"></div>
     <div th:if="${article.updatedAt != null}" th:text="'Last Update: ' + ${#temporals.format(article.updatedAt, 'dd-MM-yyyy')}"></div>

@@ -1,8 +1,11 @@
 package nl.hardwerkendenederlanders.hrcms.models;
 
 import java.util.UUID;
+
+import lombok.Builder;
 import lombok.Getter;
 
+@Builder
 @Getter
 public class ArticleAuthor extends BaseEntity {
 

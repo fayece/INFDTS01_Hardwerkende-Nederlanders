@@ -3,10 +3,12 @@ package nl.hardwerkendenederlanders.hrcms.services;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.ArticleRepository;
+import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleAuthorRepository;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentActionException;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
+import nl.hardwerkendenederlanders.hrcms.models.ArticleAuthor;
 import nl.hardwerkendenederlanders.hrcms.models.PublicationStatus;
-import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleWithSubject;
+import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleWithSubjectAndViewsDto;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.ArticleService;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -14,14 +16,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class ArticleServiceImpl implements ArticleService {
     private final ArticleRepository articleRepository;
+    private final ArticleAuthorRepository articleAuthorRepository;
 
-    public ArticleServiceImpl(ArticleRepository articleRepository) {
+    public ArticleServiceImpl(ArticleRepository articleRepository, ArticleAuthorRepository articleAuthorRepository) {
         this.articleRepository = articleRepository;
+        this.articleAuthorRepository = articleAuthorRepository;
     }
 
     // ensures the given article is present in the database. If the ID doesn't exist a new article is made. If it does
     // the article is updated
-    public void ensureArticleExists(Article article) {
+    public void ensureArticleExists(Article article, UUID authorId) {
         article = Article.fillOutNullFields(article);
         try {
             if (articleRepository.findById(article.getId()) == null) {
@@ -30,6 +34,13 @@ public class ArticleServiceImpl implements ArticleService {
                 article.setUpdatedAt(OffsetDateTime.now());
                 articleRepository.update(article);
             }
+
+            ArticleAuthor articleAuthor = ArticleAuthor.builder()
+                    .articleId(article.getId())
+                    .authorId(authorId)
+                    .build();
+            articleAuthorRepository.ensureInsert(articleAuthor);
+
         } catch (DataAccessException dae) {
             if (article.getPublicationStatus() == PublicationStatus.PUBLISHED) {
                 throw new ComponentActionException(
@@ -38,6 +49,9 @@ public class ArticleServiceImpl implements ArticleService {
                         "/article/editor?error=INSERT",
                         dae,
                         "database error" + dae.getMessage());
+            }
+            else{
+                throw dae;
             }
         }
     }
@@ -58,7 +72,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public ArticleWithSubject findArticleWithSubjectById(UUID id) {
+    public ArticleWithSubjectAndViewsDto findArticleWithSubjectById(UUID id) {
         return articleRepository.findArticleWithSubject(id);
     }
 }

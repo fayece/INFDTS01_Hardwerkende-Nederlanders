@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ArticleRepositoryTest {
 
     @Autowired
-    private JdbcArticleRepository articleRepository;
+    private ArticleRepository articleRepository;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

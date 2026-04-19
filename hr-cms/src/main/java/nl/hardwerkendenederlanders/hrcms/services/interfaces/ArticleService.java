@@ -2,10 +2,10 @@ package nl.hardwerkendenederlanders.hrcms.services.interfaces;
 
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
-import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleWithSubject;
+import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleWithSubjectAndViewsDto;
 
 public interface ArticleService {
-    void ensureArticleExists(Article article);
+    void ensureArticleExists(Article article, UUID articleId);
 
     Article findById(UUID id);
 
@@ -16,5 +16,5 @@ public interface ArticleService {
     /**
      * Get an article DTO ready for frontend display
      */
-    ArticleWithSubject findArticleWithSubjectById(UUID id);
+    ArticleWithSubjectAndViewsDto findArticleWithSubjectById(UUID id);
 }

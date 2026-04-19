@@ -2,7 +2,8 @@ package nl.hardwerkendenederlanders.hrcms.models.dtos.article;
 
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 
-public record ArticleWithSubject (
+public record ArticleWithSubjectAndViewsDto(
     Article article,
-    String subjectName
+    String subjectName,
+    int viewCount
 ) {}

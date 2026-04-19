@@ -2,6 +2,8 @@ package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
 import nl.hardwerkendenederlanders.hrcms.database.ArticleRepository;
 import nl.hardwerkendenederlanders.hrcms.database.SubjectRepository;
+import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleAuthorRepository;
+import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleViewersRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,8 +20,8 @@ public class DatabaseConfiguration {
 
     @Bean
     public ArticleAuthorRepository ArticleAuthorRepository(
-            NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
-        return new ArticleAuthorRepository(jdbc, resourceLoader);
+            NamedParameterJdbcTemplate jdbc) {
+        return new JdbcArticleAuthorRepository(jdbc);
     }
 
     @Bean
@@ -62,5 +64,10 @@ public class DatabaseConfiguration {
     @Bean
     public SubjectRepository subjectRepository(NamedParameterJdbcTemplate jdbc) {
         return new JdbcSubjectRepository(jdbc);
+    }
+
+    @Bean
+    public ArticleViewersRepository articleViewersRepository(NamedParameterJdbcTemplate jdbc) {
+        return new JdbcArticleViewersRepository(jdbc);
     }
 }
