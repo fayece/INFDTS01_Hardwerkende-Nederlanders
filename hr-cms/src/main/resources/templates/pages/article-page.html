@@ -7,7 +7,7 @@
 <div th:insert="~{fragments/app-wide/navbar :: navbar}" class="navbar"></div>
 <main class="standard-page-layout">
     <div class="article-page-layout">
-        <div th:replace="~{fragments/articles/full-article :: full-article(${article}, ${subject}, ${authors})}"></div>
+        <div th:replace="~{fragments/articles/full-article :: full-article(${article}, ${authors})}"></div>
 
         <div th:replace="~{fragments/articles/comment-section :: comment-section}"></div>
     </div>

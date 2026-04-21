@@ -5,7 +5,7 @@ import java.util.UUID;
 import jakarta.servlet.http.HttpSession;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentUnavailableException;
 import nl.hardwerkendenederlanders.hrcms.models.ArticleViewer;
-import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleWithSubjectAndViewsDto;
+import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleFullDetailsDto;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.PagedComments;
 import nl.hardwerkendenederlanders.hrcms.services.CommentServiceImpl;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.ArticleAuthorsService;
@@ -44,14 +44,12 @@ public class ReaderArticleController {
     @GetMapping("/{articleId}")
     public String getArticle(@PathVariable UUID articleId, Model model, HttpSession httpSession) {
         articleViewersService.AddView(new ArticleViewer(articleId, userSessionService.getLoggedInUser(httpSession)));
-        ArticleWithSubjectAndViewsDto articleWithSubject = articleService.findArticleWithSubjectById(articleId);
+        ArticleFullDetailsDto articleFull = articleService.findArticleFullId(articleId);
 
-        if (articleWithSubject == null) {
+        if (articleFull == null) {
             return "error/404";
         }
-        model.addAttribute("view_count", articleWithSubject.viewCount());
-        model.addAttribute("article", articleWithSubject.article());
-        model.addAttribute("subject", articleWithSubject.subjectName());
+        model.addAttribute("article", articleFull);
         model.addAttribute("authors", authorsService.findAuthorsForArticle(articleId));
 
         try {

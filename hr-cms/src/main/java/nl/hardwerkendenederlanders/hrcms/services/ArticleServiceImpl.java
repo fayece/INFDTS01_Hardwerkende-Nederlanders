@@ -8,7 +8,7 @@ import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentActionException;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.ArticleAuthor;
 import nl.hardwerkendenederlanders.hrcms.models.PublicationStatus;
-import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleWithSubjectAndViewsDto;
+import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleFullDetailsDto;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.ArticleService;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -62,17 +62,17 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Article[] findAllPaged(int pageSize, int page) {
+    public ArticleFullDetailsDto[] findAllPaged(int pageSize, int page) {
         return articleRepository.findAllPaged(pageSize, page);
     }
 
     @Override
-    public Article[] findNewPublished(int pageSize, int page) {
+    public ArticleFullDetailsDto[] findNewPublished(int pageSize, int page) {
         return articleRepository.findNewPublished(pageSize, page);
     }
 
     @Override
-    public ArticleWithSubjectAndViewsDto findArticleWithSubjectById(UUID id) {
+    public ArticleFullDetailsDto findArticleFullId(UUID id) {
         return articleRepository.findArticleWithSubject(id);
     }
 }

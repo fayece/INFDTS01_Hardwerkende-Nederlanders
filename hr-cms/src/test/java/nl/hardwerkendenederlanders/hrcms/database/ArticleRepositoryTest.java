@@ -9,6 +9,7 @@ import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcArticleRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.PublicationStatus;
+import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleFullDetailsDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -113,7 +114,7 @@ public class ArticleRepositoryTest {
                 .build();
         articleRepository.insert(article2);
 
-        Article[] articles = articleRepository.findAllPaged(100, 1);
+        ArticleFullDetailsDto[] articles = articleRepository.findAllPaged(100, 1);
         assertEquals("Article 1", articles[1].getTitle());
         assertEquals("Article 2", articles[0].getTitle());
     }
