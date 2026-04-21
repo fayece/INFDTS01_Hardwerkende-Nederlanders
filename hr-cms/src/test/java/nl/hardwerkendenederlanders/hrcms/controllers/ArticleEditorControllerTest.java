@@ -5,9 +5,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.UUID;
-
 import jakarta.servlet.http.HttpSession;
+import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.ArticleService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.SubjectService;
@@ -20,7 +19,8 @@ public class ArticleEditorControllerTest {
     private final SubjectService subjectService = mock(SubjectService.class);
     private final UserSessionService userSessionService = mock(UserSessionService.class);
 
-    private final EditorArticleController controller = new EditorArticleController(articleService, subjectService, userSessionService);
+    private final EditorArticleController controller =
+            new EditorArticleController(articleService, subjectService, userSessionService);
 
     @Test
     void WriteArticle_SaveAsDraft_UserIsRedirectedToPageWithIdOfArticle() {

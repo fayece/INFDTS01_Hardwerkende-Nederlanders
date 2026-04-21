@@ -1,9 +1,8 @@
 package nl.hardwerkendenederlanders.hrcms.database.interfaces;
 
+import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.models.ArticleAuthor;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.article.AuthorDto;
-
-import java.util.UUID;
 
 public interface ArticleAuthorRepository {
     /**
@@ -13,5 +12,4 @@ public interface ArticleAuthorRepository {
     void ensureInsert(ArticleAuthor articleAuthor);
 
     AuthorDto[] findAuthorsForArticle(UUID articleId);
-
 }

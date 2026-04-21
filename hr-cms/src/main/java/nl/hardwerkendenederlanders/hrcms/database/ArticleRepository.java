@@ -16,9 +16,9 @@ public interface ArticleRepository {
 
     ArticleFullDetailsDto[] findAllPaged(int limit, int offset);
 
-    ArticleFullDetailsDto[] findNewPublished(int limit, int offset);
+    ArticleFullDetailsDto[] findNewArticlesPublishedPaged(int limit, int offset);
 
     void delete(UUID id);
 
-    ArticleFullDetailsDto findArticleWithSubject(UUID id);
+    ArticleFullDetailsDto findArticlePublished(UUID id);
 }

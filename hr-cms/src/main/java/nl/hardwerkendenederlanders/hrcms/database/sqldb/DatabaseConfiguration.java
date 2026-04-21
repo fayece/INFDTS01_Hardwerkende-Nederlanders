@@ -19,8 +19,7 @@ public class DatabaseConfiguration {
     }
 
     @Bean
-    public ArticleAuthorRepository ArticleAuthorRepository(
-            NamedParameterJdbcTemplate jdbc) {
+    public ArticleAuthorRepository ArticleAuthorRepository(NamedParameterJdbcTemplate jdbc) {
         return new JdbcArticleAuthorRepository(jdbc);
     }
 

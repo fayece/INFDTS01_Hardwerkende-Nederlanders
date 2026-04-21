@@ -2,9 +2,7 @@ package nl.hardwerkendenederlanders.hrcms.database;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleAuthorRepository;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.*;
@@ -15,9 +13,6 @@ import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.article.AuthorDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -71,8 +66,7 @@ public class ArticleAuthorRepositoryTest {
         ArticleAuthor articleAuthor = new ArticleAuthor(article.getId(), author.getId());
 
         articleAuthorRepository.ensureInsert(articleAuthor);
-        AuthorDto[] retrieved =
-                articleAuthorRepository.findAuthorsForArticle(article.getId());
+        AuthorDto[] retrieved = articleAuthorRepository.findAuthorsForArticle(article.getId());
 
         assertNotNull(retrieved);
         assertEquals("Test Author", retrieved[0].getFullName());

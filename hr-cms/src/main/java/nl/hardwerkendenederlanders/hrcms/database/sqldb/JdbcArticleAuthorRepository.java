@@ -1,16 +1,12 @@
 package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
-import nl.hardwerkendenederlanders.hrcms.models.Article;
+import java.util.UUID;
+import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleAuthorRepository;
 import nl.hardwerkendenederlanders.hrcms.models.ArticleAuthor;
-import nl.hardwerkendenederlanders.hrcms.models.PublicationStatus;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.article.AuthorDto;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleAuthorRepository;
-
-import java.time.OffsetDateTime;
-import java.util.UUID;
 
 public class JdbcArticleAuthorRepository implements ArticleAuthorRepository {
     private final NamedParameterJdbcTemplate jdbc;
@@ -72,6 +68,6 @@ public class JdbcArticleAuthorRepository implements ArticleAuthorRepository {
                 """;
         MapSqlParameterSource mapping = new MapSqlParameterSource();
         mapping.addValue("articleId", articleId);
-        return  jdbc.query(sql, mapping, authorNameMapper()).toArray(new AuthorDto[0]);
+        return jdbc.query(sql, mapping, authorNameMapper()).toArray(new AuthorDto[0]);
     }
 }

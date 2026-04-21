@@ -9,11 +9,9 @@ public class JdbcArticleViewersRepository implements ArticleViewersRepository {
 
     private final NamedParameterJdbcTemplate jdbc;
 
-
-    public JdbcArticleViewersRepository(NamedParameterJdbcTemplate jdbc){
+    public JdbcArticleViewersRepository(NamedParameterJdbcTemplate jdbc) {
         this.jdbc = jdbc;
     }
-
 
     @Override
     public void ensureInsert(ArticleViewer articleViewer) {

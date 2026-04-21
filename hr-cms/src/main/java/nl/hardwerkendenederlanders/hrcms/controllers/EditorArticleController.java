@@ -1,13 +1,11 @@
 package nl.hardwerkendenederlanders.hrcms.controllers;
 
-import java.util.UUID;
-
 import jakarta.servlet.http.HttpSession;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentActionException;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.ArticleService;
-import nl.hardwerkendenederlanders.hrcms.services.interfaces.AuthService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.SubjectService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
 import org.springframework.stereotype.Controller;
@@ -22,7 +20,8 @@ public class EditorArticleController {
     private final SubjectService subjectService;
     private final UserSessionService userSessionService;
 
-    public EditorArticleController(ArticleService articleService, SubjectService subjectService, UserSessionService userSessionService) {
+    public EditorArticleController(
+            ArticleService articleService, SubjectService subjectService, UserSessionService userSessionService) {
         this.articleService = articleService;
         this.subjectService = subjectService;
         this.userSessionService = userSessionService;
@@ -36,7 +35,7 @@ public class EditorArticleController {
         return "pages/article-editor-page";
     }
 
-    // load exisiting article
+    // load existing article
     @GetMapping("/{articleId}")
     public String getArticle(Model model, @PathVariable(value = "articleId") UUID id) {
         Article article = articleService.findById(id);

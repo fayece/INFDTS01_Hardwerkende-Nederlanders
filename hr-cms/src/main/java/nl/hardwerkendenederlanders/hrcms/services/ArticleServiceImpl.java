@@ -49,8 +49,7 @@ public class ArticleServiceImpl implements ArticleService {
                         "/article/editor?error=INSERT",
                         dae,
                         "database error" + dae.getMessage());
-            }
-            else{
+            } else {
                 throw dae;
             }
         }
@@ -68,11 +67,11 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public ArticleFullDetailsDto[] findNewPublished(int pageSize, int page) {
-        return articleRepository.findNewPublished(pageSize, page);
+        return articleRepository.findNewArticlesPublishedPaged(pageSize, page);
     }
 
     @Override
     public ArticleFullDetailsDto findArticleFullId(UUID id) {
-        return articleRepository.findArticleWithSubject(id);
+        return articleRepository.findArticlePublished(id);
     }
 }

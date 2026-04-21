@@ -1,8 +1,7 @@
 package nl.hardwerkendenederlanders.hrcms.controllers;
 
-import java.util.UUID;
-
 import jakarta.servlet.http.HttpSession;
+import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentUnavailableException;
 import nl.hardwerkendenederlanders.hrcms.models.ArticleViewer;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleFullDetailsDto;
@@ -25,7 +24,7 @@ public class ReaderArticleController {
     private final ArticleService articleService;
     private final CommentServiceImpl commentService;
     private final ArticleAuthorsService authorsService;
-    private  final UserSessionService userSessionService;
+    private final UserSessionService userSessionService;
     private final ArticleViewersService articleViewersService;
 
     public ReaderArticleController(

@@ -65,8 +65,7 @@ public class JdbcArticleRepository implements ArticleRepository {
                 .firstAuthor(new AuthorDto(
                         rs.getString("first_author_first_name"),
                         rs.getString("first_author_prefix"),
-                        rs.getString("first_author_last_name")
-                ))
+                        rs.getString("first_author_last_name")))
                 .build();
     }
 
@@ -131,7 +130,7 @@ public class JdbcArticleRepository implements ArticleRepository {
     }
 
     @Override
-    public ArticleFullDetailsDto[] findNewPublished(int limit, int offset) {
+    public ArticleFullDetailsDto[] findNewArticlesPublishedPaged(int limit, int offset) {
         if (limit <= 0)
             throw new IllegalArgumentException(
                     "findAllPages was called with an limit of " + limit + " the minimum is 1");
@@ -163,11 +162,11 @@ public class JdbcArticleRepository implements ArticleRepository {
         jdbc.update(query, Map.of("id", id));
     }
 
-    public @Nullable ArticleFullDetailsDto findArticleWithSubject(UUID id){
+    public @Nullable ArticleFullDetailsDto findArticlePublished(UUID id) {
         String query = """
                 SELECT *
                 FROM full_articles
-                WHERE article_id = :id;
+                WHERE article_id = :id AND publication_status = 'PUBLISHED';
                 """;
         MapSqlParameterSource mapping = new MapSqlParameterSource();
         mapping.addValue("id", id);

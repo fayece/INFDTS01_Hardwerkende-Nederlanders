@@ -1,7 +1,6 @@
 package nl.hardwerkendenederlanders.hrcms.models;
 
 import java.util.UUID;
-
 import lombok.Builder;
 import lombok.Getter;
 

@@ -6,7 +6,6 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcArticleRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.PublicationStatus;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleFullDetailsDto;
@@ -193,5 +192,78 @@ public class ArticleRepositoryTest {
     @MethodSource("invalidPaginationData")
     void findAllArticlesPaged_withInvalidLimit_shouldThrowException(int offset, int limit) {
         assertThrows(IllegalArgumentException.class, () -> articleRepository.findAllPaged(offset, limit));
+    }
+
+    @Test
+    void findPublishedArticles_withOnePublishedArticle_should_returnArticle() {
+        Article articlePublished = Article.builder()
+                .title("Article Published")
+                .textContent("Content for article")
+                .publicationStatus(PublicationStatus.PUBLISHED)
+                .build();
+        articleRepository.insert(articlePublished);
+
+        // this article should be ignored
+        Article articleDraft = Article.builder()
+                .title("Article")
+                .textContent("Content for article")
+                .publicationStatus(PublicationStatus.DRAFT)
+                .build();
+        articleRepository.insert(articleDraft);
+
+        var recent = articleRepository.findNewArticlesPublishedPaged(10, 1);
+
+        assertEquals(1, recent.length);
+        assertEquals("Article Published", recent[0].getTitle());
+    }
+
+    @Test
+    void findAllArticlesPublished_withValidPaginationData_shouldReturnCorrectCount() {
+        for (int i = 0; i < 15; i++) {
+            Article article = Article.builder()
+                    .title("Article " + i)
+                    .textContent("Content for article " + i)
+                    .publicationStatus(PublicationStatus.PUBLISHED)
+                    .build();
+            articleRepository.insert(article);
+        }
+
+        var page1 = articleRepository.findAllPaged(10, 1);
+        var page2 = articleRepository.findAllPaged(10, 2);
+
+        assertEquals(10, page1.length);
+        assertEquals(5, page2.length);
+    }
+
+    @Test
+    void findAllArticlesPublished_noArticles_shouldReturnEmpty() {
+        var articles = articleRepository.findNewArticlesPublishedPaged(100, 1);
+
+        assertNotNull(articles);
+        assertEquals(0, articles.length);
+    }
+
+    @Test
+    void findSinglePublishedArticle_articlePublished_shouldReturnArticle() {
+        Article article = Article.builder()
+                .title("just a title")
+                .textContent("just a body, hide the body!")
+                .publicationStatus(PublicationStatus.PUBLISHED)
+                .build();
+        articleRepository.insert(article);
+        ArticleFullDetailsDto dto = articleRepository.findArticlePublished(article.getId());
+        assertNotNull(dto);
+        assertEquals("just a title", dto.getTitle());
+    }
+
+    @Test
+    void findSinglePublishedArticle_articleDraft_shouldReturnNull() {
+        Article article = Article.builder()
+                .title("just a title")
+                .textContent("just a body, hide the body!")
+                .build();
+        articleRepository.insert(article);
+        ArticleFullDetailsDto dto = articleRepository.findArticlePublished(article.getId());
+        assertNull(dto);
     }
 }
