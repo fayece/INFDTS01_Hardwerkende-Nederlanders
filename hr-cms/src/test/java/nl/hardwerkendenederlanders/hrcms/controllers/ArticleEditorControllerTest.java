@@ -6,6 +6,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import jakarta.servlet.http.HttpSession;
+
+import java.util.Optional;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.ArticleService;
@@ -33,7 +35,7 @@ public class ArticleEditorControllerTest {
                 .textContent("text content")
                 .build();
         when(articleService.findById(any())).thenReturn(article);
-        when(userSessionService.getLoggedInUser(any())).thenReturn(UUID.randomUUID());
+        when(userSessionService.getLoggedInUser(any())).thenReturn(Optional.of(UUID.randomUUID()));
 
         // act
         String redirect = controller.putArticle(new ConcurrentModel(), article, mock(HttpSession.class));
