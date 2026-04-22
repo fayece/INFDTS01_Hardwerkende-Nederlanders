@@ -53,7 +53,10 @@ public class EditorArticleController {
         model.addAttribute("articleForm", articleForm);
         try {
             var user = userSessionService.getLoggedInUser(httpSession);
-            articleService.ensureArticleExists(articleForm, user);
+            if (user.isEmpty()){
+                return "redirect:/login";
+            }
+            articleService.ensureArticleExists(articleForm, user.get());
 
         } catch (ComponentActionException e) {
             if (e.getAction() == ComponentActionException.Action.CREATE) {
