@@ -7,11 +7,7 @@
     <main class="standard-page-layout">
         <h1>Your Personal Feed</h1>
         <div th:replace="~{fragments/articles/article-list :: article-list(articles=${articles}, url=${'/article/'})}"></div>
-        <div class="pagination-navigator">
-            <a class="pagination-navigator--hyperlink" th:if="${currentPage >= 2}" th:href="'/?page=' + (${currentPage} - 1)">Prev</a>
-            <span class="pagination-navigator--page-count" th:text="${currentPage}"></span>
-            <a class="pagination-navigator--hyperlink" th:if="${articles.length >= 20}" th:href="'/?page=' + (${currentPage} + 1)">Next</a>
-        </div>
+        <div th:replace="fragments/app-wide/pagination-navigator :: pagination-navigator(${currentPage}, ${articles.length >= 20})"/>
     </main>
     <footer th:replace="~{fragments/app-wide/footer :: footer}"></footer>
 </body>

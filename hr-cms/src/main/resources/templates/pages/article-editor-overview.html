@@ -7,6 +7,7 @@
 <main class="standard-page-layout">
     <a th:href="@{/article/editor}">New Article</a>
     <div th:replace="~{fragments/articles/article-list :: article-list(articles=${articles}, url='/article/editor/')}"></div>
+    <div th:replace="fragments/app-wide/pagination-navigator :: pagination-navigator(${currentPage}, ${articles.length >= 20})"/>
 </main>
 <footer th:replace="~{fragments/app-wide/footer :: footer}"></footer>
 </body>

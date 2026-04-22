@@ -1,0 +1,5 @@
+<div class="pagination-navigator" th:fragment="pagination-navigator(currentPage, lastPage)">
+    <a class="pagination-navigator--hyperlink" th:if="${currentPage >= 2}" th:href="'/?page=' + (${currentPage} - 1)">Prev</a>
+    <span class="pagination-navigator--page-count" th:text="${currentPage}"></span>
+    <a class="pagination-navigator--hyperlink" th:if="${lastPage}" th:href="'/?page=' + (${currentPage} + 1)">Next</a>
+</div>
