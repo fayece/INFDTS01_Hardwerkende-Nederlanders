@@ -2,6 +2,7 @@ package nl.hardwerkendenederlanders.hrcms.services;
 
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.CommentRepository;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentActionException;
@@ -55,10 +56,14 @@ public class CommentServiceImpl implements CommentService {
     }
 
     public CommentViewDto postComment(Comment comment, HttpSession session) {
+        Optional<UUID> userId = userSessionService.getLoggedInUser(session);
+        if (userId.isEmpty()) {
+            String target = "/article/" + comment.getArticleId();
+            throw new ComponentActionException(
+                    "comment", ComponentActionException.Action.CREATE, target, null, "Please log in to comment");
+        }
         try {
-            UUID userId = userSessionService.getLoggedInUser(session);
-            comment.setCreatorId(userId);
-
+            comment.setCreatorId(userId.get());
             CommentWithAuthor result = commentRepository.insertReturning(comment);
             return CommentViewDto.from(result.comment(), result.authorName(), result.replyCount());
 

@@ -1,6 +1,7 @@
 package nl.hardwerkendenederlanders.hrcms.services;
 
 import jakarta.servlet.http.HttpSession;
+import java.util.Optional;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
@@ -13,10 +14,8 @@ public class UserSessionServiceImpl implements UserSessionService {
         session.setAttribute("userId", user.getId());
     }
 
-    public UUID getLoggedInUser(HttpSession session) {
-        var userId = session.getAttribute("userId");
-        if (userId == null) throw new RuntimeException("Not logged in");
-        return (UUID) userId;
+    public Optional<UUID> getLoggedInUser(HttpSession session) {
+        return Optional.ofNullable((UUID) session.getAttribute("userId"));
     }
 
     public boolean isLoggedIn(HttpSession session) {
