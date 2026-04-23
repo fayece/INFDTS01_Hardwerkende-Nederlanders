@@ -12,6 +12,7 @@ import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleFullDetailsD
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.ArticleService;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
@@ -25,6 +26,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     // ensures the given article is present in the database. If the ID doesn't exist a new article is made. If it does
     // the article is updated
+    @Transactional
     public void ensureArticleExists(Article article, UUID authorId) {
         article = Article.fillOutNullFields(article);
         try {
