@@ -48,7 +48,6 @@ public class JdbcArticleAuthorRepository implements ArticleAuthorRepository {
         return mapping;
     }
 
-
     @Override
     public void ensureInsert(ArticleAuthor articleAuthor) {
         String sql = """
