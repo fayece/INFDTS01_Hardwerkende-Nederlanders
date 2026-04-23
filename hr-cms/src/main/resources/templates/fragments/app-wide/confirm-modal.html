@@ -1,0 +1,13 @@
+<dialog th:fragment="confirm-modal(title, description, confirmText, confirmClass, cancelText)"
+        class="confirm-modal">
+    <h3 class="modal-title" th:text="${title}"></h3>
+    <p class="modal-body" th:text="${description}"></p>
+    <div class="modal-actions">
+        <button type="button"
+                th:class="'modal-btn ' + (${confirmClass} ?: 'modal-btn--accent') + ' confirm-action'"
+                th:text="${confirmText} ?: 'Confirm'">Confirm</button>
+        <button type="button"
+                class="modal-btn modal-btn--cancel cancel-action"
+                th:text="${cancelText} ?: 'Cancel'">Cancel</button>
+    </div>
+</dialog>

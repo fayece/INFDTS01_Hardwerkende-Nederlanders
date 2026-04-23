@@ -7,11 +7,18 @@
                th:data-timestamp="${comment.createdAt}"
                th:text="${#temporals.format(comment.createdAt, 'dd-MM-yyyy HH:mm')}">
         </small>
-        <button type="button"
+        <button th:if="${!comment.isDeleted}"
+                type="button"
                 class="reply-button"
                 th:data-comment-id="${comment.id}"
                 th:data-article-id="${articleId}">
             ↵ Reply
+        </button>
+        <button th:if="${!comment.isDeleted and session.userId != null and session.userId == comment.creatorId}"
+                type="button"
+                class="delete-button"
+                th:data-comment-id="${comment.id}">
+            Delete
         </button>
     </div>
 

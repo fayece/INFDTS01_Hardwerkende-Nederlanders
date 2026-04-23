@@ -1,0 +1,55 @@
+.confirm-modal {
+    border: solid var(--edge) 0.1rem;
+    border-radius: var(--radius-small);
+    padding: 1.5rem;
+    max-width: 22rem;
+}
+
+.confirm-modal::backdrop {
+    background: rgba(0, 0, 0, 0.25);
+}
+
+.modal-title {
+    margin: 0 0 0.5rem;
+    font-size: 1rem;
+}
+
+.modal-body {
+    margin: 0 0 1.5rem;
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+.modal-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.modal-btn {
+    flex: 1;
+    border: none;
+    border-radius: var(--radius-small);
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.modal-btn:hover {
+    opacity: 0.8;
+}
+
+.modal-btn--accent {
+    background: var(--accent);
+    color: var(--background);
+}
+
+.modal-btn--cancel {
+    background: var(--edge);
+    color: var(--text);
+}
+
+.modal-btn--danger {
+    background: var(--warning);
+    color: var(--background);
+}
