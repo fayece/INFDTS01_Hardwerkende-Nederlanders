@@ -43,7 +43,7 @@ public class ReaderArticleController {
     @GetMapping("/{articleId}")
     public String getArticle(@PathVariable UUID articleId, Model model, HttpSession httpSession) {
         var user = userSessionService.getLoggedInUser(httpSession);
-        if (user.isEmpty()){
+        if (user.isEmpty()) {
             return "redirect:/login";
         }
         articleViewersService.AddView(new ArticleViewer(articleId, user.get()));

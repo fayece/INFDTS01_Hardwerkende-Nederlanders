@@ -1,12 +1,14 @@
 package nl.hardwerkendenederlanders.hrcms.database;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleViewersRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.ArticleViewer;
 import nl.hardwerkendenederlanders.hrcms.models.PublicationStatus;
 import nl.hardwerkendenederlanders.hrcms.models.User;
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,16 +16,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
-import java.util.UUID;
-
-
 @SpringBootTest
 public class JdbcArticleViewersTest {
 
     @Autowired
     private ArticleRepository articleRepository;
+
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private ArticleViewersRepository viewersRepository;
 
@@ -43,9 +44,11 @@ public class JdbcArticleViewersTest {
                 .firstName("Siegfried")
                 .prefix("Von")
                 .lastName("Höhefelden")
-                .email(UUID.randomUUID() + "" + UUID.randomUUID() + "@" + UUID.randomUUID() + UUID.randomUUID() +".com")
+                .email(UUID.randomUUID() + "" + UUID.randomUUID() + "@" + UUID.randomUUID() + UUID.randomUUID()
+                        + ".com")
                 .passwordHash("pwwasswoert")
-                .active(true).build();
+                .active(true)
+                .build();
     }
 
     @BeforeEach
@@ -61,7 +64,8 @@ public class JdbcArticleViewersTest {
         userRepository.insert(validDefaultUser);
         ArticleViewer viewer = ArticleViewer.builder()
                 .articleId(validDefaultArticle.getId())
-                .viewerId(validDefaultUser.getId()).build();
+                .viewerId(validDefaultUser.getId())
+                .build();
         viewersRepository.ensureInsert(viewer);
 
         var fullArticle = articleRepository.findArticlePublished(validDefaultArticle.getId());
@@ -88,12 +92,14 @@ public class JdbcArticleViewersTest {
                     .lastName(String.valueOf(i))
                     .email(String.valueOf(i) + "@bijlmerbajes.nl")
                     .passwordHash("strenge beveiliging")
-                    .active(true).build();
+                    .active(true)
+                    .build();
             userRepository.insert(validDefaultUser);
 
             ArticleViewer viewer = ArticleViewer.builder()
                     .articleId(validDefaultArticle.getId())
-                    .viewerId(validDefaultUser.getId()).build();
+                    .viewerId(validDefaultUser.getId())
+                    .build();
             viewersRepository.ensureInsert(viewer);
         }
 
@@ -109,10 +115,12 @@ public class JdbcArticleViewersTest {
         userRepository.insert(validDefaultUser);
         ArticleViewer viewer1 = ArticleViewer.builder()
                 .articleId(validDefaultArticle.getId())
-                .viewerId(validDefaultUser.getId()).build();
+                .viewerId(validDefaultUser.getId())
+                .build();
         ArticleViewer viewer2 = ArticleViewer.builder()
                 .articleId(validDefaultArticle.getId())
-                .viewerId(validDefaultUser.getId()).build();
+                .viewerId(validDefaultUser.getId())
+                .build();
         viewersRepository.ensureInsert(viewer2);
 
         var fullArticle = articleRepository.findArticlePublished(validDefaultArticle.getId());

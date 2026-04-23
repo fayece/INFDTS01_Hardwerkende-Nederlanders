@@ -6,7 +6,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import jakarta.servlet.http.HttpSession;
-
 import java.util.Optional;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.models.Article;

@@ -27,8 +27,8 @@ public class JdbcArticleAuthorRepository implements ArticleAuthorRepository {
     }
 
     /**
-     * Make a RowMapper that mpas SQL rows to Java AuthorDTO's
-     * @return
+     * Make a RowMapper that maps SQL rows to Java AuthorDTO's
+     * @return The RowMapper
      */
     private RowMapper<AuthorDto> authorNameMapper() {
         return (rs, _) -> new AuthorDto(rs.getString("first_name"), rs.getString("prefix"), rs.getString("last_name"));
@@ -36,8 +36,8 @@ public class JdbcArticleAuthorRepository implements ArticleAuthorRepository {
 
     /**
      * Map a article into SQL
-     * @param articleAuthor
-     * @return
+     * @param articleAuthor the author
+     * @return mapper
      */
     private MapSqlParameterSource ArticleMapper(ArticleAuthor articleAuthor) {
         MapSqlParameterSource mapping = new MapSqlParameterSource();
@@ -47,6 +47,7 @@ public class JdbcArticleAuthorRepository implements ArticleAuthorRepository {
 
         return mapping;
     }
+
 
     @Override
     public void ensureInsert(ArticleAuthor articleAuthor) {

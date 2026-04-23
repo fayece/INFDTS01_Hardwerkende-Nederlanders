@@ -2,7 +2,6 @@ package nl.hardwerkendenederlanders.hrcms.services;
 
 import static org.mockito.Mockito.*;
 
-import java.sql.SQLException;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.ArticleRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleAuthorRepository;
