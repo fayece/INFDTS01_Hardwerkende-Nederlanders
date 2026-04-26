@@ -1,7 +1,5 @@
 package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
-import nl.hardwerkendenederlanders.hrcms.database.ArticleRepository;
-import nl.hardwerkendenederlanders.hrcms.database.SubjectRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
@@ -11,8 +9,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 public class DatabaseConfiguration {
 
     @Bean
-    public ArticleRepository articleRepository(NamedParameterJdbcTemplate jdbc) {
-        return new JdbcArticleRepository(jdbc);
+    public ArticleRepository articleRepository(NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
+        return new ArticleRepository(jdbc, resourceLoader);
     }
 
     @Bean
@@ -22,13 +20,13 @@ public class DatabaseConfiguration {
     }
 
     @Bean
-    public JdbcCommentRepository commentRepository(NamedParameterJdbcTemplate jdbc) {
-        return new JdbcCommentRepository(jdbc);
+    public CommentRepository commentRepository(NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
+        return new CommentRepository(jdbc, resourceLoader);
     }
 
     @Bean
-    public JdbcMediaRepository mediaItemRepository(NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
-        return new JdbcMediaRepository(jdbc);
+    public MediaItemRepository mediaItemRepository(NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
+        return new MediaItemRepository(jdbc, resourceLoader);
     }
 
     @Bean
@@ -51,10 +49,5 @@ public class DatabaseConfiguration {
     public RolePermissionRepository rolePermissionRepository(
             NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
         return new RolePermissionRepository(jdbc, resourceLoader);
-    }
-
-    @Bean
-    public SubjectRepository subjectRepository(NamedParameterJdbcTemplate jdbc) {
-        return new JdbcSubjectRepository(jdbc);
     }
 }
