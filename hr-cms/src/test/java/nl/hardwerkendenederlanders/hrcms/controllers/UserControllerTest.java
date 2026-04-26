@@ -196,8 +196,7 @@ class UserControllerTest {
 
         HttpSession session = mock(HttpSession.class);
 
-        when(userSessionService.getLoggedInUser(session))
-                .thenReturn(Optional.of(currentUserId));
+        when(userSessionService.getLoggedInUser(session)).thenReturn(Optional.of(currentUserId));
 
         String result = userController.deleteUser(userId, session);
 
@@ -213,8 +212,7 @@ class UserControllerTest {
 
         HttpSession session = mock(HttpSession.class);
 
-        when(userSessionService.getLoggedInUser(session))
-                .thenReturn(Optional.of(currentUserId));
+        when(userSessionService.getLoggedInUser(session)).thenReturn(Optional.of(currentUserId));
         doThrow(new IllegalArgumentException("cannot delete current user"))
                 .when(userService)
                 .deleteById(userId, currentUserId);
