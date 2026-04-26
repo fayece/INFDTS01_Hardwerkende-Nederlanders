@@ -123,7 +123,7 @@ public class UserController {
     @PostMapping("/delete-user")
     public String deleteUser(@RequestParam UUID userId, HttpSession session) {
         Optional<UUID> currentUserId = userSessionService.getLoggedInUser(session);
-        userService.deleteById(userId, currentUserId.get());
+        currentUserId.ifPresent(uuid -> userService.deleteById(userId, uuid));
 
         return "redirect:/manage-users";
     }
