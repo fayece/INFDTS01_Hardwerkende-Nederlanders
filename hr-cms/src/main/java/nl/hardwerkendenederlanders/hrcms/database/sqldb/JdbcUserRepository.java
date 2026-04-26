@@ -90,6 +90,7 @@ public class JdbcUserRepository implements UserRepository {
                 WHERE first_name ILIKE :name
                 OR last_name ILIKE :name
                 OR email ILIKE :name
+                OR (first_name || ' ' || last_name) ILIKE :name
                 ORDER BY last_name
                 LIMIT :limit
                 OFFSET :offset
@@ -111,6 +112,7 @@ public class JdbcUserRepository implements UserRepository {
                 WHERE first_name ILIKE :name
                 OR last_name ILIKE :name
                 OR email ILIKE :name
+                OR (first_name || ' ' || last_name) ILIKE :name
                 """.formatted(TABLE);
 
         MapSqlParameterSource params = new MapSqlParameterSource().addValue("name", "%" + name + "%");

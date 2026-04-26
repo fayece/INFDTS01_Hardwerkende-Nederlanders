@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayDeque;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserService;
@@ -195,7 +196,7 @@ class UserControllerTest {
 
         HttpSession session = mock(HttpSession.class);
 
-        when(userSessionService.getLoggedInUser(session)).thenReturn(currentUserId);
+        when(userSessionService.getLoggedInUser(session)).thenReturn(Optional.of(currentUserId));
 
         String result = userController.deleteUser(userId, session);
 
@@ -211,7 +212,7 @@ class UserControllerTest {
 
         HttpSession session = mock(HttpSession.class);
 
-        when(userSessionService.getLoggedInUser(session)).thenReturn(currentUserId);
+        when(userSessionService.getLoggedInUser(session)).thenReturn(Optional.of(currentUserId));
         doThrow(new IllegalArgumentException("cannot delete current user"))
                 .when(userService)
                 .deleteById(userId, currentUserId);
