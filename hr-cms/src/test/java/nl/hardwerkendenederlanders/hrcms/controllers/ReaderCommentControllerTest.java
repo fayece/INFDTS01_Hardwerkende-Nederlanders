@@ -93,6 +93,19 @@ class ReaderCommentControllerTest {
     }
 
     @Test
+    void deleteComment_success_returnsCommentFragment() {
+        UUID commentId = UUID.randomUUID();
+        CommentViewDto dto = mock(CommentViewDto.class);
+        when(commentService.deleteComment(commentId, session)).thenReturn(dto);
+
+        String viewName = commentController.deleteComment(commentId, session, model);
+
+        assertEquals("fragments/articles/comment :: comment", viewName);
+        assertEquals(dto, model.getAttribute("comment"));
+        verify(commentService).deleteComment(commentId, session);
+    }
+
+    @Test
     void postComment_validationError_returnsCommentSectionFragmentWithError() {
         // Arrange
         BindingResult bindingResult = mock(BindingResult.class);

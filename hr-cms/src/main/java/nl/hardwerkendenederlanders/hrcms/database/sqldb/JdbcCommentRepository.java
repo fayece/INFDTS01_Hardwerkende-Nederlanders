@@ -200,16 +200,15 @@ public class JdbcCommentRepository implements CommentRepository {
                 LEFT JOIN reply_counts rc ON rc.parent_comment_id = c.id
                 WHERE c.parent_comment_id = :parentId
                 ORDER BY c.created_at, c.id""",
-                Map.of("parentId", parentId), commentWithAuthorRowMapper);
+                Map.of("parentId", parentId),
+                commentWithAuthorRowMapper);
     }
 
-    private static final String MASKED_BODY =
-            "CASE WHEN c.deleted_at IS NOT NULL THEN 'This comment has been deleted' " +
-            "ELSE c.comment_body END AS comment_body";
+    private static final String MASKED_BODY = "CASE WHEN c.deleted_at IS NOT NULL THEN 'This comment has been deleted' "
+            + "ELSE c.comment_body END AS comment_body";
 
-    private static final String MASKED_NAME =
-            "CASE WHEN c.deleted_at IS NOT NULL THEN 'Unknown' " +
-            "ELSE CONCAT_WS(' ', u.first_name, NULLIF(TRIM(u.prefix), ''), u.last_name) END AS name";
+    private static final String MASKED_NAME = "CASE WHEN c.deleted_at IS NOT NULL THEN 'Unknown' "
+            + "ELSE CONCAT_WS(' ', u.first_name, NULLIF(TRIM(u.prefix), ''), u.last_name) END AS name";
 
     private static final String REPLY_COUNTS_CTE = """
         WITH reply_counts AS (

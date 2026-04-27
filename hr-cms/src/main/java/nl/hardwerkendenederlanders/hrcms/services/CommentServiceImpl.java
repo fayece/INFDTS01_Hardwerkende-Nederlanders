@@ -83,20 +83,30 @@ public class CommentServiceImpl implements CommentService {
                     "comment", ComponentActionException.Action.DELETE, "/", null, "Please log in to delete a comment");
         }
 
-        Comment comment = commentRepository.findById(commentId)
+        Comment comment = commentRepository
+                .findById(commentId)
                 .orElseThrow(() -> new ComponentActionException(
                         "comment", ComponentActionException.Action.DELETE, "/", null, "Comment not found"));
 
         if (!comment.getCreatorId().equals(userId.get())) {
             throw new ComponentActionException(
-                    "comment", ComponentActionException.Action.DELETE, "/", null, "You can only delete your own comments");
+                    "comment",
+                    ComponentActionException.Action.DELETE,
+                    "/",
+                    null,
+                    "You can only delete your own comments");
         }
 
         commentRepository.delete(commentId);
 
-        CommentWithAuthor deleted = commentRepository.findByIdWithAuthor(commentId)
+        CommentWithAuthor deleted = commentRepository
+                .findByIdWithAuthor(commentId)
                 .orElseThrow(() -> new ComponentActionException(
-                        "comment", ComponentActionException.Action.DELETE, "/", null, "Comment not found after deletion"));
+                        "comment",
+                        ComponentActionException.Action.DELETE,
+                        "/",
+                        null,
+                        "Comment not found after deletion"));
 
         return CommentViewDto.from(deleted.comment(), deleted.authorName(), deleted.replyCount());
     }

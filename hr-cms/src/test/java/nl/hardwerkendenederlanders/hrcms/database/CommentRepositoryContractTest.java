@@ -119,6 +119,142 @@ public abstract class CommentRepositoryContractTest {
     }
 
     @Test
+    void findByIdWithAuthor_returnsCommentWithAuthorName() {
+        Comment comment = Comment.builder()
+                .articleId(getValidArticleId())
+                .creatorId(getValidAuthorId())
+                .commentBody("Test content")
+                .build();
+        getRepository().insert(comment);
+
+        CommentWithAuthor result =
+                getRepository().findByIdWithAuthor(comment.getId()).orElse(null);
+
+        assertNotNull(result);
+        assertEquals(comment.getId(), result.comment().getId());
+        assertNotNull(result.authorName());
+    }
+
+    @Test
+    void findByIdWithAuthor_deletedComment_masksBodyAndAuthor() {
+        Comment comment = Comment.builder()
+                .articleId(getValidArticleId())
+                .creatorId(getValidAuthorId())
+                .commentBody("Original content")
+                .build();
+        getRepository().insert(comment);
+        getRepository().delete(comment.getId());
+
+        CommentWithAuthor result =
+                getRepository().findByIdWithAuthor(comment.getId()).orElse(null);
+
+        assertNotNull(result);
+        assertEquals("This comment has been deleted", result.comment().getCommentBody());
+        assertEquals("Unknown", result.authorName());
+    }
+
+    @Test
+    void findByIdWithAuthor_commentWithReplies_hasCorrectReplyCount() {
+        Comment parent = Comment.builder()
+                .articleId(getValidArticleId())
+                .creatorId(getValidAuthorId())
+                .commentBody("Parent comment")
+                .build();
+        getRepository().insert(parent);
+
+        getRepository()
+                .insert(Comment.builder()
+                        .articleId(getValidArticleId())
+                        .creatorId(getValidAuthorId())
+                        .commentBody("Reply")
+                        .parentCommentId(parent.getId())
+                        .build());
+
+        CommentWithAuthor result =
+                getRepository().findByIdWithAuthor(parent.getId()).orElse(null);
+
+        assertNotNull(result);
+        assertEquals(1, result.replyCount());
+    }
+
+    @Test
+    void findTopLevelCommentsByArticleIdPaged_deletedComment_masksBodyAndAuthor() {
+        Comment comment = Comment.builder()
+                .articleId(getValidArticleId())
+                .creatorId(getValidAuthorId())
+                .commentBody("Original content")
+                .build();
+        getRepository().insert(comment);
+        getRepository().delete(comment.getId());
+
+        List<CommentWithAuthor> results =
+                getRepository().findTopLevelCommentsByArticleIdPaged(getValidArticleId(), 0, 10);
+
+        assertEquals(1, results.size());
+        assertEquals(
+                "This comment has been deleted", results.getFirst().comment().getCommentBody());
+        assertEquals("Unknown", results.getFirst().authorName());
+    }
+
+    @Test
+    void findCommentsByParentId_deletedReply_masksBodyAndAuthor() {
+        Comment topLevel = Comment.builder()
+                .articleId(getValidArticleId())
+                .creatorId(getValidAuthorId())
+                .commentBody("Top level")
+                .build();
+        getRepository().insert(topLevel);
+
+        Comment reply = Comment.builder()
+                .articleId(getValidArticleId())
+                .creatorId(getValidAuthorId())
+                .commentBody("Original reply")
+                .parentCommentId(topLevel.getId())
+                .build();
+        getRepository().insert(reply);
+        getRepository().delete(reply.getId());
+
+        List<CommentWithAuthor> replies = getRepository().findCommentsByParentId(topLevel.getId());
+
+        assertEquals(1, replies.size());
+        assertEquals(
+                "This comment has been deleted", replies.getFirst().comment().getCommentBody());
+        assertEquals("Unknown", replies.getFirst().authorName());
+    }
+
+    @Test
+    void findById_deletedComment_masksBody() {
+        Comment comment = Comment.builder()
+                .articleId(getValidArticleId())
+                .creatorId(getValidAuthorId())
+                .commentBody("Original content")
+                .build();
+        getRepository().insert(comment);
+        getRepository().delete(comment.getId());
+
+        Comment retrieved = getRepository().findById(comment.getId()).orElse(null);
+
+        assertNotNull(retrieved);
+        assertEquals("This comment has been deleted", retrieved.getCommentBody());
+    }
+
+    @Test
+    void findAllPaged_deletedComment_masksBody() {
+        Comment comment = Comment.builder()
+                .articleId(getValidArticleId())
+                .creatorId(getValidAuthorId())
+                .commentBody("Original content")
+                .build();
+        getRepository().insert(comment);
+        getRepository().delete(comment.getId());
+
+        List<Comment> page = getRepository().findAllPaged(1, 10);
+
+        assertEquals(1, page.size());
+        assertEquals("This comment has been deleted", page.getFirst().getCommentBody());
+    }
+
+    @Test
     void findTopLevelCommentsByArticleIdPaged_shouldOnlyReturnCommentsWithoutParents() {
         UUID articleId = getValidArticleId();
 
