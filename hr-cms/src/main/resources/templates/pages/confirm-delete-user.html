@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Manage users</title>
+    <link rel="stylesheet"
+          th:each="cssRef : ${@cssDiscoveryService.getAllCssPaths()}"
+          th:href="${cssRef}">
+</head>
+<body>
+<div th:insert="~{fragments/app-wide/admin-navbar :: navbar}" class="navbar"></div>
+<div class="delete-user-container">
+    <div>
+        <h2>Are you sure you want to delete this user?</h2>
+        <h3><b>This action cannot be undone</b></h3>
+        <h4 th:text="'First name: ' + ${userFirstName}"></h4>
+        <h4 th:text="'Last name: '+ ${userLastName}"></h4>
+        <h4 th:text="'Email address: '+ ${userEmail}"></h4>
+        <form th:action="@{/manage-users/delete-user(userId=${userToDeleteId})}" method="post">
+            <button class="delete-user-button" type="submit">Delete user</button>
+        </form>
+        <h3>If you don't want to delete this user, return</h3>
+        <a class="return-button-admin" th:href="@{/manage-users}">Return</a>
+    </div>
+</div>
+
+
+</body>
