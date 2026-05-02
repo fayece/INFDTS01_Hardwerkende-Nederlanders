@@ -1,0 +1,45 @@
+.create-user-form{
+    display: flex;
+    flex-direction: column;
+}
+
+.create-user-button{
+    width: 120px;
+    background: cadetblue;
+    border: #1f1f21 solid 2px;
+    border-radius: 5px;
+    font-size: 16px;
+    padding: 5px;
+    margin-top: 10px;
+}
+
+.create-user-button:hover{
+    cursor: pointer;
+}
+
+.create-user-form label{
+    margin-top: 10px;
+}
+
+.create-user-page{
+    margin: 30px;
+}
+
+.return-button-admin, .delete-user-button{
+    margin-top: 50px;
+    background: #e5e7eb;
+    border: black solid 2px;
+    padding: 6px;
+    color: black;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.delete-user-button{
+    background: firebrick;
+}
+
+.delete-user-container{
+    margin: 30px;
+}
+

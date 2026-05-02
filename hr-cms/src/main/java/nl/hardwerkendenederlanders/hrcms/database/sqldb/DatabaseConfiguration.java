@@ -14,7 +14,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 public class DatabaseConfiguration {
 
     @Bean
-    public ArticleRepository articleRepository(NamedParameterJdbcTemplate jdbc) {
+    public JdbcArticleRepository articleRepository(NamedParameterJdbcTemplate jdbc) {
         return new JdbcArticleRepository(jdbc);
     }
 
@@ -24,12 +24,12 @@ public class DatabaseConfiguration {
     }
 
     @Bean
-    public JdbcCommentRepository commentRepository(NamedParameterJdbcTemplate jdbc) {
+    public JdbcCommentRepository JdbcCommentRepository(NamedParameterJdbcTemplate jdbc) {
         return new JdbcCommentRepository(jdbc);
     }
 
     @Bean
-    public JdbcMediaRepository mediaItemRepository(NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
+    public JdbcMediaRepository JdbcMediaRepository(NamedParameterJdbcTemplate jdbc) {
         return new JdbcMediaRepository(jdbc);
     }
 
