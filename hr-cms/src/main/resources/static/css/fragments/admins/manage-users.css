@@ -1,0 +1,75 @@
+﻿.user-page{
+    display: flex;
+    flex-direction: column;
+}
+
+.search-bar-container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 5px;
+}
+
+.admin-search-bar{
+    width: 400px;
+    font-size: 24px;
+    padding: 6px;
+}
+
+.manage-button-tag{
+    border: black solid 2px;
+    padding: 6px;
+    color: black;
+    background: #e5e7eb;
+    margin-right: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.blue-button{
+    border: black solid 2px;
+    padding: 6px;
+    background: cadetblue;
+    color: black;
+    border-radius: 5px;
+}
+
+.search-button{
+    display: inline-flex;
+    font-size: 20px;
+}
+
+.search-button:hover{
+    cursor: pointer;
+}
+
+.user-table{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.user-table-head th, .user-table-body td{
+    border: #1f1f21 solid 2px;
+}
+
+.user-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-tr{
+    background: cadetblue;
+}
+
+.set-active-level{
+    background: none;
+    border: none;
+    font-size: 14px;
+}
+
+.set-active-level:hover, .edit-user-button:hover{
+    cursor: pointer;
+    text-decoration: underline;
+}
