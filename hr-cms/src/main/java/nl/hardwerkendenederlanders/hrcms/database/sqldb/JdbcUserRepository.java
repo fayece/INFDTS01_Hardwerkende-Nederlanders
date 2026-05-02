@@ -11,7 +11,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-@Repository
 public class JdbcUserRepository implements UserRepository {
     private final NamedParameterJdbcTemplate jdbc;
     private static final String TABLE = "users";

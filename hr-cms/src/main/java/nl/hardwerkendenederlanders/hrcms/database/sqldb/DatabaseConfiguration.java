@@ -1,6 +1,5 @@
 package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
-import nl.hardwerkendenederlanders.hrcms.database.ArticleRepository;
 import nl.hardwerkendenederlanders.hrcms.database.SubjectRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleAuthorRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleViewersRepository;
