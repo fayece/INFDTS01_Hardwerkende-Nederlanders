@@ -1,22 +1,28 @@
 package nl.hardwerkendenederlanders.hrcms.database.redis;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.RedisClient;
+import redis.clients.jedis.*;
 
+@Service
 public class RedisArticles {
 
+    private final RedisClient jedis;
+
+    public RedisArticles(RedisClient jedis) {
+        this.jedis = jedis;
+    }
 
     public void insert(String key, String value) {
-        Jedis jedis = new Jedis("redis://:radijs@localhost:6033");
+
         jedis.set(key, value);
-        jedis.close();
+
     }
 
     public String find(String key) {
-        Jedis jedis = new Jedis("redis://:radijs@localhost:6033");
         var result = jedis.get(key);
-        jedis.close();
         return result;
     }
 }
