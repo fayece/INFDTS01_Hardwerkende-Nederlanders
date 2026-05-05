@@ -1,14 +1,9 @@
-package nl.hardwerkendenederlanders.hrcms.database.redis;
+package nl.hardwerkendenederlanders.hrcms.database.cache.redis;
 
-import lombok.Builder;
-import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
 import redis.clients.jedis.*;
 
 import java.time.Duration;
@@ -24,6 +19,18 @@ public class RedisConfiguration {
     private int port;
 
     private static @Nullable RedisClient client;
+
+    /**
+     * Singleton for getting jedis client.
+     * IMPORTANT: do not close connection
+     * */
+    @Bean
+    public RedisClient jedis() {
+        if (client == null){
+            makeClient();
+        }
+        return client;
+    }
 
     private void makeClient(){
         ConnectionPoolConfig poolConfig = new ConnectionPoolConfig();
@@ -47,13 +54,5 @@ public class RedisConfiguration {
                 .poolConfig(poolConfig)
                 .clientConfig(clientConfig)
                 .build();
-    }
-
-    @Bean
-    public RedisClient jedis() {
-        if (client == null){
-            makeClient();
-        }
-        return client;
     }
 }

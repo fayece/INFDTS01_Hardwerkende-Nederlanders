@@ -43,7 +43,7 @@ services:
     cpus: 1
 
   cache_redis:
-    image: redis:8.6.2-trixie
+    image: redis/redis-stack:latest
     container_name: hard-work-redis
     env_file: ".env"
     command:
