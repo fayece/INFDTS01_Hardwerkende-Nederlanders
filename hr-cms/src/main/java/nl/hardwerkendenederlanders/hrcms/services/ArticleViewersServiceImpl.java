@@ -12,7 +12,7 @@ public class ArticleViewersServiceImpl implements ArticleViewersService {
     private final ArticleViewersRepository articleViewersRepository;
 
     @Override
-    public void AddView(ArticleViewer articleViewer) {
+    public void addView(ArticleViewer articleViewer) {
         articleViewersRepository.ensureInsert(articleViewer);
     }
 }

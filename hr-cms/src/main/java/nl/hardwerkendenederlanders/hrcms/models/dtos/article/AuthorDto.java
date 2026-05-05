@@ -1,12 +1,18 @@
 package nl.hardwerkendenederlanders.hrcms.models.dtos.article;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import nl.hardwerkendenederlanders.hrcms.models.dtos.commonalities.FullName;
 import org.jetbrains.annotations.Nullable;
 
-public record AuthorDto(String firstName, @Nullable String prefix, String lastName) {
-    public String getFullName() {
-        if (prefix == null || prefix.trim().isEmpty()) {
-            return firstName + " " + lastName;
-        }
-        return firstName + " " + prefix + " " + lastName;
-    }
+@AllArgsConstructor
+@Builder
+@Getter
+@Setter
+public class AuthorDto implements FullName {
+    private String firstName;
+    private @Nullable String prefix;
+    private String lastName;
 }

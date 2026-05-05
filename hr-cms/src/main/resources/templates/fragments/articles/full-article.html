@@ -4,9 +4,7 @@
     <ul class="full-article__author-list">
         <li th:each="author: ${authors}">
             <div th:insert="~{fragments/users/username :: username(
-                firstname=${author.firstName},
-                prefix=${author.prefix},
-                lastname=${author.lastName})}">
+                name=${author.getFullName()})}">
             </div>
         </li>
 
