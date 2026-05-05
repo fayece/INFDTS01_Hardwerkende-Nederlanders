@@ -53,12 +53,7 @@ public class DatabaseConfiguration {
             NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
         return new RolePermissionRepository(jdbc, resourceLoader);
     }
-
-    @Bean
-    public UserRepository userRepository(NamedParameterJdbcTemplate jdbc) {
-        return new JdbcUserRepository(jdbc);
-    }
-
+    
     @Bean
     public SubjectRepository subjectRepository(NamedParameterJdbcTemplate jdbc) {
         return new JdbcSubjectRepository(jdbc);
