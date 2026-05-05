@@ -3,7 +3,6 @@ package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 import nl.hardwerkendenederlanders.hrcms.database.SubjectRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleAuthorRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleViewersRepository;
-import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
@@ -53,7 +52,7 @@ public class DatabaseConfiguration {
             NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
         return new RolePermissionRepository(jdbc, resourceLoader);
     }
-    
+
     @Bean
     public SubjectRepository subjectRepository(NamedParameterJdbcTemplate jdbc) {
         return new JdbcSubjectRepository(jdbc);
