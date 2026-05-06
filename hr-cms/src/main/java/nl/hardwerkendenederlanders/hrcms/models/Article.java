@@ -35,7 +35,7 @@ public class Article {
                 .title(article.getTitle())
                 .textContent(article.getTextContent())
                 .createdAt(article.getCreatedAt() != null ? article.getCreatedAt() : OffsetDateTime.now())
-                .updatedAt(article.getUpdatedAt() != null ? article.getUpdatedAt() : OffsetDateTime.now())
+                .updatedAt(article.getUpdatedAt())
                 .publicationStatus(
                         article.getPublicationStatus() != null
                                 ? article.getPublicationStatus()
