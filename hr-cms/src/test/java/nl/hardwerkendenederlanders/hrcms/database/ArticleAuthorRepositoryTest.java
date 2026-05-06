@@ -2,20 +2,17 @@ package nl.hardwerkendenederlanders.hrcms.database;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
+import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleAuthorRepository;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.*;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.ArticleAuthor;
 import nl.hardwerkendenederlanders.hrcms.models.Role;
 import nl.hardwerkendenederlanders.hrcms.models.User;
+import nl.hardwerkendenederlanders.hrcms.models.dtos.article.AuthorDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -68,52 +65,24 @@ public class ArticleAuthorRepositoryTest {
     void insertArticleAuthor_withValidArticleAuthor_shouldPersistAndRetrieve() {
         ArticleAuthor articleAuthor = new ArticleAuthor(article.getId(), author.getId());
 
-        articleAuthorRepository.insert(articleAuthor);
-        ArticleAuthor retrieved =
-                articleAuthorRepository.findById(articleAuthor.getId()).orElse(null);
+        articleAuthorRepository.ensureInsert(articleAuthor);
+        AuthorDto[] retrieved = articleAuthorRepository.findAuthorsForArticle(article.getId());
 
         assertNotNull(retrieved);
-        assertEquals(articleAuthor.getId(), retrieved.getId());
-        assertEquals(article.getId(), retrieved.getArticleId());
-        assertEquals(author.getId(), retrieved.getAuthorId());
+        assertEquals("Test Author", retrieved[0].getFullName());
     }
 
     @Test
-    void findArticleAuthorById_withExistingId_shouldReturnArticleAuthor() {
-        ArticleAuthor articleAuthor = new ArticleAuthor(article.getId(), author.getId());
-
-        articleAuthorRepository.insert(articleAuthor);
-        ArticleAuthor retrieved =
-                articleAuthorRepository.findById(articleAuthor.getId()).orElse(null);
-
-        assertNotNull(retrieved);
-        assertEquals(articleAuthor.getId(), retrieved.getId());
-        assertEquals(articleAuthor.getArticleId(), retrieved.getArticleId());
-        assertEquals(articleAuthor.getAuthorId(), retrieved.getAuthorId());
-    }
-
-    @Test
-    void findArticleAuthorById_withNonExistentId_shouldReturnEmptyOptional() {
-        Optional<ArticleAuthor> result = articleAuthorRepository.findById(UUID.randomUUID());
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void deleteArticleAuthorById_withExistingArticleAuthor_shouldRemoveArticleAuthor() {
-        ArticleAuthor articleAuthor = new ArticleAuthor(article.getId(), author.getId());
-
-        articleAuthorRepository.insert(articleAuthor);
-        articleAuthorRepository.delete(articleAuthor.getId());
-
-        Optional<ArticleAuthor> result = articleAuthorRepository.findById(articleAuthor.getId());
-        assertTrue(result.isEmpty());
+    void findArticleAuthorById_withNonExistentId_shouldReturnEmptyArray() {
+        AuthorDto[] result = articleAuthorRepository.findAuthorsForArticle(UUID.randomUUID());
+        assertEquals(0, result.length);
     }
 
     @Test
     void findAllArticleAuthorsPaged_withValidPaginationData_shouldReturnCorrectCount() {
         for (int i = 0; i < 15; i++) {
             User newAuthor = User.builder()
-                    .firstName("Author " + i)
+                    .firstName("Numbered Arthur " + i)
                     .lastName("Test")
                     .email("author" + i + "@example.com")
                     .passwordHash("R@ndomP4ssw0rd1!@x")
@@ -122,23 +91,12 @@ public class ArticleAuthorRepositoryTest {
 
             userRepository.insert(newAuthor);
 
-            articleAuthorRepository.insert(new ArticleAuthor(article.getId(), newAuthor.getId()));
+            articleAuthorRepository.ensureInsert(new ArticleAuthor(article.getId(), newAuthor.getId()));
         }
 
-        var page1 = articleAuthorRepository.findAllPaged(1, 10);
-        var page2 = articleAuthorRepository.findAllPaged(2, 10);
+        AuthorDto[] authors = articleAuthorRepository.findAuthorsForArticle(article.getId());
 
-        assertEquals(10, page1.size());
-        assertEquals(5, page2.size());
-    }
-
-    static Stream<Arguments> invalidPaginationData() {
-        return Stream.of(Arguments.of(0, 0), Arguments.of(1, 0), Arguments.of(1, -1), Arguments.of(0, -1));
-    }
-
-    @ParameterizedTest
-    @MethodSource("invalidPaginationData")
-    void findAllArticleAuthorsPaged_withInvalidLimit_shouldThrowException(int offset, int limit) {
-        assertThrows(IllegalArgumentException.class, () -> articleAuthorRepository.findAllPaged(offset, limit));
+        assertEquals(15, authors.length);
+        assertEquals("Numbered Arthur 14 Test", authors[14].getFullName());
     }
 }
