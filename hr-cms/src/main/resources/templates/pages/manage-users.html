@@ -28,6 +28,9 @@
             </datalist>
         </form>
     </div>
+    <div th:if="${errorMessage}" class="error-container">
+        <p th:text="${errorMessage}"></p>
+    </div>
     <div class="user-container">
         <h2>Users</h2>
         <table class="user-table">

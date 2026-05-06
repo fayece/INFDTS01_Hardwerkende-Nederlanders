@@ -40,4 +40,10 @@ public class GlobalExceptionHandler {
         String errorMessage = requireNonNullElse(ex.getMessage(), "An unknown error occurred");
         return new ErrorResponse(errorMessage);
     }
+
+    @ExceptionHandler(NotFoundException.class)
+    public String handleNotFound(NotFoundException e, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        return "redirect:/manage-users";
+    }
 }
