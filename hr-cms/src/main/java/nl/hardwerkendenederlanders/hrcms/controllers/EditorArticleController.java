@@ -1,13 +1,11 @@
 package nl.hardwerkendenederlanders.hrcms.controllers;
 
-import jakarta.servlet.http.HttpSession;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentActionException;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.ArticleService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.SubjectService;
-import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,13 +16,10 @@ import org.springframework.web.bind.annotation.*;
 public class EditorArticleController {
     private final ArticleService articleService;
     private final SubjectService subjectService;
-    private final UserSessionService userSessionService;
 
-    public EditorArticleController(
-            ArticleService articleService, SubjectService subjectService, UserSessionService userSessionService) {
+    public EditorArticleController(ArticleService articleService, SubjectService subjectService) {
         this.articleService = articleService;
         this.subjectService = subjectService;
-        this.userSessionService = userSessionService;
     }
 
     // start empty editor
@@ -35,7 +30,7 @@ public class EditorArticleController {
         return "pages/article-editor-page";
     }
 
-    // load existing article
+    // load exisiting article
     @GetMapping("/{articleId}")
     public String getArticle(Model model, @PathVariable(value = "articleId") UUID id) {
         Article article = articleService.findById(id);
@@ -49,15 +44,11 @@ public class EditorArticleController {
     // method must be Post for HTML form (it does not support put)
     // save draft
     @PostMapping("/save")
-    public String putArticle(Model model, @ModelAttribute("articleForm") Article articleForm, HttpSession httpSession) {
+    public String putArticle(Model model, @ModelAttribute("articleForm") Article articleForm) {
         model.addAttribute("articleForm", articleForm);
-        try {
-            var user = userSessionService.getLoggedInUser(httpSession);
-            if (user.isEmpty()) {
-                return "redirect:/login";
-            }
-            articleService.ensureArticleExists(articleForm, user.get());
 
+        try {
+            articleService.ensureArticleExists(articleForm);
         } catch (ComponentActionException e) {
             if (e.getAction() == ComponentActionException.Action.CREATE) {
                 return "redirect:/article/editor?error=INSERT";

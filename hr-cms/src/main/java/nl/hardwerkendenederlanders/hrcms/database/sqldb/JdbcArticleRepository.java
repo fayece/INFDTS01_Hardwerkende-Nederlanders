@@ -8,16 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 import nl.hardwerkendenederlanders.hrcms.database.ArticleRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.PublicationStatus;
-import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleFullDetailsDto;
-import nl.hardwerkendenederlanders.hrcms.models.dtos.article.AuthorDto;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Repository;
 
 @Slf4j
-@Repository
 public class JdbcArticleRepository implements ArticleRepository {
     private final NamedParameterJdbcTemplate jdbc;
 
@@ -49,24 +45,6 @@ public class JdbcArticleRepository implements ArticleRepository {
         mapping.addValue("subject_id", article.getSubjectId());
 
         return mapping;
-    }
-
-    private RowMapper<ArticleFullDetailsDto> fullArticleMapper() {
-        return (rs, rowNum) -> ArticleFullDetailsDto.builder()
-                .id(rs.getObject("article_id", UUID.class))
-                .title(rs.getString("title"))
-                .textContent(rs.getString("text_content"))
-                .updatedAt(rs.getObject("updated_at", OffsetDateTime.class))
-                .createdAt(rs.getObject("created_at", OffsetDateTime.class))
-                .publicationStatus(PublicationStatus.valueOf(rs.getString("publication_status")))
-                .subjectName(rs.getString("subject_name"))
-                .viewCount(rs.getInt("view_count"))
-                .commentCount(rs.getInt("comment_count"))
-                .firstAuthor(new AuthorDto(
-                        rs.getString("first_author_first_name"),
-                        rs.getString("first_author_prefix"),
-                        rs.getString("first_author_last_name")))
-                .build();
     }
 
     @Override
@@ -108,7 +86,7 @@ public class JdbcArticleRepository implements ArticleRepository {
     }
 
     @Override
-    public ArticleFullDetailsDto[] findAllPaged(int limit, int offset) {
+    public Article[] findAllPaged(int limit, int offset) {
         if (limit <= 0)
             throw new IllegalArgumentException(
                     "findAllPages was called with an limit of " + limit + " the minimum is 1");
@@ -117,7 +95,7 @@ public class JdbcArticleRepository implements ArticleRepository {
                     "findAllPages was called with a offset of " + offset + " the minimum is 1");
 
         String query = """
-         SELECT * FROM full_articles
+         SELECT * FROM articles
          ORDER BY created_at DESC
          LIMIT :limit
          OFFSET :offset;
@@ -125,31 +103,7 @@ public class JdbcArticleRepository implements ArticleRepository {
         MapSqlParameterSource mapping = new MapSqlParameterSource();
         mapping.addValue("limit", limit);
         mapping.addValue("offset", (offset - 1) * limit);
-
-        return jdbc.query(query, mapping, fullArticleMapper()).toArray(new ArticleFullDetailsDto[0]);
-    }
-
-    @Override
-    public ArticleFullDetailsDto[] findNewArticlesPublishedPaged(int limit, int offset) {
-        if (limit <= 0)
-            throw new IllegalArgumentException(
-                    "findAllPages was called with an limit of " + limit + " the minimum is 1");
-        if (offset <= 0)
-            throw new IllegalArgumentException(
-                    "findAllPages was called with a offset of " + offset + " the minimum is 1");
-
-        String query = """
-         SELECT *
-         FROM full_articles
-         WHERE publication_status = 'PUBLISHED'
-         ORDER BY created_at DESC
-         LIMIT :limit
-         OFFSET :offset;
-         """;
-        MapSqlParameterSource mapping = new MapSqlParameterSource();
-        mapping.addValue("limit", limit);
-        mapping.addValue("offset", (offset - 1) * limit);
-        return jdbc.query(query, mapping, fullArticleMapper()).toArray(new ArticleFullDetailsDto[0]);
+        return jdbc.query(query, mapping, rowMapper()).toArray(new Article[0]);
     }
 
     @Override
@@ -160,20 +114,5 @@ public class JdbcArticleRepository implements ArticleRepository {
                 WHERE id = :id
                 """;
         jdbc.update(query, Map.of("id", id));
-    }
-
-    public @Nullable ArticleFullDetailsDto findArticlePublished(UUID id) {
-        String query = """
-                SELECT *
-                FROM full_articles
-                WHERE article_id = :id AND publication_status = 'PUBLISHED';
-                """;
-        MapSqlParameterSource mapping = new MapSqlParameterSource();
-        mapping.addValue("id", id);
-        try {
-            return jdbc.queryForObject(query, mapping, fullArticleMapper());
-        } catch (EmptyResultDataAccessException erdae) {
-            return null;
-        }
     }
 }

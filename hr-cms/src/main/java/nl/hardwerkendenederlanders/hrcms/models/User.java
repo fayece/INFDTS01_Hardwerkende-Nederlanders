@@ -6,12 +6,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import nl.hardwerkendenederlanders.hrcms.models.dtos.commonalities.FullName;
 import org.jetbrains.annotations.Nullable;
 
 @SuperBuilder
 @Getter
-public class User implements FullName {
+public class User {
 
     @Builder.Default
     private UUID id = UUID.randomUUID();
@@ -89,5 +88,12 @@ public class User implements FullName {
         this.organizationId = organizationId;
         this.active = active;
         this.createdAt = createdAt;
+    }
+
+    public String getFullName() {
+        if (prefix == null || prefix.trim().isEmpty()) {
+            return firstName + " " + lastName;
+        }
+        return firstName + " " + prefix + " " + lastName;
     }
 }

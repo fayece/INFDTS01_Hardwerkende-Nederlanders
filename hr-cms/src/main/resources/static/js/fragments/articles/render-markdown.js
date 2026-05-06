@@ -1,5 +1,5 @@
 export function renderMarkdown(root = document) {
-    root.querySelectorAll(".comment-body[data-markdown], .full-article__md-container[data-markdown]").forEach((el) => {
+    root.querySelectorAll(".comment-body[data-markdown]").forEach((el) => {
         const markdown = el.getAttribute("data-markdown");
         window.toastui.Editor.factory({
             el: el,

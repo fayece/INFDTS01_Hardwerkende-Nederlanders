@@ -5,7 +5,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RequestMapping("article/editor")
 @Controller
@@ -17,9 +16,8 @@ public class EditorArticleOverviewController {
     }
 
     @GetMapping("/overview")
-    public String GetArticleEditorOverview(Model model, @RequestParam(defaultValue = "1") int page) {
-        model.addAttribute("articles", articleService.findAllPaged(20, page));
-        model.addAttribute("currentPage", page);
+    public String GetArticleEditorOverview(Model model) {
+        model.addAttribute("articles", articleService.findAllPaged(20, 1));
         return "pages/article-editor-overview";
     }
 }

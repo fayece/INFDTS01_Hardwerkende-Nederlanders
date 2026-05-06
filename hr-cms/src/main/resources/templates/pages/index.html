@@ -7,7 +7,6 @@
     <main class="standard-page-layout">
         <h1>Your Personal Feed</h1>
         <div th:replace="~{fragments/articles/article-list :: article-list(articles=${articles}, url=${'/article/'})}"></div>
-        <div th:replace="~{fragments/app-wide/pagination-navigator :: pagination-navigator(${currentPage}, ${articles.length >= 20})}"/>
     </main>
     <footer th:replace="~{fragments/app-wide/footer :: footer}"></footer>
 </body>
