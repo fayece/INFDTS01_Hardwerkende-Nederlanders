@@ -1,9 +1,6 @@
 <!--Username with profile picture-->
-<span th:fragment="username(firstname, prefix, lastname)" class="username">
+<span th:fragment="username(name)" class="username">
     <img src="" alt="pfp" class="username--image"/>
-    <span th:text="
-    ${firstname} + ' ' +
-    (${prefix} != null? ${prefix} + ' ': '') +
-    ${lastname}" class="">
+    <span th:text="${name}" class="">
     </span>
 </span>

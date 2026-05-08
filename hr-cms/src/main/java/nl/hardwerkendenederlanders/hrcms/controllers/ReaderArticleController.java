@@ -46,7 +46,7 @@ public class ReaderArticleController {
         if (user.isEmpty()) {
             return "redirect:/login";
         }
-        articleViewersService.AddView(new ArticleViewer(articleId, user.get()));
+        articleViewersService.addView(new ArticleViewer(articleId, user.get()));
         ArticleFullDetailsDto articleFull = articleService.findArticleFullId(articleId);
 
         if (articleFull == null) {

@@ -1,9 +1,7 @@
-<!--A clickalbe thumbnail for articles-->
+<!--A clickable thumbnail for articles-->
 <a th:fragment="article_card(article, url)" class="article_card" th:href="@{${url} + *{article.id}}">
     <span th:replace="~{fragments/users/username :: username(
-    firstname = ${article.firstAuthor.firstName},
-    prefix = ${article.firstAuthor.prefix},
-    lastname = ${article.firstAuthor.lastName}
+    name = ${article.firstAuthor.getFullName()}
     )}"></span>
     <span th:text="${article.title}" class ="article-card--title">The title of the article is placed right here!</span>
     <span th:insert="~{fragments/articles/engagement :: engagement(views=${article.viewCount}, comments=${article.commentCount})}"></span>

@@ -4,19 +4,19 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Repository;
 
+@Repository
+@AllArgsConstructor
 public class JdbcUserRepository implements UserRepository {
     private final NamedParameterJdbcTemplate jdbc;
     private static final String TABLE = "users";
-
-    public JdbcUserRepository(NamedParameterJdbcTemplate jdbc) {
-        this.jdbc = jdbc;
-    }
 
     private final RowMapper<User> rowMapper = (rs, rowNum) -> new User(
             UUID.fromString(rs.getString("id")),

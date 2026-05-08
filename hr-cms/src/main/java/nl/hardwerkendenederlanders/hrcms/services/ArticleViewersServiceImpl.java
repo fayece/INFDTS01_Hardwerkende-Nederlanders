@@ -16,7 +16,7 @@ public class ArticleViewersServiceImpl implements ArticleViewersService {
 
     @Transactional
     @Override
-    public void AddView(ArticleViewer articleViewer) {
+    public void addView(ArticleViewer articleViewer) {
         articleViewersRepository.ensureInsert(articleViewer);
         //articleCache.IncrementViewForArticle(articleViewer.getArticleId());
     }
