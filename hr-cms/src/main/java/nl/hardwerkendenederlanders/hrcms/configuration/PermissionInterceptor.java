@@ -27,12 +27,15 @@ public class PermissionInterceptor implements HandlerInterceptor {
         if (!(handler instanceof HandlerMethod handlerMethod))
             return true;
 
+        HttpSession session = request.getSession(false);
+
         RequiresPermission annotation = handlerMethod.getMethodAnnotation(RequiresPermission.class);
 
-        if (annotation == null)
+        if (annotation == null) {
+            trackSuccessfulUrl(session, request);
             return true;
+        }
 
-        HttpSession session = request.getSession(false);
         if (session == null || !userSessionService.isLoggedIn(session)) {
             response.sendRedirect("/login");
             return false;
@@ -46,6 +49,15 @@ public class PermissionInterceptor implements HandlerInterceptor {
             return false;
         }
 
+        trackSuccessfulUrl(session, request);
         return true;
+    }
+
+    private void trackSuccessfulUrl(HttpSession session, HttpServletRequest request) {
+        if (session == null) return;
+        String uri = request.getRequestURI();
+        if (uri.startsWith("/error")) return;
+        String query = request.getQueryString();
+        session.setAttribute("lastSuccessfulUrl", query != null ? uri + "?" + query : uri);
     }
 }
