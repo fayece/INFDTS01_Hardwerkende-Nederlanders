@@ -2,7 +2,7 @@ package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
 import java.util.List;
 import java.util.UUID;
-import nl.hardwerkendenederlanders.hrcms.database.SubjectRepository;
+import nl.hardwerkendenederlanders.hrcms.database.interfaces.SubjectRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Subject;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;

@@ -1,6 +1,6 @@
 package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
-import nl.hardwerkendenederlanders.hrcms.database.SubjectRepository;
+import nl.hardwerkendenederlanders.hrcms.database.interfaces.SubjectRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleAuthorRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleViewersRepository;
 import org.springframework.context.annotation.Bean;
