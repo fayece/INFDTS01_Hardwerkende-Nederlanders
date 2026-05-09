@@ -2,6 +2,8 @@ package nl.hardwerkendenederlanders.hrcms.controllers;
 
 import jakarta.servlet.http.HttpSession;
 import java.util.UUID;
+
+import nl.hardwerkendenederlanders.hrcms.configuration.RequiresPermission;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentUnavailableException;
 import nl.hardwerkendenederlanders.hrcms.models.ArticleViewer;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleFullDetailsDto;
@@ -40,6 +42,7 @@ public class ReaderArticleController {
         this.articleViewersService = articleViewersService;
     }
 
+    @RequiresPermission("article:read")
     @GetMapping("/{articleId}")
     public String getArticle(@PathVariable UUID articleId, Model model, HttpSession httpSession) {
         var user = userSessionService.getLoggedInUser(httpSession);

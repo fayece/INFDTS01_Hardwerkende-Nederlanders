@@ -1,9 +1,7 @@
 package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.PermissionRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Permission;
 import org.springframework.jdbc.core.RowMapper;
@@ -64,6 +62,31 @@ public class JdbcPermissionRepository implements PermissionRepository {
 
         List<Permission> results = jdbc.query(sql, Map.of("id", id), rowMapper());
         return results.isEmpty() ? Optional.empty() : Optional.of(results.getFirst());
+    }
+
+    public boolean hasPermission(UUID userId, String permissionKey) {
+        String sql = """
+            SELECT COUNT(*) > 0
+            FROM permissions p
+            JOIN role_permissions rp ON p.id = rp.permission_id
+            JOIN users u ON rp.role_id = u.role_id
+            WHERE u.id = :userId AND p.permission_key = :permissionKey;
+            """;
+
+        return Boolean.TRUE.equals(
+                jdbc.queryForObject(sql, Map.of("userId", userId, "permissionKey", permissionKey), Boolean.class));
+    }
+
+    public Set<String> findUserPermissions(UUID userId) {
+        String sql = """
+            SELECT DISTINCT p.permission_key
+            FROM permissions p
+            JOIN role_permissions rp ON p.id = rp.permission_id
+            JOIN users u ON rp.role_id = u.role_id
+            WHERE u.id = :userId;
+            """;
+
+        return new HashSet<>(jdbc.queryForList(sql, Map.of("userId", userId), String.class));
     }
 
     @Override

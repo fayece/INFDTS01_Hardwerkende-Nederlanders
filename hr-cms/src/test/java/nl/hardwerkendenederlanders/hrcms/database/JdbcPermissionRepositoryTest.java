@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
 @Transactional
-public class PermissionRepositoryTest {
+public class JdbcPermissionRepositoryTest {
 
     @Autowired
     private JdbcPermissionRepository permissionRepository;

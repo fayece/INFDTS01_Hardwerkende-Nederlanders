@@ -2,6 +2,8 @@ package nl.hardwerkendenederlanders.hrcms.controllers;
 
 import jakarta.servlet.http.HttpSession;
 import java.util.*;
+
+import nl.hardwerkendenederlanders.hrcms.configuration.RequiresPermission;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
@@ -22,6 +24,7 @@ public class UserController {
         this.userSessionService = userSessionService;
     }
 
+    @RequiresPermission("admin:manage_users")
     @GetMapping()
     public String manageUserPage(
             @RequestParam(defaultValue = "0") Integer page,
@@ -57,11 +60,13 @@ public class UserController {
         return "pages/manage-users";
     }
 
+    @RequiresPermission("admin:manage_users")
     @GetMapping("/create-user")
     public String createUserPage() {
         return "pages/create-user";
     }
 
+    @RequiresPermission("admin:manage_users")
     @GetMapping("/edit/{id}")
     public String editUser(@PathVariable UUID id, Model model) {
         User user = userService.findById(id);
@@ -74,6 +79,7 @@ public class UserController {
         return "pages/edit-user";
     }
 
+    @RequiresPermission("admin:manage_users")
     @PostMapping("/new")
     public String createNewUser(
             @RequestParam String firstName,
@@ -88,6 +94,7 @@ public class UserController {
         return "pages/create-user";
     }
 
+    @RequiresPermission("admin:manage_users")
     @PostMapping("/update")
     public String updateUser(
             @RequestParam UUID id,
@@ -102,6 +109,7 @@ public class UserController {
         return "redirect:/manage-users"; // or a successpage -> manage-users
     }
 
+    @RequiresPermission("admin:manage_users")
     @PostMapping("/set-active")
     public String changeActiveStatus(@RequestParam UUID userId, @RequestParam boolean setActive, Model model) {
         userService.updateActivityById(userId, setActive);
@@ -109,6 +117,7 @@ public class UserController {
         return "redirect:/manage-users";
     }
 
+    @RequiresPermission("admin:manage_users")
     @GetMapping("/confirm-delete")
     public String confirmDeleteUser(@RequestParam UUID userId, Model model) {
         User user = userService.findById(userId);
@@ -120,6 +129,7 @@ public class UserController {
         return "pages/confirm-delete-user";
     }
 
+    @RequiresPermission("admin:manage_users")
     @PostMapping("/delete-user")
     public String deleteUser(@RequestParam UUID userId, HttpSession session) {
         Optional<UUID> currentUserId = userSessionService.getLoggedInUser(session);

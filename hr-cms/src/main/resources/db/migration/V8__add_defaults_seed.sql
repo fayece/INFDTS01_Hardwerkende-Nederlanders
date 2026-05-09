@@ -44,6 +44,7 @@ WITH perms_insert AS (
         (gen_random_uuid(), 'comment', 'read'),
         (gen_random_uuid(), 'comment', 'update'),
         (gen_random_uuid(), 'comment', 'delete'),
+        (gen_random_uuid(), 'media', 'upload'),
         -- user profiles are linked to users. No need to create 'create' or 'delete' permissions
         (gen_random_uuid(), 'profile', 'read'),
         (gen_random_uuid(), 'profile', 'update'),
@@ -117,6 +118,11 @@ comment_delete AS (
     FROM permissions
     WHERE permission_key = 'comment:delete'
 ),
+media_upload AS (
+    SELECT id
+    FROM permissions
+    WHERE permission_key = 'media:upload'
+),
 profile_read AS (
     SELECT id
     FROM permissions
@@ -173,6 +179,8 @@ INSERT INTO role_permissions (id, role_id, permission_id) VALUES
     (gen_random_uuid(), (SELECT id FROM admin_role), (SELECT id FROM comment_update)),
     (gen_random_uuid(), (SELECT id FROM admin_role), (SELECT id FROM comment_delete)),
 
+    (gen_random_uuid(), (SELECT id FROM admin_role), (SELECT id FROM media_upload)),
+
     (gen_random_uuid(), (SELECT id FROM admin_role), (SELECT id FROM profile_read)),
     (gen_random_uuid(), (SELECT id FROM admin_role), (SELECT id FROM profile_update)),
 
@@ -196,6 +204,8 @@ INSERT INTO role_permissions (id, role_id, permission_id) VALUES
     (gen_random_uuid(), (SELECT id FROM content_manager_role), (SELECT id FROM comment_update)),
     (gen_random_uuid(), (SELECT id FROM content_manager_role), (SELECT id FROM comment_delete)),
 
+    (gen_random_uuid(), (SELECT id FROM content_manager_role), (SELECT id FROM media_upload)),
+
     (gen_random_uuid(), (SELECT id FROM content_manager_role), (SELECT id FROM profile_read)),
     (gen_random_uuid(), (SELECT id FROM content_manager_role), (SELECT id FROM profile_update)),
 
@@ -210,6 +220,8 @@ INSERT INTO role_permissions (id, role_id, permission_id) VALUES
     (gen_random_uuid(), (SELECT id FROM user_role), (SELECT id FROM comment_read)),
     (gen_random_uuid(), (SELECT id FROM user_role), (SELECT id FROM comment_update)),
     (gen_random_uuid(), (SELECT id FROM user_role), (SELECT id FROM comment_delete)),
+
+    (gen_random_uuid(), (SELECT id FROM user_role), (SELECT id FROM media_upload)),
 
     (gen_random_uuid(), (SELECT id FROM user_role), (SELECT id FROM profile_read)),
     (gen_random_uuid(), (SELECT id FROM user_role), (SELECT id FROM profile_update))

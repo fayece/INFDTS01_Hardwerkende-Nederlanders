@@ -5,6 +5,8 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
+import nl.hardwerkendenederlanders.hrcms.configuration.RequiresPermission;
 import nl.hardwerkendenederlanders.hrcms.models.Comment;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentCreateDto;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentViewDto;
@@ -32,6 +34,7 @@ public class ReaderCommentController {
         this.commentService = commentService;
     }
 
+    @RequiresPermission("comment:read")
     @GetMapping("/article/{articleId}")
     public String getCommentsByArticle(
             @PathVariable UUID articleId, @RequestParam(defaultValue = "10") int offset, Model model) {
@@ -46,6 +49,7 @@ public class ReaderCommentController {
         return COMMENT_SECTION_VIEW;
     }
 
+    @RequiresPermission("comment:read")
     @GetMapping("/{parentId}/replies")
     public String getReplies(@PathVariable UUID parentId, Model model) {
         List<CommentViewDto> replies = commentService.getReplies(parentId);
@@ -54,6 +58,7 @@ public class ReaderCommentController {
         return COMMENT_LIST_FRAGMENT;
     }
 
+    @RequiresPermission("comment:create")
     @PostMapping("/article/{articleId}/new")
     public String postComment(
             @PathVariable UUID articleId,
