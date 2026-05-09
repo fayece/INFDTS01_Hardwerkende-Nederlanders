@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
-import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleAuthorRepository;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.*;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.ArticleAuthor;
@@ -21,10 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
 @Transactional
-public class ArticleAuthorRepositoryTest {
+public class JdbcArticleAuthorRepositoryTest {
 
     @Autowired
-    private ArticleAuthorRepository articleAuthorRepository;
+    private JdbcArticleAuthorRepository articleAuthorRepository;
 
     @Autowired
     private JdbcArticleRepository articleRepository;
@@ -33,7 +32,7 @@ public class ArticleAuthorRepositoryTest {
     private JdbcUserRepository userRepository;
 
     @Autowired
-    private RoleRepository roleRepository;
+    private JdbcRoleRepository jdbcRoleRepository;
 
     private Article article;
     private User author;
@@ -47,9 +46,9 @@ public class ArticleAuthorRepositoryTest {
 
         articleRepository.insert(article);
 
-        Role role = new Role("Author Role");
+        Role role = Role.of("Author").build();
 
-        roleRepository.insert(role);
+        jdbcRoleRepository.insert(role);
 
         author = User.builder()
                 .firstName("Test")

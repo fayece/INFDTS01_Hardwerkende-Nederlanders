@@ -3,8 +3,8 @@ package nl.hardwerkendenederlanders.hrcms.services;
 import static org.mockito.Mockito.*;
 
 import java.util.UUID;
-import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleAuthorRepository;
+import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

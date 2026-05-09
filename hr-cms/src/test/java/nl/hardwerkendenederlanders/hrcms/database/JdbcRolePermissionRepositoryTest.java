@@ -6,9 +6,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.PermissionRepository;
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.RolePermissionRepository;
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.RoleRepository;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcPermissionRepository;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcRolePermissionRepository;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcRoleRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Permission;
 import nl.hardwerkendenederlanders.hrcms.models.Role;
 import nl.hardwerkendenederlanders.hrcms.models.RolePermission;
@@ -20,31 +20,40 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
 @Transactional
-public class RolePermissionRepositoryTest {
+public class JdbcRolePermissionRepositoryTest {
 
     @Autowired
-    private RolePermissionRepository rolePermissionRepository;
+    private JdbcRolePermissionRepository jdbcRolePermissionRepository;
 
     @Autowired
-    private RoleRepository roleRepository;
+    private JdbcRoleRepository jdbcRoleRepository;
 
     @Autowired
-    private PermissionRepository permissionRepository;
+    private JdbcPermissionRepository permissionRepository;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     private Role role;
     private Permission permission;
 
     @BeforeEach
     void setUp() {
-        role = new Role("Editor");
-        roleRepository.insert(role);
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "role_permissions");
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "permissions");
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "roles");
 
-        permission = new Permission("ARTICLE", "READ", "article_read");
+        role = Role.of("Editor").build();
+        jdbcRoleRepository.insert(role);
+
+        permission = Permission.of("article", "read").build();
         permissionRepository.insert(permission);
     }
 
@@ -52,10 +61,10 @@ public class RolePermissionRepositoryTest {
     void insertRolePermission_withValidRolePermission_shouldPersistAndRetrieve() {
         RolePermission rolePermission = new RolePermission(role.getId(), permission.getId());
 
-        rolePermissionRepository.insert(rolePermission);
+        jdbcRolePermissionRepository.insert(rolePermission);
 
         RolePermission retrieved =
-                rolePermissionRepository.findById(rolePermission.getId()).orElse(null);
+                jdbcRolePermissionRepository.findById(rolePermission.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(rolePermission.getId(), retrieved.getId());
@@ -67,10 +76,10 @@ public class RolePermissionRepositoryTest {
     void findRolePermissionById_withExistingId_shouldReturnRolePermission() {
         RolePermission rolePermission = new RolePermission(role.getId(), permission.getId());
 
-        rolePermissionRepository.insert(rolePermission);
+        jdbcRolePermissionRepository.insert(rolePermission);
 
         RolePermission retrieved =
-                rolePermissionRepository.findById(rolePermission.getId()).orElse(null);
+                jdbcRolePermissionRepository.findById(rolePermission.getId()).orElse(null);
 
         assertNotNull(retrieved);
         assertEquals(rolePermission.getId(), retrieved.getId());
@@ -80,7 +89,7 @@ public class RolePermissionRepositoryTest {
 
     @Test
     void findRolePermissionById_withNonExistingId_shouldReturnEmptyOptional() {
-        Optional<RolePermission> result = rolePermissionRepository.findById(UUID.randomUUID());
+        Optional<RolePermission> result = jdbcRolePermissionRepository.findById(UUID.randomUUID());
         assertTrue(result.isEmpty());
     }
 
@@ -88,24 +97,25 @@ public class RolePermissionRepositoryTest {
     void deleteRolePermission_withExistingRolePermission_shouldRemoveFromDatabase() {
         RolePermission rolePermission = new RolePermission(role.getId(), permission.getId());
 
-        rolePermissionRepository.insert(rolePermission);
-        rolePermissionRepository.delete(rolePermission.getId());
+        jdbcRolePermissionRepository.insert(rolePermission);
+        jdbcRolePermissionRepository.delete(rolePermission.getId());
 
-        Optional<RolePermission> result = rolePermissionRepository.findById(rolePermission.getId());
+        Optional<RolePermission> result = jdbcRolePermissionRepository.findById(rolePermission.getId());
         assertTrue(result.isEmpty());
     }
 
     @Test
     void findAllRolePermissionsPaged_withValidPaginationData_shouldReturnCorrectCount() {
         for (int i = 0; i < 15; i++) {
-            Permission newPermission = new Permission("RESOURCE_" + i, "READ", "resource_" + i + "_read");
+            Permission newPermission =
+                    Permission.of("read", "resource_" + i + "_read").build();
             permissionRepository.insert(newPermission);
 
-            rolePermissionRepository.insert(new RolePermission(role.getId(), newPermission.getId()));
+            jdbcRolePermissionRepository.insert(new RolePermission(role.getId(), newPermission.getId()));
         }
 
-        var page1 = rolePermissionRepository.findAllPaged(1, 10);
-        var page2 = rolePermissionRepository.findAllPaged(2, 10);
+        var page1 = jdbcRolePermissionRepository.findAllPaged(1, 10);
+        var page2 = jdbcRolePermissionRepository.findAllPaged(2, 10);
 
         assertEquals(10, page1.size());
         assertEquals(5, page2.size());
@@ -118,6 +128,6 @@ public class RolePermissionRepositoryTest {
     @ParameterizedTest
     @MethodSource("invalidPaginationData")
     void findAllRolePermissionsPaged_withInvalidLimit_shouldThrowException(int offset, int limit) {
-        assertThrows(IllegalArgumentException.class, () -> rolePermissionRepository.findAllPaged(offset, limit));
+        assertThrows(IllegalArgumentException.class, () -> jdbcRolePermissionRepository.findAllPaged(offset, limit));
     }
 }

@@ -7,9 +7,9 @@ import nl.hardwerkendenederlanders.hrcms.models.Subject;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
-@Service
+@Repository
 public class JdbcSubjectRepository implements SubjectRepository {
     private final NamedParameterJdbcTemplate jdbc;
 

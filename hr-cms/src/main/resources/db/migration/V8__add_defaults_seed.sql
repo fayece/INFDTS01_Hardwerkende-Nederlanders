@@ -1,12 +1,32 @@
 ALTER TABLE subjects
-ADD CONSTRAINT unique_subject_name UNIQUE (subject_name);
+    ADD CONSTRAINT unique_subject_name UNIQUE (subject_name);
+
+ALTER TABLE permissions
+    DROP COLUMN internal_name;
+
+-- drop the old permission_key column and recreate it as generated columns.
+ALTER TABLE permissions
+    DROP COLUMN permission_key;
+
+ALTER TABLE roles
+    DROP COLUMN internal_name;
+
+ALTER TABLE permissions
+    ADD COLUMN permission_key VARCHAR(255) GENERATED ALWAYS AS (
+        LOWER(resource) || ':' || LOWER(action_name)
+    ) STORED UNIQUE;
+
+ALTER TABLE roles
+    ADD COLUMN internal_name VARCHAR(255) GENERATED ALWAYS AS (
+        UPPER(REPLACE(role_name, ' ', '_'))
+    ) STORED UNIQUE;
 
 
 WITH roles_insert AS (
-    INSERT INTO roles (id, role_name, internal_name) VALUES
-        (gen_random_uuid(), 'Administrator', 'ADMIN'),
-        (gen_random_uuid(), 'Content Manager', 'CONTENT_MANAGER'),
-        (gen_random_uuid(), 'User', 'USER')
+    INSERT INTO roles (id, role_name) VALUES
+        (gen_random_uuid(), 'Administrator'),
+        (gen_random_uuid(), 'Content Manager'),
+        (gen_random_uuid(), 'User')
     ON CONFLICT DO NOTHING
     RETURNING id, internal_name
 )
@@ -14,27 +34,27 @@ SELECT * FROM roles_insert;
 
 
 WITH perms_insert AS (
-    INSERT INTO permissions(id, resource, action_name, permission_key, internal_name) VALUES
-        (gen_random_uuid(), 'article', 'create', 'article:create', 'CREATE_ARTICLE'),
-        (gen_random_uuid(), 'article', 'read', 'article:read', 'READ_ARTICLE'),
-        (gen_random_uuid(), 'article', 'update', 'article:update', 'UPDATE_ARTICLE'),
-        (gen_random_uuid(), 'article', 'delete', 'article:delete', 'DELETE_ARTICLE'),
-        (gen_random_uuid(), 'article', 'publish', 'article:publish', 'PUBLISH_ARTICLE'),
-        (gen_random_uuid(), 'comment', 'create', 'comment:create', 'CREATE_COMMENT'),
-        (gen_random_uuid(), 'comment', 'read', 'comment:read', 'READ_COMMENT'),
-        (gen_random_uuid(), 'comment', 'update', 'comment:update', 'UPDATE_COMMENT'),
-        (gen_random_uuid(), 'comment', 'delete', 'comment:delete', 'DELETE_COMMENT'),
-        -- user profiles are linked to users. No need to create profile:create or profile:delete permissions
-        (gen_random_uuid(), 'profile', 'read', 'profile:read', 'READ_PROFILE'),
-        (gen_random_uuid(), 'profile', 'update', 'profile:update', 'UPDATE_PROFILE'),
-        (gen_random_uuid(), 'admin', 'manage_articles', 'admin:manage_articles', 'MANAGE_ARTICLES'),            -- article moderation
-        (gen_random_uuid(), 'admin', 'manage_comments', 'admin:manage_comments', 'MANAGE_COMMENTS'),            -- comment moderation
-        (gen_random_uuid(), 'admin', 'manage_users', 'admin:manage_users', 'MANAGE_USERS'),                     -- create/delete users, assign roles to users
-        (gen_random_uuid(), 'admin', 'manage_profiles', 'admin:manage_profiles', 'MANAGE_PROFILES'),            -- in case someone's profile needs admin intervention
-        (gen_random_uuid(), 'admin', 'manage_roles', 'admin:manage_roles', 'MANAGE_ROLES'),                     -- create/delete roles and assign permissions to roles
-        (gen_random_uuid(), 'admin', 'manage_permissions', 'admin:manage_permissions', 'MANAGE_PERMISSIONS')    -- create/delete permissions
+    INSERT INTO permissions(id, resource, action_name) VALUES
+        (gen_random_uuid(), 'article', 'create'),
+        (gen_random_uuid(), 'article', 'read'),
+        (gen_random_uuid(), 'article', 'update'),
+        (gen_random_uuid(), 'article', 'delete'),
+        (gen_random_uuid(), 'article', 'publish'),
+        (gen_random_uuid(), 'comment', 'create'),
+        (gen_random_uuid(), 'comment', 'read'),
+        (gen_random_uuid(), 'comment', 'update'),
+        (gen_random_uuid(), 'comment', 'delete'),
+        -- user profiles are linked to users. No need to create 'create' or 'delete' permissions
+        (gen_random_uuid(), 'profile', 'read'),
+        (gen_random_uuid(), 'profile', 'update'),
+        (gen_random_uuid(), 'admin', 'manage_articles'),            -- article moderation
+        (gen_random_uuid(), 'admin', 'manage_comments'),            -- comment moderation
+        (gen_random_uuid(), 'admin', 'manage_users'),               -- create/delete users, assign roles to users
+        (gen_random_uuid(), 'admin', 'manage_profiles'),            -- in case someone's profile needs admin intervention
+        (gen_random_uuid(), 'admin', 'manage_roles'),               -- create/delete roles and assign permissions to roles
+        (gen_random_uuid(), 'admin', 'manage_permissions')          -- create/delete permissions
     ON CONFLICT DO NOTHING
-    RETURNING id, internal_name
+    RETURNING id
 )
 SELECT * FROM perms_insert;
 
@@ -42,7 +62,7 @@ SELECT * FROM perms_insert;
 WITH admin_role AS (
     SELECT id
     FROM roles
-    WHERE internal_name = 'ADMIN'
+    WHERE internal_name = 'ADMINISTRATOR'
 ),
 content_manager_role AS (
     SELECT id

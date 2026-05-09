@@ -4,7 +4,9 @@ import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleViewersRepos
 import nl.hardwerkendenederlanders.hrcms.models.ArticleViewer;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class JdbcArticleViewersRepository implements ArticleViewersRepository {
 
     private final NamedParameterJdbcTemplate jdbc;

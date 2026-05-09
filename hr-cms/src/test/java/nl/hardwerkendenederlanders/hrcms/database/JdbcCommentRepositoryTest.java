@@ -7,7 +7,7 @@ import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.CommentRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.MediaRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.RoleRepository;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcRoleRepository;
 import nl.hardwerkendenederlanders.hrcms.models.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class JdbcCommentRepositoryTest extends CommentRepositoryContractTest {
     private MediaRepository mediaRepository;
 
     @Autowired
-    private RoleRepository roleRepository;
+    private JdbcRoleRepository jdbcRoleRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -59,8 +59,8 @@ public class JdbcCommentRepositoryTest extends CommentRepositoryContractTest {
         this.articleId = article.getId();
 
         String uniqueRoleName = "Author Role " + UUID.randomUUID();
-        Role role = new Role(uniqueRoleName);
-        roleRepository.insert(role);
+        Role role = Role.of(uniqueRoleName).build();
+        jdbcRoleRepository.insert(role);
 
         User author = User.builder()
                 .firstName("Test")

@@ -11,7 +11,9 @@ import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentWithAuthor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class JdbcCommentRepository implements CommentRepository {
     private final NamedParameterJdbcTemplate jdbc;
 

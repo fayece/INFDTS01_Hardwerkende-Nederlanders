@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
-
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.CommentRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Comment;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentWithAuthor;

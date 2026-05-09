@@ -6,8 +6,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.PermissionRepository;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcPermissionRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Permission;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -15,6 +16,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -23,11 +26,20 @@ import org.springframework.transaction.annotation.Transactional;
 public class PermissionRepositoryTest {
 
     @Autowired
-    private PermissionRepository permissionRepository;
+    private JdbcPermissionRepository permissionRepository;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @BeforeEach
+    void setUp() {
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "role_permissions");
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "permissions");
+    }
 
     @Test
     void insertPermission_withValidPermission_shouldPersistAndRetrieve() {
-        Permission permission = new Permission("ARTICLE", "READ", "article_read");
+        Permission permission = Permission.of("article", "read").build();
 
         permissionRepository.insert(permission);
 
@@ -37,13 +49,12 @@ public class PermissionRepositoryTest {
         assertEquals(permission.getId(), retrieved.getId());
         assertEquals(permission.getResource(), retrieved.getResource());
         assertEquals(permission.getActionName(), retrieved.getActionName());
-        assertEquals(permission.getPermissionKey(), retrieved.getPermissionKey());
-        assertEquals(permission.getInternalName(), retrieved.getInternalName());
+        assertEquals(permission.getResource() + ":" + permission.getActionName(), retrieved.getPermissionKey());
     }
 
     @Test
     void findPermissionById_withExistingId_shouldReturnPermission() {
-        Permission permission = new Permission("ARTICLE", "WRITE", "article_write");
+        Permission permission = Permission.of("article", "write").build();
 
         permissionRepository.insert(permission);
 
@@ -53,8 +64,7 @@ public class PermissionRepositoryTest {
         assertEquals(permission.getId(), retrieved.getId());
         assertEquals(permission.getResource(), retrieved.getResource());
         assertEquals(permission.getActionName(), retrieved.getActionName());
-        assertEquals(permission.getPermissionKey(), retrieved.getPermissionKey());
-        assertEquals(permission.getInternalName(), retrieved.getInternalName());
+        assertEquals(permission.getResource() + ":" + permission.getActionName(), retrieved.getPermissionKey());
     }
 
     @Test
@@ -65,7 +75,7 @@ public class PermissionRepositoryTest {
 
     @Test
     void deletePermission_withExistingPermission_shouldRemoveFromDatabase() {
-        Permission permission = new Permission("ARTICLE", "DELETE", "article_delete");
+        Permission permission = Permission.of("article", "delete").build();
 
         permissionRepository.insert(permission);
         permissionRepository.delete(permission.getId());
@@ -77,12 +87,12 @@ public class PermissionRepositoryTest {
     @Test
     void findAllPermissionsPaged_withValidPaginationData_shouldReturnCorrectCount() {
         String[] actions = {
-            "READ", "WRITE", "DELETE", "PUBLISH", "ARCHIVE", "RESTORE", "COMMENT", "LIKE", "SHARE", "EXPORT", "IMPORT",
-            "APPROVE", "REJECT", "TAG", "UNTAG"
+            "read", "write", "delete", "publish", "archive", "restore", "comment", "like", "share", "export", "import",
+            "approve", "reject", "tag", "untag"
         };
 
         for (int i = 0; i < 15; i++) {
-            Permission permission = new Permission("ARTICLE", actions[i], "article_" + actions[i].toLowerCase());
+            Permission permission = Permission.of("article", actions[i]).build();
             permissionRepository.insert(permission);
         }
 
