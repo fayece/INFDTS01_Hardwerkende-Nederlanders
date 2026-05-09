@@ -179,6 +179,9 @@ INSERT INTO role_permissions (id, role_id, permission_id) VALUES
     (gen_random_uuid(), (SELECT id FROM content_manager_role), (SELECT id FROM profile_read)),
     (gen_random_uuid(), (SELECT id FROM content_manager_role), (SELECT id FROM profile_update)),
 
+    (gen_random_uuid(), (SELECT id FROM content_manager_role), (SELECT id FROM admin_manage_articles)),
+    (gen_random_uuid(), (SELECT id FROM content_manager_role), (SELECT id FROM admin_manage_comments)),
+
 
     -- User - basic engagement permissions
     (gen_random_uuid(), (SELECT id FROM user_role), (SELECT id FROM article_read)),
