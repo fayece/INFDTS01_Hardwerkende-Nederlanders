@@ -32,12 +32,12 @@ public class ReaderArticleController {
             CommentServiceImpl commentService,
             ArticleAuthorsService authorsService,
             UserSessionService userSessionService,
-            ArticleViewersService articleViewersSerivce) {
+            ArticleViewersService articleViewersService) {
         this.articleService = articleService;
         this.commentService = commentService;
         this.authorsService = authorsService;
         this.userSessionService = userSessionService;
-        this.articleViewersService = articleViewersSerivce;
+        this.articleViewersService = articleViewersService;
     }
 
     @GetMapping("/{articleId}")
