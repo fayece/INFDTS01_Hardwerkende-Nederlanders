@@ -1,0 +1,32 @@
+<div th:fragment="comment" class="comment" xmlns="http://www.w3.org/1999/html">
+    <span class="author-name" th:text="${comment.authorName ?: 'Unknown User'}"></span>
+    <div class="comment-body" th:data-markdown="${comment.commentBody}"></div>
+
+    <div class="comment-footer">
+        <small class="local-time"
+               th:data-timestamp="${comment.createdAt}"
+               th:text="${#temporals.format(comment.createdAt, 'dd-MM-yyyy HH:mm')}">
+        </small>
+        <button th:if="${!comment.isDeleted}"
+                type="button"
+                class="reply-button"
+                th:data-comment-id="${comment.id}"
+                th:data-article-id="${articleId}">
+            ↵ Reply
+        </button>
+        <button th:if="${!comment.isDeleted and session.userId != null and session.userId == comment.creatorId}"
+                type="button"
+                class="delete-button"
+                th:data-comment-id="${comment.id}">
+            Delete
+        </button>
+    </div>
+
+    <div class="replies-container" th:id="'replies-for-' + ${comment.id}"></div>
+
+    <button class="load-replies-button"
+            th:if="${comment.hasReplies}"
+            th:data-parent-id="${comment.id}">
+        View Replies
+    </button>
+</div>

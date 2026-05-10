@@ -1,5 +1,8 @@
 package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
+import nl.hardwerkendenederlanders.hrcms.database.SubjectRepository;
+import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleAuthorRepository;
+import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleViewersRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
@@ -9,24 +12,23 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 public class DatabaseConfiguration {
 
     @Bean
-    public ArticleRepository articleRepository(NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
-        return new ArticleRepository(jdbc, resourceLoader);
+    public JdbcArticleRepository articleRepository(NamedParameterJdbcTemplate jdbc) {
+        return new JdbcArticleRepository(jdbc);
     }
 
     @Bean
-    public ArticleAuthorRepository ArticleAuthorRepository(
-            NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
-        return new ArticleAuthorRepository(jdbc, resourceLoader);
+    public ArticleAuthorRepository ArticleAuthorRepository(NamedParameterJdbcTemplate jdbc) {
+        return new JdbcArticleAuthorRepository(jdbc);
     }
 
     @Bean
-    public CommentRepository commentRepository(NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
-        return new CommentRepository(jdbc, resourceLoader);
+    public JdbcCommentRepository JdbcCommentRepository(NamedParameterJdbcTemplate jdbc) {
+        return new JdbcCommentRepository(jdbc);
     }
 
     @Bean
-    public MediaItemRepository mediaItemRepository(NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
-        return new MediaItemRepository(jdbc, resourceLoader);
+    public JdbcMediaRepository JdbcMediaRepository(NamedParameterJdbcTemplate jdbc) {
+        return new JdbcMediaRepository(jdbc);
     }
 
     @Bean
@@ -52,7 +54,12 @@ public class DatabaseConfiguration {
     }
 
     @Bean
-    public UserRepository userRepository(NamedParameterJdbcTemplate jdbc, ResourceLoader resourceLoader) {
-        return new UserRepository(jdbc, resourceLoader);
+    public SubjectRepository subjectRepository(NamedParameterJdbcTemplate jdbc) {
+        return new JdbcSubjectRepository(jdbc);
+    }
+
+    @Bean
+    public ArticleViewersRepository articleViewersRepository(NamedParameterJdbcTemplate jdbc) {
+        return new JdbcArticleViewersRepository(jdbc);
     }
 }

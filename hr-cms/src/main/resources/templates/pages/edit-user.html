@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit user</title>
+    <link rel="stylesheet"
+          th:each="cssRef : ${@cssDiscoveryService.getAllCssPaths()}"
+          th:href="${cssRef}">
+</head>
+<body>
+<div th:insert="~{fragments/app-wide/admin-navbar :: navbar}" class="navbar"></div>
+<div class="create-user-page">
+    <h2>Edit user</h2>
+    <h4>Edit or delete user</h4>
+    <div th:if="${errorMessage}" th:text="${errorMessage}" class="error-container"></div>
+    <div class="create-user-form-container">
+        <form class="create-user-form" th:action="@{/manage-users/update}" method="post">
+            <input type="hidden" name="id" th:value="${currentUser.id}">
+            <label><b>First name:</b>
+                <input type="text" name="firstName" th:value="${currentUser.firstName}">
+            </label>
+            <label><b>Prefix:</b>
+                <input type="text" name="prefix" th:value="${currentUser.prefix}">
+            </label>
+            <label><b>Last name:</b>
+                <input type="text" name="lastName" th:value="${currentUser.lastName}">
+            </label>
+            <label><b>Email:</b>
+                <input type="text" name="email" th:value="${currentUser.email}">
+            </label>
+            <label><b>RoleId</b>
+                <input type="text" name="roleId" th:value="${currentUser.roleId}">
+            </label>
+            <label><b>OrganisationId</b>
+                <input type="text" name="organisationId" th:value="${currentUser.organizationId}">
+            </label>
+            <button class="create-user-button" type="submit">Update user</button>
+        </form>
+    </div>
+    <br>
+    <a class="return-button-admin" th:href="@{/manage-users}">Return</a>
+    <a class="delete-user-button" th:href="@{/manage-users/confirm-delete(userId=${currentUser.Id})}">Delete user</a>
+</div>
+</body>
+</html>

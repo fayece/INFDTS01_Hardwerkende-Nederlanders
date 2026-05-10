@@ -27,6 +27,6 @@ public class ReaderHomeControllerTest {
 
     @Test
     void testGetHomePage() throws Exception {
-        mockMvc.perform(get("/")).andExpect(status().isOk()).andExpect(view().name("index"));
+        mockMvc.perform(get("/")).andExpect(status().isOk()).andExpect(view().name("pages/index"));
     }
 }

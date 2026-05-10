@@ -2,14 +2,17 @@ package nl.hardwerkendenederlanders.hrcms.models;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.Nullable;
 
-@SuperBuilder
+@Builder
 @Getter
-public class Comment extends BaseTimedEntity {
+public class Comment {
+
+    @Builder.Default
+    private final UUID id = UUID.randomUUID();
 
     @Setter
     @Nullable
@@ -28,45 +31,10 @@ public class Comment extends BaseTimedEntity {
     @Nullable
     private UUID parentCommentId;
 
+    @Builder.Default
+    private final OffsetDateTime createdAt = OffsetDateTime.now();
+
     @Setter
     @Nullable
     private OffsetDateTime deletedAt;
-    /*
-     Note: deletedAt will be set when a comment is "deleted". This allows us to keep the comment in the database
-     for historical and relational integrity, while marking it as deleted.
-     The comment's body is also preserved, for potential moderation review, but should be replaced in the application
-     with placeholder text (e.g., "[deleted]") when deletedAt is not null.
-    */
-
-    public Comment(
-            UUID id,
-            String commentBody,
-            UUID creatorId,
-            UUID articleId,
-            @Nullable UUID mediaId,
-            @Nullable UUID parentCommentId,
-            OffsetDateTime createdAt,
-            @Nullable OffsetDateTime deletedAt) {
-        super(id, createdAt);
-        this.commentBody = commentBody;
-        this.creatorId = creatorId;
-        this.articleId = articleId;
-        this.mediaId = mediaId;
-        this.parentCommentId = parentCommentId;
-        this.deletedAt = deletedAt;
-    }
-
-    public Comment(
-            String commentBody,
-            UUID creatorId,
-            UUID articleId,
-            @Nullable UUID mediaId,
-            @Nullable UUID parentCommentId) {
-        super();
-        this.commentBody = commentBody;
-        this.creatorId = creatorId;
-        this.articleId = articleId;
-        this.mediaId = mediaId;
-        this.parentCommentId = parentCommentId;
-    }
 }

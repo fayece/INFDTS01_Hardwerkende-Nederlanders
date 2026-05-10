@@ -1,0 +1,17 @@
+<div th:fragment="full-article(article, authors)" class="content-section">
+    <h1 th:text="${article.Title}"></h1>
+    <span th:insert="~{fragments/articles/engagement :: engagement(views=${article.viewCount}, comments=${article.commentCount})}"></span>
+    <ul class="full-article__author-list">
+        <li th:each="author: ${authors}">
+            <div th:insert="~{fragments/users/username :: username(
+                name=${author.getFullName()})}">
+            </div>
+        </li>
+
+    </ul>
+    <div th:text="'Subject:'+ (${article.subjectName} != null ? ${article.subjectName} : 'Undefined')"></div>
+    <div th:text="'Created On: ' + ${#temporals.format(article.createdAt, 'dd-MM-yyyy')}"></div>
+    <div th:if="${article.updatedAt != null}" th:text="'Last Update: ' + ${#temporals.format(article.updatedAt, 'dd-MM-yyyy')}"></div>
+    <div class="full-article__md-container" th:attr="data-markdown=${article.TextContent}">
+    </div>
+</div>

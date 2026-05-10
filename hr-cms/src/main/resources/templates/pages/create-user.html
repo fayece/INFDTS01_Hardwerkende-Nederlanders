@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create user</title>
+    <link rel="stylesheet"
+          th:each="cssRef : ${@cssDiscoveryService.getAllCssPaths()}"
+          th:href="${cssRef}">
+</head>
+<body>
+<div th:insert="~{fragments/app-wide/admin-navbar :: navbar}" class="navbar"></div>
+    <div class="create-user-page">
+        <h2>Create new user</h2>
+        <h4>You can create as many new users as you'd like and leave by pressing the return button</h4>
+        <div th:if="${errorMessage}" th:text="${errorMessage}" class="error-container"></div>
+        <div class="create-user-form-container">
+            <form class="create-user-form" th:action="@{/manage-users/new}" method="post">
+                <label><b>First name:</b>
+                    <input type="text" name="firstName" required>
+                </label>
+                <label><b>Prefix:</b>
+                    <input type="text" name="prefix">
+                </label>
+                <label><b>Last name:</b>
+                    <input type="text" name="lastName" required>
+                </label>
+                <label><b>Email</b>
+                    <input type="text" name="email" required>
+                </label>
+                <label><b>Password</b>
+                    <input type="text" name="password" required>
+                </label>
+                <button class="create-user-button" type="submit">Save user</button>
+            </form>
+        </div>
+        <br>
+        <a class="return-button-admin" th:href="@{/manage-users}">Return</a>
+
+
+    </div>
+</body>
+</html>

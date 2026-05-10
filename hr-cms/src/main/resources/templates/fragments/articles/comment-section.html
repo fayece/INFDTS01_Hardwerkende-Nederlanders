@@ -1,0 +1,61 @@
+<section th:fragment="comment-section" class="content-section comment-section">
+    <div class="comment-section--inner">
+        <h2>Comments</h2>
+
+        <form class="comment-section--create"
+              th:action="@{/comment/article/{articleId}/new(articleId=${articleId})}"
+              method="post">
+
+            <div th:if="${errorMessage}" class="error-container">
+                <p th:text="${errorMessage}"></p>
+            </div>
+
+            <div id="comment-editor"></div>
+            <input type="hidden" name="commentBody" id="commentBody">
+
+            <button type="submit">Post Comment</button>
+        </form>
+
+        <!--    Read comments-->
+        <ul th:fragment="comment-list" class="comment-section--list">
+            <li th:each="comment : ${comments}">
+                <div th:replace="~{fragments/articles/comment :: comment(comment=${comment})}"></div>
+            </li>
+        </ul>
+
+        <button th:if="${hasMore}"
+                th:data-article-id="${articleId}"
+                th:data-offset="${offset}"
+                class="comment-section--load-more"
+                id="load-more-comments">
+            Show more comments
+        </button>
+
+        <div th:replace="~{fragments/app-wide/confirm-modal :: confirm-modal(
+            title='Delete comment?',
+            description='This will permanently hide your comment. This action cannot be undone.',
+            confirmText='Delete',
+            confirmClass='modal-btn--danger',
+            cancelText='Cancel'
+        )}"></div>
+
+        <template id="reply-form-template">
+            <div class="reply-form-container">
+                <div class="reply-editor-target"></div>
+                <div>
+                    <button type="button" class="submit-reply">Post Reply</button>
+                    <button type="button" class="cancel-reply">Cancel</button>
+                </div>
+            </div>
+        </template>
+    </div>
+</section>
+
+<!--    Handle exceptions-->
+<div th:fragment="comments-unavailable" class="error-container">
+    <p>
+        <strong>Oops!</strong>
+        The <span th:text="${failedComponent ?: 'comments'}">comments</span> are temporarily unavailable.
+        Please try again later.
+    </p>
+</div>
