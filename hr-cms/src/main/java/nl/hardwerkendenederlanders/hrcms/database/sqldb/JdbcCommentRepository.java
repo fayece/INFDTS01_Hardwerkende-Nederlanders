@@ -207,7 +207,7 @@ public class JdbcCommentRepository implements CommentRepository {
     private static final String MASKED_BODY = "CASE WHEN c.deleted_at IS NOT NULL THEN 'This comment has been deleted' "
             + "ELSE c.comment_body END AS comment_body";
 
-    private static final String MASKED_NAME = "CASE WHEN c.deleted_at IS NOT NULL THEN 'Unknown' "
+    private static final String MASKED_NAME = "CASE WHEN c.deleted_at IS NOT NULL THEN 'Hidden' "
             + "ELSE CONCAT_WS(' ', u.first_name, NULLIF(TRIM(u.prefix), ''), u.last_name) END AS name";
 
     private static final String REPLY_COUNTS_CTE = """

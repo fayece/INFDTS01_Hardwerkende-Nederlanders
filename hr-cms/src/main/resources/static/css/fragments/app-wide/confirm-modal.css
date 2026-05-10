@@ -39,7 +39,7 @@
     opacity: 0.8;
 }
 
-.modal-btn--accent {
+.modal-btn--confirm {
     background: var(--accent);
     color: var(--background);
 }

@@ -4,7 +4,7 @@
     <p class="modal-body" th:text="${description}"></p>
     <div class="modal-actions">
         <button type="button"
-                th:class="'modal-btn ' + (${confirmClass} ?: 'modal-btn--accent') + ' confirm-action'"
+                th:class="'modal-btn ' + (${confirmClass} ?: 'modal-btn--confirm') + ' confirm-action'"
                 th:text="${confirmText} ?: 'Confirm'">Confirm</button>
         <button type="button"
                 class="modal-btn modal-btn--cancel cancel-action"

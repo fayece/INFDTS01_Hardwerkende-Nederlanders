@@ -150,7 +150,7 @@ public abstract class CommentRepositoryContractTest {
 
         assertNotNull(result);
         assertEquals("This comment has been deleted", result.comment().getCommentBody());
-        assertEquals("Unknown", result.authorName());
+        assertEquals("Hidden", result.authorName());
     }
 
     @Test
@@ -193,7 +193,7 @@ public abstract class CommentRepositoryContractTest {
         assertEquals(1, results.size());
         assertEquals(
                 "This comment has been deleted", results.getFirst().comment().getCommentBody());
-        assertEquals("Unknown", results.getFirst().authorName());
+        assertEquals("Hidden", results.getFirst().authorName());
     }
 
     @Test
@@ -219,7 +219,7 @@ public abstract class CommentRepositoryContractTest {
         assertEquals(1, replies.size());
         assertEquals(
                 "This comment has been deleted", replies.getFirst().comment().getCommentBody());
-        assertEquals("Unknown", replies.getFirst().authorName());
+        assertEquals("Hidden", replies.getFirst().authorName());
     }
 
     @Test

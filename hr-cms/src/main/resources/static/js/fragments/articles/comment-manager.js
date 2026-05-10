@@ -129,6 +129,8 @@ export const initCommentForm = () => {
 
         const loadMoreBtn = document.getElementById("load-more-comments");
         if (loadMoreBtn) loadMoreBtn.dataset.offset = String(Number(loadMoreBtn.dataset.offset) + 1);
+
+        restoreButton();
     });
 };
 
