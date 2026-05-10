@@ -14,6 +14,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      mongo:
+        condition: service_started
     mem_limit: 500mb
     cpus: 1
     volumes:
@@ -40,6 +42,20 @@ services:
     mem_limit: 2g
     cpus: 1
 
+  mongo:
+    image: mongo:7
+    container_name: mongo_db
+    env_file: ".env"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+
 volumes:
   pgdata:
   uploads:
+  mongo_data:
