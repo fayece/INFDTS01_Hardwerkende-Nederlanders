@@ -9,13 +9,16 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Document(collection = "profiles")
 @Data
 public class Profile {
 
     @Id
-    @Setter
+    String id; //the UUID from user saved as a string
+
+    @NotBlank
     private String username;
 
     @Nullable
