@@ -37,11 +37,4 @@ public class Comment {
     @Setter
     @Nullable
     private OffsetDateTime deletedAt;
-
-    /*
-     Note: deletedAt will be set when a comment is "deleted". This allows us to keep the comment in the database
-     for historical and relational integrity, while marking it as deleted.
-     The comment's body is also preserved, for potential moderation review, but should be replaced in the application
-     with placeholder text (e.g., "[deleted]") when deletedAt is not null. This can be done in a DTO
-    */
 }

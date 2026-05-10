@@ -13,6 +13,7 @@ public record CommentViewDto(
         UUID mediaId,
         String commentBody,
         String authorName,
+        UUID creatorId,
         OffsetDateTime createdAt,
         boolean isDeleted,
         boolean hasReplies) {
@@ -26,6 +27,7 @@ public record CommentViewDto(
                 .mediaId(comment.getMediaId())
                 .commentBody(comment.getCommentBody())
                 .authorName(authorName)
+                .creatorId(comment.getCreatorId())
                 .createdAt(comment.getCreatedAt())
                 .isDeleted(isDeleted)
                 .hasReplies(replyCount > 0)

@@ -61,14 +61,17 @@
     margin-top: 0.25rem;
 }
 
-.reply-button {
+.reply-button,
+.delete-button {
     background: none;
     border: none;
-    color: var(--accent);
     cursor: pointer;
     padding: 0;
     font-size: 0.8rem;
+    font-family: inherit;
+    font-weight: normal;
     transition: color 0.2s;
+    color: var(--accent);
 }
 
 .reply-button:hover {
@@ -127,6 +130,16 @@
     cursor: pointer;
     margin-bottom: 1rem;
 }
+
+.delete-button {
+    color: var(--warning);
+}
+
+.delete-button:hover {
+    color: var(--warning-light);
+    text-decoration: underline;
+}
+
 
 .error-container {
     border: solid var(--warning-light) 0.1rem;

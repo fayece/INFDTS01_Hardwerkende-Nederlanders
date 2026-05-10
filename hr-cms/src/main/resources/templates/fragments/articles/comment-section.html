@@ -31,6 +31,14 @@
             Show more comments
         </button>
 
+        <div th:replace="~{fragments/app-wide/confirm-modal :: confirm-modal(
+            title='Delete comment?',
+            description='This will permanently hide your comment. This action cannot be undone.',
+            confirmText='Delete',
+            confirmClass='modal-btn--danger',
+            cancelText='Cancel'
+        )}"></div>
+
         <template id="reply-form-template">
             <div class="reply-form-container">
                 <div class="reply-editor-target"></div>
