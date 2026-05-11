@@ -1,10 +1,10 @@
 package nl.hardwerkendenederlanders.hrcms.services;
 
 import java.util.List;
+import lombok.AllArgsConstructor;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.RoleRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Role;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.RoleService;
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service

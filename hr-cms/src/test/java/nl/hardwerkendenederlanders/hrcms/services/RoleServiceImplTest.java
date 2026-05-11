@@ -16,10 +16,7 @@ class RoleServiceImplTest {
 
     @Test
     void findAll_withExistingRoles_returnsListOfRoles() {
-        List<Role> roles = List.of(
-            Role.of("Admin").build(),
-            Role.of("Editor").build()
-        );
+        List<Role> roles = List.of(Role.of("Admin").build(), Role.of("Editor").build());
         when(roleRepository.findAll()).thenReturn(roles);
 
         List<Role> result = roleService.findAll();

@@ -58,7 +58,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void insertUser(String firstName, String prefix, String lastName, String email, String password, UUID roleId) {
+    public void insertUser(
+            String firstName, String prefix, String lastName, String email, String password, UUID roleId) {
         User toInsert = new User(
                 UUID.randomUUID(),
                 firstName,

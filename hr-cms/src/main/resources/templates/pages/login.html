@@ -1,31 +1,36 @@
 ﻿<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Login</title>
-    <link rel="stylesheet"
-          th:each="cssRef : ${@cssDiscoveryService.getAllCssPaths()}"
-          th:href="${cssRef}">
-</head>
-<body>
-<main>
-    <h1>Login</h1>
-    <p th:if="${error}" style="color:red;">
-        Invalid email or password
-    </p>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <title>Login</title>
+        <link rel="stylesheet"
+              th:each="cssRef : ${@cssDiscoveryService.getAllCssPaths()}"
+              th:href="${cssRef}">
+    </head>
 
-    <form th:action="@{/login}" method="post">
-        <div>
-            <label>Email:</label>
-            <input type="text" name="email"/>
-        </div>
+    <body>
+        <div th:insert="~{fragments/app-wide/navbar :: navbar}" class="navbar"></div>
+        <main class="standard-page-layout">
+            <h1>Login</h1>
+            <p th:if="${error}" style="color:red;">
+                Invalid email or password
+            </p>
 
-        <div>
-            <label>Password:</label>
-            <input type="password" name="password"/>
-        </div>
+            <form th:action="@{/login}" method="post">
+                <div>
+                    <label>Email:
+                        <input type="text" name="email"/>
+                    </label>
+                </div>
 
-        <button type="submit">Login</button>
-    </form>
-</main>
-</body>
+                <div>
+                    <label>Password:
+                        <input type="password" name="password"/>
+                    </label>
+                </div>
+
+                <button type="submit">Login</button>
+            </form>
+        </main>
+        <footer th:replace="~{fragments/app-wide/footer :: footer}"></footer>
+    </body>
 </html>

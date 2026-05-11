@@ -1,48 +1,53 @@
-<head>
-    <title>Spotlight!</title>
-    <link rel="stylesheet" th:href="${cssRef}" th:each="cssRef: ${@cssDiscoveryService.getAllCssPaths()}">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <title>Edit Article</title>
+        <link rel="stylesheet"
+              th:each="cssRef : ${@cssDiscoveryService.getAllCssPaths()}"
+              th:href="${cssRef}">
+        <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+        <script th:src = "@{/js/pages/article-editor-page.js}" defer></script>
+        <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+    </head>
 
-    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
-    <script th:src = "@{/js/pages/article-editor-page.js}" defer></script>
-    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
-</head>
-<body>
-<div th:insert="~{fragments/app-wide/navbar :: navbar}" class="navbar"></div>
-<main class="standard-page-layout">
-    <section class="content-section">
+    <body>
+        <div th:insert="~{fragments/app-wide/navbar :: navbar}" class="navbar"></div>
+        <main class="standard-page-layout">
+            <section class="content-section">
 
-        <a th:href="@{/article/editor/overview}">To Overview</a>
-        <div th:if="${param.error != null && param.error[0] == 'UPDATE'}" th:insert="~{fragments/app-wide/error-modal :: error_modal('Error while updating article' )}"></div>
-        <div th:if="${param.error != null && param.error[0] == 'INSERT'}" th:insert="~{fragments/app-wide/error-modal :: error_modal('Error while insterting article')}"></div>
-        <form
-            role="form"
-            method="post"
-            th:action="@{/article/editor/save}"
-            th:object="${articleForm}"
-            onsubmit="editorIntoTextContent()">
+                <a th:href="@{/article/editor/overview}">To Overview</a>
+                <div th:if="${param.error != null && param.error[0] == 'UPDATE'}" th:insert="~{fragments/app-wide/error-modal :: error_modal('Error while updating article' )}"></div>
+                <div th:if="${param.error != null && param.error[0] == 'INSERT'}" th:insert="~{fragments/app-wide/error-modal :: error_modal('Error while insterting article')}"></div>
+                <form
+                        role="form"
+                        method="post"
+                        th:action="@{/article/editor/save}"
+                        th:object="${articleForm}"
+                        onsubmit="editorIntoTextContent()">
 
-            <div>
-                <div>
-                    <span>publication status:</span><span th:text="*{publicationStatus}"></span>
-                    <input th:field="*{id}" type="hidden">
-                    <button type="submit" name="publicationStatus" value="DRAFT">save as draft</button>
-                    <button type="submit" name="publicationStatus" value="PUBLISHED">save and publish</button>
-                </div>
-            </div>
+                    <div>
+                        <div>
+                            <span>publication status:</span><span th:text="*{publicationStatus}"></span>
+                            <input th:field="*{id}" type="hidden">
+                            <button type="submit" name="publicationStatus" value="DRAFT">save as draft</button>
+                            <button type="submit" name="publicationStatus" value="PUBLISHED">save and publish</button>
+                        </div>
+                    </div>
 
-            <label>title<input type="text" th:field="*{title}"></label>
-            <label>subject
-                <select th:field="*{subjectId}">
-                    <option th:each="subject: ${subjects}" th:value="${subject.getId()}" th:text="${subject.getSubjectName()}"></option>
-                </select>
-            </label>
+                    <label>title<input type="text" th:field="*{title}"></label>
+                    <label>subject
+                        <select th:field="*{subjectId}">
+                            <option th:each="subject: ${subjects}" th:value="${subject.getId()}" th:text="${subject.getSubjectName()}"></option>
+                        </select>
+                    </label>
 
-            <div id="editor">
-            </div>
-            <input type="hidden" th:field="*{textContent}" id="text-content">
-        </form>
-    </section>
+                    <div id="editor">
+                    </div>
+                    <input type="hidden" th:field="*{textContent}" id="text-content">
+                </form>
+            </section>
 
-</main>
-<footer th:replace="~{fragments/app-wide/footer :: footer}"></footer>
-</body>
+        </main>
+        <footer th:replace="~{fragments/app-wide/footer :: footer}"></footer>
+    </body>
+</html>

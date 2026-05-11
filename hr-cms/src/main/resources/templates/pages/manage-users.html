@@ -1,88 +1,91 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Manage users</title>
-    <link rel="stylesheet"
-          th:each="cssRef : ${@cssDiscoveryService.getAllCssPaths()}"
-          th:href="${cssRef}">
-</head>
-<body>
-<div th:insert="~{fragments/app-wide/admin-navbar :: navbar}" class="navbar"></div>
-<div class="user-page">
-    <div class="search-bar-container">
-        <a class="manage-button-tag" th:href="@{/manage-users}">See all users</a>
-        <br>
-        <a class="manage-button-tag" th:href="@{/manage-users(sortActive=true)}">See active users</a>
-        <br>
-        <a class="manage-button-tag" th:href="@{/manage-users(sortActive=false)}">See inActive users</a>
-        <br>
-        <a class="manage-button-tag blue-button" th:href="@{/manage-users/create-user}">Add new user</a>
-        <br>
-        <form th:action="@{/manage-users}" method="get">
-            <input type="text" name="searchName" th:value="${searchName}" class="admin-search-bar" placeholder="Search user" list="recentList">
-            <button type="submit" class="search-button blue-button">Search</button>
-            <datalist id="recentList">
-                <option th:each="item : ${session.recentSearches}"
-                        th:value="${item}">
-                </option>
-            </datalist>
-        </form>
-    </div>
-    <div th:if="${errorMessage}" class="error-container">
-        <p th:text="${errorMessage}"></p>
-    </div>
-    <div class="user-container">
-        <h2>Users</h2>
-        <table class="user-table">
-            <thead class="user-table-head">
-                <tr>
-                    <th class="action-tr">Edit</th>
-                    <th>First name</th>
-                    <th>Prefix</th>
-                    <th>Last name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Organisation</th>
-                    <th>Is Active</th>
-                    <th class="action-tr">Set active</th>
-                </tr>
-            </thead>
-            <tbody class="user-table-body">
-                <tr th:each="user : ${users}">
-                    <td class="action-tr">
-                        <a class="edit-user-button" th:href="@{/manage-users/edit/{id}(id=${user.getId()})}">Edit</a>
-                    </td>
-                    <td th:text="${user.getFirstName()}"></td>
-                    <td th:text="${user.getPrefix()}"></td>
-                    <td th:text="${user.getLastName()}"></td>
-                    <td th:text="${user.getEmail()}"></td>
-                    <td>placeholder</td>
-                    <td>placeholder</td>
-                    <td th:text="${user.isActive()}"></td>
-                    <td class="action-tr">
-                        <form th:action="@{/manage-users/set-active(userId=${user.getId()}, setActive=${!user.isActive()})}" method="post">
-                        <button class="set-active-level" type="submit">Change active</button>
-                        </form>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <br>
-        <div class="pagination">
-            <a class="blue-button" th:if="${currentPage > 0}"
-               th:href="@{/manage-users(page=${currentPage - 1})}">
-               Previous page
-            </a>
-            <span th:text="'Page ' + ${currentPage + 1} + '/' + ${finalPage}">
-            </span>
-            <a class="blue-button" th:if="${currentPage + 1 < finalPage}"
-               th:href="@{/manage-users(page=${currentPage + 1})}">
-                Next page
-            </a>
-        </div>
-    </div>
-
-</div>
-<footer th:replace="~{fragments/app-wide/footer :: footer}"></footer>
-</body>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <title>Manage users</title>
+        <link rel="stylesheet"
+              th:each="cssRef : ${@cssDiscoveryService.getAllCssPaths()}"
+              th:href="${cssRef}">
+    </head>
+    <body>
+        <div th:insert="~{fragments/app-wide/admin-navbar :: navbar}" class="navbar"></div>
+        <main class="standard-page-layout">
+            <div class="user-page">
+                <div class="search-bar-container">
+                    <a class="manage-button-tag" th:href="@{/manage-users}">See all users</a>
+                    <br>
+                    <a class="manage-button-tag" th:href="@{/manage-users(sortActive=true)}">See active users</a>
+                    <br>
+                    <a class="manage-button-tag" th:href="@{/manage-users(sortActive=false)}">See inActive users</a>
+                    <br>
+                    <a class="manage-button-tag blue-button" th:href="@{/manage-users/create-user}">Add new user</a>
+                    <br>
+                    <form th:action="@{/manage-users}" method="get">
+                        <label>
+                            <input type="text" name="searchName" th:value="${searchName}" class="admin-search-bar" placeholder="Search user" list="recentList">
+                        </label>
+                        <button type="submit" class="search-button blue-button">Search</button>
+                        <datalist id="recentList">
+                            <option th:each="item : ${session.recentSearches}"
+                                    th:value="${item}">
+                            </option>
+                        </datalist>
+                    </form>
+                </div>
+                <div th:if="${errorMessage}" class="error-container">
+                    <p th:text="${errorMessage}"></p>
+                </div>
+                <div class="user-container">
+                    <h2>Users</h2>
+                    <table class="user-table">
+                        <thead class="user-table-head">
+                            <tr>
+                                <th class="action-tr">Edit</th>
+                                <th>First name</th>
+                                <th>Prefix</th>
+                                <th>Last name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Organization</th>
+                                <th>Is Active</th>
+                                <th class="action-tr">Set active</th>
+                            </tr>
+                        </thead>
+                        <tbody class="user-table-body">
+                            <tr th:each="user : ${users}">
+                                <td class="action-tr">
+                                    <a class="edit-user-button" th:href="@{/manage-users/edit/{id}(id=${user.getId()})}">Edit</a>
+                                </td>
+                                <td th:text="${user.getFirstName()}"></td>
+                                <td th:text="${user.getPrefix()}"></td>
+                                <td th:text="${user.getLastName()}"></td>
+                                <td th:text="${user.getEmail()}"></td>
+                                <td th:text="${user.roleName}"></td>
+                                <td>placeholder</td>
+                                <td th:text="${user.isActive()}"></td>
+                                <td class="action-tr">
+                                    <form th:action="@{/manage-users/set-active(userId=${user.getId()}, setActive=${!user.isActive()})}" method="post">
+                                    <button class="set-active-level" type="submit">Change active</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <div class="pagination">
+                        <a class="blue-button" th:if="${currentPage > 0}"
+                           th:href="@{/manage-users(page=${currentPage - 1})}">
+                           Previous page
+                        </a>
+                        <span th:text="'Page ' + ${currentPage + 1} + '/' + ${finalPage}">
+                        </span>
+                        <a class="blue-button" th:if="${currentPage + 1 < finalPage}"
+                           th:href="@{/manage-users(page=${currentPage + 1})}">
+                            Next page
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/app-wide/footer :: footer}"></footer>
+    </body>
 </html>

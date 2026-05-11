@@ -2,8 +2,11 @@ package nl.hardwerkendenederlanders.hrcms.controllers;
 
 import jakarta.servlet.http.HttpSession;
 import java.util.*;
+import java.util.stream.Collectors;
 import nl.hardwerkendenederlanders.hrcms.configuration.RequiresPermission;
+import nl.hardwerkendenederlanders.hrcms.models.Role;
 import nl.hardwerkendenederlanders.hrcms.models.User;
+import nl.hardwerkendenederlanders.hrcms.models.dtos.userDtos.UserViewDto;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.RoleService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
@@ -55,7 +58,13 @@ public class UserController {
             session.setAttribute("recentSearches", recentSearches);
         }
 
-        model.addAttribute("users", users);
+        Map<UUID, String> roleNames =
+                roleService.findAll().stream().collect(Collectors.toMap(Role::getId, Role::getRoleName));
+
+        List<UserViewDto> userDtos =
+                users.stream().map(user -> toUserViewDto(user, roleNames)).toList();
+
+        model.addAttribute("users", userDtos);
         model.addAttribute("currentPage", page);
         model.addAttribute("finalPage", maxPages);
 
@@ -77,8 +86,11 @@ public class UserController {
             return "redirect:/manage-users";
         }
 
+        List<Role> roles = roleService.findAll();
+
         model.addAttribute("currentUser", user);
         model.addAttribute("currentUserId", id);
+        model.addAttribute("roles", roles);
         return "pages/edit-user";
     }
 
@@ -108,15 +120,14 @@ public class UserController {
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) UUID roleId,
-            @RequestParam(required = false) UUID organisationId,
-            Model model) {
+            @RequestParam(required = false) UUID organisationId) {
         userService.updateUser(id, firstName, prefix, lastName, email, roleId, organisationId);
         return "redirect:/manage-users"; // or a successpage -> manage-users
     }
 
     @RequiresPermission("admin:manage_users")
     @PostMapping("/set-active")
-    public String changeActiveStatus(@RequestParam UUID userId, @RequestParam boolean setActive, Model model) {
+    public String changeActiveStatus(@RequestParam UUID userId, @RequestParam boolean setActive) {
         userService.updateActivityById(userId, setActive);
 
         return "redirect:/manage-users";
@@ -141,5 +152,20 @@ public class UserController {
         currentUserId.ifPresent(uuid -> userService.deleteById(userId, uuid));
 
         return "redirect:/manage-users";
+    }
+
+    private UserViewDto toUserViewDto(User user, Map<UUID, String> roleNames) {
+        return UserViewDto.builder()
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .prefix(user.getPrefix())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .roleId(user.getRoleId())
+                .roleName(user.getRoleId() != null ? roleNames.get(user.getRoleId()) : null)
+                .organizationId(user.getOrganizationId())
+                .active(user.isActive())
+                .createdAt(user.getCreatedAt())
+                .build();
     }
 }
