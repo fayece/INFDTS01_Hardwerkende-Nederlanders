@@ -15,12 +15,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
-@Transactional
 public class JdbcArticleAuthorRepositoryTest {
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private JdbcArticleAuthorRepository articleAuthorRepository;
@@ -39,6 +42,11 @@ public class JdbcArticleAuthorRepositoryTest {
 
     @BeforeEach
     void setUp() {
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "article_authors");
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "articles");
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "roles");
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "users");
+
         article = Article.builder()
                 .title("Test Article")
                 .textContent("Test content.")

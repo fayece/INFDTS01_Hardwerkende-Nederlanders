@@ -2,7 +2,6 @@ package nl.hardwerkendenederlanders.hrcms.controllers;
 
 import jakarta.servlet.http.HttpSession;
 import java.util.*;
-
 import nl.hardwerkendenederlanders.hrcms.configuration.RequiresPermission;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserService;

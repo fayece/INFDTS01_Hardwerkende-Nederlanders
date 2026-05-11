@@ -1,7 +1,6 @@
 package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
 import java.util.*;
-
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.PermissionRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Permission;
 import org.springframework.jdbc.core.RowMapper;

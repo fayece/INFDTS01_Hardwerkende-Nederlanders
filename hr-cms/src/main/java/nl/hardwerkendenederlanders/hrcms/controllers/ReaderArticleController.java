@@ -2,7 +2,6 @@ package nl.hardwerkendenederlanders.hrcms.controllers;
 
 import jakarta.servlet.http.HttpSession;
 import java.util.UUID;
-
 import nl.hardwerkendenederlanders.hrcms.configuration.RequiresPermission;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentUnavailableException;
 import nl.hardwerkendenederlanders.hrcms.models.ArticleViewer;

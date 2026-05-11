@@ -5,7 +5,6 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-
 import nl.hardwerkendenederlanders.hrcms.configuration.RequiresPermission;
 import nl.hardwerkendenederlanders.hrcms.models.Comment;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentCreateDto;
@@ -82,6 +81,7 @@ public class ReaderCommentController {
         return COMMENT_VIEW;
     }
 
+    @RequiresPermission("comment:delete")
     @DeleteMapping("/{commentId}")
     public String deleteComment(@PathVariable UUID commentId, HttpSession session, Model model) {
         CommentViewDto dto = commentService.deleteComment(commentId, session);
