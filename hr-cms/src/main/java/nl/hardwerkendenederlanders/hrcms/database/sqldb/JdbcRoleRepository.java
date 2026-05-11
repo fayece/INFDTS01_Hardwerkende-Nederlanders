@@ -82,6 +82,16 @@ public class JdbcRoleRepository implements RoleRepository {
     }
 
     @Override
+    public List<Role> findAll() {
+        String sql = """
+            SELECT *
+            FROM roles
+            ORDER BY role_name DESC;
+            """;
+        return jdbc.query(sql, rowMapper());
+    }
+
+    @Override
     public List<Role> findAllPaged(int page, int limit) {
         if (limit <= 0) throw new IllegalArgumentException("Limit must be greater than 0.");
         if (page <= 0) throw new IllegalArgumentException("Page must be greater than 0.");

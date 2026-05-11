@@ -29,13 +29,19 @@
                 <label><b>Password</b>
                     <input type="text" name="password" required>
                 </label>
+                <label><b>Role</b>
+                    <select name="roleId" required>
+                        <option value="" disabled selected>Choose role</option>
+                        <option th:each="role : ${roles}"
+                                th:value="${role.id}"
+                                th:text="${role.roleName}"></option>
+                    </select>
+                </label>
                 <button class="create-user-button" type="submit">Save user</button>
             </form>
         </div>
         <br>
         <a class="return-button-admin" th:href="@{/manage-users}">Return</a>
-
-
     </div>
 </body>
 </html>

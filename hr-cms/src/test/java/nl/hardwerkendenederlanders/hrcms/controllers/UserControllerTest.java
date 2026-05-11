@@ -8,7 +8,9 @@ import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import nl.hardwerkendenederlanders.hrcms.models.Role;
 import nl.hardwerkendenederlanders.hrcms.models.User;
+import nl.hardwerkendenederlanders.hrcms.services.interfaces.RoleService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
 import org.junit.jupiter.api.Test;
@@ -19,7 +21,8 @@ class UserControllerTest {
 
     private final UserService userService = mock(UserService.class);
     private final UserSessionService userSessionService = mock(UserSessionService.class);
-    private final UserController userController = new UserController(userService, userSessionService);
+    private final RoleService roleService = mock(RoleService.class);
+    private final UserController userController = new UserController(userService, userSessionService, roleService);
 
     @Test
     void manageUserPage_default() {
@@ -93,9 +96,15 @@ class UserControllerTest {
 
     @Test
     void createUserPage_returnsView() {
-        String result = userController.createUserPage();
+        Model model = new ConcurrentModel();
+        List<Role> roles = List.of(mock(Role.class));
+        when(roleService.findAll()).thenReturn(roles);
+
+        String result = userController.createUserPage(model);
 
         assertEquals("pages/create-user", result);
+        assertEquals(roles, model.getAttribute("roles"));
+        verify(roleService).findAll();
     }
 
     @Test
@@ -131,13 +140,18 @@ class UserControllerTest {
     @Test
     void createNewUser_success() {
         Model model = new ConcurrentModel();
+        UUID roleId = UUID.randomUUID();
+        List<Role> roles = List.of(mock(Role.class));
+        when(roleService.findAll()).thenReturn(roles);
 
-        String result = userController.createNewUser("Kim", "", "Possible", "kp@example.com", "secret", model);
+        String result = userController.createNewUser("Kim", "", "Possible", "kp@example.com", "secret", roleId, model);
 
         assertEquals("pages/create-user", result);
         assertEquals(true, model.getAttribute("inserted"));
+        assertEquals(roles, model.getAttribute("roles"));
 
-        verify(userService).insertUser("Kim", "", "Possible", "kp@example.com", "secret");
+        verify(userService).insertUser("Kim", "", "Possible", "kp@example.com", "secret", roleId);
+        verify(roleService).findAll();
     }
 
     @Test

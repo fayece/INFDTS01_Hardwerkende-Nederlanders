@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpSession;
 import java.util.*;
 import nl.hardwerkendenederlanders.hrcms.configuration.RequiresPermission;
 import nl.hardwerkendenederlanders.hrcms.models.User;
+import nl.hardwerkendenederlanders.hrcms.services.interfaces.RoleService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
 import org.springframework.stereotype.Controller;
@@ -17,10 +18,12 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
     private final UserSessionService userSessionService;
+    private final RoleService roleService;
 
-    public UserController(UserService userService, UserSessionService userSessionService) {
+    public UserController(UserService userService, UserSessionService userSessionService, RoleService roleService) {
         this.userService = userService;
         this.userSessionService = userSessionService;
+        this.roleService = roleService;
     }
 
     @RequiresPermission("admin:manage_users")
@@ -61,7 +64,8 @@ public class UserController {
 
     @RequiresPermission("admin:manage_users")
     @GetMapping("/create-user")
-    public String createUserPage() {
+    public String createUserPage(Model model) {
+        model.addAttribute("roles", roleService.findAll());
         return "pages/create-user";
     }
 
@@ -86,10 +90,12 @@ public class UserController {
             @RequestParam String lastName,
             @RequestParam String email,
             @RequestParam String password,
+            @RequestParam UUID roleId,
             Model model) {
 
-        userService.insertUser(firstName, prefix, lastName, email, password);
+        userService.insertUser(firstName, prefix, lastName, email, password, roleId);
         model.addAttribute("inserted", true);
+        model.addAttribute("roles", roleService.findAll());
         return "pages/create-user";
     }
 

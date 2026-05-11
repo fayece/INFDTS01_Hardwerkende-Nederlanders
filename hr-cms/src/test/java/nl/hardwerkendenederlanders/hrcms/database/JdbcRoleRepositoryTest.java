@@ -2,6 +2,7 @@ package nl.hardwerkendenederlanders.hrcms.database;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -109,6 +110,26 @@ public class JdbcRoleRepositoryTest {
 
         assertEquals(10, page1.size());
         assertEquals(5, page2.size());
+    }
+
+    @Test
+    void findAll_withMultipleRoles_returnsAllOrderedByName() {
+        jdbcRoleRepository.insert(Role.of("Admin").build());
+        jdbcRoleRepository.insert(Role.of("Article mod").build());
+        jdbcRoleRepository.insert(Role.of("Dearest guest").build());
+
+        List<Role> result = jdbcRoleRepository.findAll();
+
+        assertEquals(3, result.size());
+        assertEquals("Dearest guest", result.get(0).getRoleName());
+        assertEquals("Article mod", result.get(1).getRoleName());
+        assertEquals("Admin", result.get(2).getRoleName());
+    }
+
+    @Test
+    void findAll_withNoRoles_returnsEmptyList() {
+        List<Role> result = jdbcRoleRepository.findAll();
+        assertTrue(result.isEmpty());
     }
 
     static Stream<Arguments> invalidPaginationData() {

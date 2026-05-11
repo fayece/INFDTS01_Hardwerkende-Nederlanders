@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void insertUser(String firstName, String prefix, String lastName, String email, String password) {
+    public void insertUser(String firstName, String prefix, String lastName, String email, String password, UUID roleId) {
         User toInsert = new User(
                 UUID.randomUUID(),
                 firstName,
@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
                 lastName,
                 email,
                 password,
-                null,
+                roleId,
                 null,
                 true,
                 OffsetDateTime.now());
