@@ -86,6 +86,80 @@ class CommentServiceImplTest {
     }
     // endregion
 
+    // region deleteComment tests
+    @Test
+    void deleteComment_success_deletesAndReturnsDto() {
+        HttpSession session = mock(HttpSession.class);
+        UUID userId = UUID.randomUUID();
+        UUID commentId = UUID.randomUUID();
+        Comment comment = Comment.builder()
+                .id(commentId)
+                .creatorId(userId)
+                .articleId(UUID.randomUUID())
+                .build();
+        CommentWithAuthor deletedRecord = new CommentWithAuthor(comment, "Unknown", 0);
+
+        when(userSessionService.getLoggedInUser(session)).thenReturn(Optional.of(userId));
+        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+        when(commentRepository.findByIdWithAuthor(commentId)).thenReturn(Optional.of(deletedRecord));
+
+        CommentViewDto result = commentService.deleteComment(commentId, session);
+
+        verify(commentRepository).delete(commentId);
+        assertNotNull(result);
+        assertEquals(commentId, result.id());
+    }
+
+    @Test
+    void deleteComment_notLoggedIn_throwsComponentActionException() {
+        HttpSession session = mock(HttpSession.class);
+        when(userSessionService.getLoggedInUser(session)).thenReturn(Optional.empty());
+
+        ComponentActionException ex = assertThrows(
+                ComponentActionException.class, () -> commentService.deleteComment(UUID.randomUUID(), session));
+
+        assertEquals(ComponentActionException.Action.DELETE, ex.getAction());
+        verify(commentRepository, never()).delete(any());
+    }
+
+    @Test
+    void deleteComment_commentNotFound_throwsComponentActionException() {
+        HttpSession session = mock(HttpSession.class);
+        UUID userId = UUID.randomUUID();
+        UUID commentId = UUID.randomUUID();
+
+        when(userSessionService.getLoggedInUser(session)).thenReturn(Optional.of(userId));
+        when(commentRepository.findById(commentId)).thenReturn(Optional.empty());
+
+        ComponentActionException ex =
+                assertThrows(ComponentActionException.class, () -> commentService.deleteComment(commentId, session));
+
+        assertEquals(ComponentActionException.Action.DELETE, ex.getAction());
+        verify(commentRepository, never()).delete(any());
+    }
+
+    @Test
+    void deleteComment_notOwner_throwsComponentActionException() {
+        HttpSession session = mock(HttpSession.class);
+        UUID userId = UUID.randomUUID();
+        UUID commentId = UUID.randomUUID();
+        Comment comment = Comment.builder()
+                .id(commentId)
+                .creatorId(UUID.randomUUID())
+                .articleId(UUID.randomUUID())
+                .build();
+
+        when(userSessionService.getLoggedInUser(session)).thenReturn(Optional.of(userId));
+        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+
+        ComponentActionException ex =
+                assertThrows(ComponentActionException.class, () -> commentService.deleteComment(commentId, session));
+
+        assertEquals(ComponentActionException.Action.DELETE, ex.getAction());
+        verify(commentRepository, never()).delete(any());
+    }
+    // endregion
+
     // region postComment tests
     @Test
     void postComment_success_sanitizesAndInserts() {

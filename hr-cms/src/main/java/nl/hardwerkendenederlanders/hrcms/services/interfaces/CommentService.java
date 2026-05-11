@@ -14,4 +14,6 @@ public interface CommentService {
     List<CommentViewDto> getReplies(UUID parentId);
 
     CommentViewDto postComment(Comment comment, HttpSession session);
+
+    CommentViewDto deleteComment(UUID commentId, HttpSession session);
 }

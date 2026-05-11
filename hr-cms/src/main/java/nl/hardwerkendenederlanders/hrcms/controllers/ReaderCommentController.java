@@ -81,4 +81,11 @@ public class ReaderCommentController {
         model.addAttribute("comment", dto);
         return COMMENT_VIEW;
     }
+
+    @DeleteMapping("/{commentId}")
+    public String deleteComment(@PathVariable UUID commentId, HttpSession session, Model model) {
+        CommentViewDto dto = commentService.deleteComment(commentId, session);
+        model.addAttribute("comment", dto);
+        return COMMENT_VIEW;
+    }
 }
