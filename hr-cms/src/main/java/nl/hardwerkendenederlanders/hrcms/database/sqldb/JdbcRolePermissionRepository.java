@@ -67,16 +67,6 @@ public class JdbcRolePermissionRepository implements RolePermissionRepository {
     }
 
     @Override
-    public void delete(UUID id) {
-        String sql = """
-            DELETE FROM role_permissions
-            WHERE id = :id;
-            """;
-
-        jdbc.update(sql, Map.of("id", id));
-    }
-
-    @Override
     public List<RolePermission> findAllPaged(int page, int limit) {
         if (limit <= 0) throw new IllegalArgumentException("Limit must be greater than 0.");
         if (page <= 0) throw new IllegalArgumentException("Page must be greater than 0.");

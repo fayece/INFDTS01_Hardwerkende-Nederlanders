@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcPermissionRepository;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcRolePermissionRepository;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcRoleRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Permission;
@@ -34,9 +33,6 @@ public class JdbcRolePermissionRepositoryTest {
 
     @Autowired
     private JdbcRoleRepository jdbcRoleRepository;
-
-    @Autowired
-    private JdbcPermissionRepository permissionRepository;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -96,17 +92,6 @@ public class JdbcRolePermissionRepositoryTest {
     @Test
     void findRolePermissionById_withNonExistingId_shouldReturnEmptyOptional() {
         Optional<RolePermission> result = jdbcRolePermissionRepository.findById(UUID.randomUUID());
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void deleteRolePermission_withExistingRolePermission_shouldRemoveFromDatabase() {
-        RolePermission rolePermission = new RolePermission(role.getId(), permission.getId());
-
-        jdbcRolePermissionRepository.insert(rolePermission);
-        jdbcRolePermissionRepository.delete(rolePermission.getId());
-
-        Optional<RolePermission> result = jdbcRolePermissionRepository.findById(rolePermission.getId());
         assertTrue(result.isEmpty());
     }
 
