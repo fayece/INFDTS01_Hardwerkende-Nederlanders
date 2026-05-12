@@ -19,6 +19,10 @@ public class PermissionInterceptor implements HandlerInterceptor {
     private final UserSessionService userSessionService;
     private final PermissionService permissionService;
 
+    /*
+    preHandle is called before the controller method is invoked.
+    It checks if the user is logged in and if the user has the require permission to access the requested endpoint.
+     */
     @Override
     public boolean preHandle(
             @NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler)
