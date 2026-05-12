@@ -2,17 +2,17 @@ package nl.hardwerkendenederlanders.hrcms.database;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcPermissionRepository;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcRolePermissionRepository;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcRoleRepository;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcUserRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Permission;
+import nl.hardwerkendenederlanders.hrcms.models.Role;
+import nl.hardwerkendenederlanders.hrcms.models.RolePermission;
+import nl.hardwerkendenederlanders.hrcms.models.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -29,87 +29,61 @@ public class JdbcPermissionRepositoryTest {
     private JdbcPermissionRepository permissionRepository;
 
     @Autowired
+    private JdbcUserRepository userRepository;
+
+    @Autowired
+    private JdbcRoleRepository roleRepository;
+
+    @Autowired
+    private JdbcRolePermissionRepository rolePermissionRepository;
+
+    @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    private Permission permission;
+    private User user;
 
     @BeforeEach
     void setUp() {
         JdbcTestUtils.deleteFromTables(jdbcTemplate, "role_permissions");
-        JdbcTestUtils.deleteFromTables(jdbcTemplate, "permissions");
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "roles");
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "users");
+
+        String sql = "SELECT id, resource, action_name, permission_key FROM permissions LIMIT 1";
+        permission = jdbcTemplate.queryForObject(
+                sql,
+                (rs, _) -> Permission.builder()
+                        .id(rs.getObject("id", java.util.UUID.class))
+                        .resource(rs.getString("resource"))
+                        .actionName(rs.getString("action_name"))
+                        .permissionKey(rs.getString("permission_key"))
+                        .build());
+
+        Role role = Role.of("test_role").build();
+        roleRepository.insert(role);
+
+        RolePermission rolePermission = new RolePermission(role.getId(), permission.getId());
+        rolePermissionRepository.insert(rolePermission);
+
+        user = User.builder()
+                .firstName("Test")
+                .lastName("User")
+                .email("test@user.com")
+                .passwordHash("hash123-005-12X")
+                .roleId(role.getId())
+                .build();
+        userRepository.insert(user);
     }
 
     @Test
-    void insertPermission_withValidPermission_shouldPersistAndRetrieve() {
-        Permission permission = Permission.of("article", "read").build();
-
-        permissionRepository.insert(permission);
-
-        Permission retrieved = permissionRepository.findById(permission.getId()).orElse(null);
-
-        assertNotNull(retrieved);
-        assertEquals(permission.getId(), retrieved.getId());
-        assertEquals(permission.getResource(), retrieved.getResource());
-        assertEquals(permission.getActionName(), retrieved.getActionName());
-        assertEquals(permission.getResource() + ":" + permission.getActionName(), retrieved.getPermissionKey());
+    void hasPermission_returnsTrueIfUserHasPermission() {
+        boolean result = permissionRepository.hasPermission(user.getId(), permission.getPermissionKey());
+        assertTrue(result);
     }
 
     @Test
-    void findPermissionById_withExistingId_shouldReturnPermission() {
-        Permission permission = Permission.of("article", "write").build();
-
-        permissionRepository.insert(permission);
-
-        Permission retrieved = permissionRepository.findById(permission.getId()).orElse(null);
-
-        assertNotNull(retrieved);
-        assertEquals(permission.getId(), retrieved.getId());
-        assertEquals(permission.getResource(), retrieved.getResource());
-        assertEquals(permission.getActionName(), retrieved.getActionName());
-        assertEquals(permission.getResource() + ":" + permission.getActionName(), retrieved.getPermissionKey());
-    }
-
-    @Test
-    void findPermissionById_withNonExistingId_shouldReturnEmptyOptional() {
-        Optional<Permission> result = permissionRepository.findById(UUID.randomUUID());
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void deletePermission_withExistingPermission_shouldRemoveFromDatabase() {
-        Permission permission = Permission.of("article", "delete").build();
-
-        permissionRepository.insert(permission);
-        permissionRepository.delete(permission.getId());
-
-        Optional<Permission> result = permissionRepository.findById(permission.getId());
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void findAllPermissionsPaged_withValidPaginationData_shouldReturnCorrectCount() {
-        String[] actions = {
-            "read", "write", "delete", "publish", "archive", "restore", "comment", "like", "share", "export", "import",
-            "approve", "reject", "tag", "untag"
-        };
-
-        for (int i = 0; i < 15; i++) {
-            Permission permission = Permission.of("article", actions[i]).build();
-            permissionRepository.insert(permission);
-        }
-
-        var page1 = permissionRepository.findAllPaged(1, 10);
-        var page2 = permissionRepository.findAllPaged(2, 10);
-
-        assertEquals(10, page1.size());
-        assertEquals(5, page2.size());
-    }
-
-    static Stream<Arguments> invalidPaginationData() {
-        return Stream.of(Arguments.of(0, 0), Arguments.of(1, 0), Arguments.of(1, -1), Arguments.of(0, -1));
-    }
-
-    @ParameterizedTest
-    @MethodSource("invalidPaginationData")
-    void findAllPermissionsPaged_withInvalidLimit_shouldThrowException(int offset, int limit) {
-        assertThrows(IllegalArgumentException.class, () -> permissionRepository.findAllPaged(offset, limit));
+    void hasPermission_returnsFalseIfUserDoesNotHavePermission() {
+        boolean result = permissionRepository.hasPermission(user.getId(), "different:permission");
+        assertFalse(result);
     }
 }

@@ -47,14 +47,20 @@ public class JdbcRolePermissionRepositoryTest {
     @BeforeEach
     void setUp() {
         JdbcTestUtils.deleteFromTables(jdbcTemplate, "role_permissions");
-        JdbcTestUtils.deleteFromTables(jdbcTemplate, "permissions");
         JdbcTestUtils.deleteFromTables(jdbcTemplate, "roles");
 
         role = Role.of("Editor").build();
         jdbcRoleRepository.insert(role);
 
-        permission = Permission.of("article", "read").build();
-        permissionRepository.insert(permission);
+        String sql = "SELECT id, resource, action_name, permission_key FROM permissions LIMIT 1";
+        permission = jdbcTemplate.queryForObject(
+                sql,
+                (rs, _) -> Permission.builder()
+                        .id(UUID.fromString(rs.getString("id")))
+                        .resource(rs.getString("resource"))
+                        .actionName(rs.getString("action_name"))
+                        .permissionKey(rs.getString("permission_key"))
+                        .build());
     }
 
     @Test
@@ -107,11 +113,9 @@ public class JdbcRolePermissionRepositoryTest {
     @Test
     void findAllRolePermissionsPaged_withValidPaginationData_shouldReturnCorrectCount() {
         for (int i = 0; i < 15; i++) {
-            Permission newPermission =
-                    Permission.of("read", "resource_" + i + "_read").build();
-            permissionRepository.insert(newPermission);
-
-            jdbcRolePermissionRepository.insert(new RolePermission(role.getId(), newPermission.getId()));
+            Role newRole = Role.of("Role " + i).build();
+            jdbcRoleRepository.insert(newRole);
+            jdbcRolePermissionRepository.insert(new RolePermission(newRole.getId(), permission.getId()));
         }
 
         var page1 = jdbcRolePermissionRepository.findAllPaged(1, 10);
