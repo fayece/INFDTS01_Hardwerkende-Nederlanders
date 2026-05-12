@@ -12,12 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 public class ArticleViewersServiceImpl implements ArticleViewersService {
     private final ArticleViewersRepository articleViewersRepository;
-    private final ArticleCache articleCache;
 
     @Transactional
     @Override
     public void addView(ArticleViewer articleViewer) {
         articleViewersRepository.ensureInsert(articleViewer);
-        //articleCache.IncrementViewForArticle(articleViewer.getArticleId());
     }
 }
