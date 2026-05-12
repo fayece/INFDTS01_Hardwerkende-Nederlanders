@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.UUID;
-import nl.hardwerkendenederlanders.hrcms.database.MediaRepository;
+import nl.hardwerkendenederlanders.hrcms.database.interfaces.MediaRepository;
 import nl.hardwerkendenederlanders.hrcms.exceptions.MediaUploadException;
 import nl.hardwerkendenederlanders.hrcms.models.MediaItem;
 import nl.hardwerkendenederlanders.hrcms.models.MediaType;

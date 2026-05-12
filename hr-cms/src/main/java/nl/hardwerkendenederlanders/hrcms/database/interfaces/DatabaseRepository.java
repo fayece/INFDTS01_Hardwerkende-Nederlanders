@@ -1,4 +1,4 @@
-package nl.hardwerkendenederlanders.hrcms.database;
+package nl.hardwerkendenederlanders.hrcms.database.interfaces;
 
 import java.util.List;
 import java.util.Optional;

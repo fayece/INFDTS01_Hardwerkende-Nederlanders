@@ -1,9 +1,24 @@
-<body>
-    <h1>
-        error 404!
-    </h1>
-    <strong>That sure sounds very technical!</strong>
-    <p>But it just means that we could not find what you where looking for.<br>Maybe It will come back sometime soon, say could I interest you in a button to the home page?</p>
-    <a th:href="@{/}">Home</a>
-    <link rel="stylesheet" th:href="@{/css/main.css}"/>
-</body>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <title>404</title>
+        <link rel="stylesheet"
+              th:each="cssRef : ${@cssDiscoveryService.getAllCssPaths()}"
+              th:href="${cssRef}">
+    </head>
+
+    <body>
+        <div th:insert="~{fragments/app-wide/navbar :: navbar}" class="navbar"></div>
+        <main class="standard-page-layout">
+            <h1>error 404!</h1>
+            <strong>That sure sounds very technical!</strong>
+            <p>
+                But it just means that we could not find what you were looking for.<br>
+                Maybe it will come back sometime soon.<br>
+                Say, could I interest you in a button to the home page?
+            </p>
+            <a th:href="@{/}">Home</a>
+        </main>
+        <footer th:replace="~{fragments/app-wide/footer :: footer}"></footer>
+    </body>
+</html>

@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
-import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleAuthorRepository;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.*;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.ArticleAuthor;
@@ -16,15 +15,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
-@Transactional
-public class ArticleAuthorRepositoryTest {
+public class JdbcArticleAuthorRepositoryTest {
 
     @Autowired
-    private ArticleAuthorRepository articleAuthorRepository;
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private JdbcArticleAuthorRepository articleAuthorRepository;
 
     @Autowired
     private JdbcArticleRepository articleRepository;
@@ -33,13 +35,18 @@ public class ArticleAuthorRepositoryTest {
     private JdbcUserRepository userRepository;
 
     @Autowired
-    private RoleRepository roleRepository;
+    private JdbcRoleRepository jdbcRoleRepository;
 
     private Article article;
     private User author;
 
     @BeforeEach
     void setUp() {
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "article_authors");
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "articles");
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "roles");
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "users");
+
         article = Article.builder()
                 .title("Test Article")
                 .textContent("Test content.")
@@ -47,9 +54,9 @@ public class ArticleAuthorRepositoryTest {
 
         articleRepository.insert(article);
 
-        Role role = new Role("Author Role");
+        Role role = Role.of("Author").build();
 
-        roleRepository.insert(role);
+        jdbcRoleRepository.insert(role);
 
         author = User.builder()
                 .firstName("Test")

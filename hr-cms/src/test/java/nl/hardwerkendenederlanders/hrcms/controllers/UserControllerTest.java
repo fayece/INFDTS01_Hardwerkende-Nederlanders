@@ -8,7 +8,10 @@ import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import nl.hardwerkendenederlanders.hrcms.models.Role;
 import nl.hardwerkendenederlanders.hrcms.models.User;
+import nl.hardwerkendenederlanders.hrcms.models.dtos.userDtos.UserViewDto;
+import nl.hardwerkendenederlanders.hrcms.services.interfaces.RoleService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
 import org.junit.jupiter.api.Test;
@@ -19,7 +22,8 @@ class UserControllerTest {
 
     private final UserService userService = mock(UserService.class);
     private final UserSessionService userSessionService = mock(UserSessionService.class);
-    private final UserController userController = new UserController(userService, userSessionService);
+    private final RoleService roleService = mock(RoleService.class);
+    private final UserController userController = new UserController(userService, userSessionService, roleService);
 
     @Test
     void manageUserPage_default() {
@@ -29,17 +33,24 @@ class UserControllerTest {
 
         when(userService.getUsers(0, null, null)).thenReturn(users);
         when(userService.getMaxPages(null, null)).thenReturn(1);
+        when(roleService.findAll()).thenReturn(List.of());
         when(session.getAttribute("recentSearches")).thenReturn(null);
 
         String result = userController.manageUserPage(0, null, null, model, session);
 
         assertEquals("pages/manage-users", result);
-        assertEquals(users, model.getAttribute("users"));
+
+        @SuppressWarnings("unchecked")
+        List<UserViewDto> userDtos = (List<UserViewDto>) model.getAttribute("users");
+        assertNotNull(userDtos);
+        assertEquals(2, userDtos.size());
+
         assertEquals(0, model.getAttribute("currentPage"));
         assertEquals(1, model.getAttribute("finalPage"));
 
         verify(userService).getUsers(0, null, null);
         verify(userService).getMaxPages(null, null);
+        verify(roleService).findAll();
         verify(session).getAttribute("recentSearches");
         verify(session, never()).setAttribute(eq("recentSearches"), any());
     }
@@ -52,18 +63,25 @@ class UserControllerTest {
 
         when(userService.getUsers(0, "Kim", null)).thenReturn(users);
         when(userService.getMaxPages("Kim", null)).thenReturn(1);
+        when(roleService.findAll()).thenReturn(List.of());
         when(session.getAttribute("recentSearches")).thenReturn(null);
 
         String result = userController.manageUserPage(0, "Kim", null, model, session);
 
         assertEquals("pages/manage-users", result);
-        assertEquals(users, model.getAttribute("users"));
+
+        @SuppressWarnings("unchecked")
+        List<UserViewDto> userDtos = (List<UserViewDto>) model.getAttribute("users");
+        assertNotNull(userDtos);
+        assertEquals(1, userDtos.size());
+
         assertEquals("Kim", model.getAttribute("searchName"));
         assertEquals(0, model.getAttribute("currentPage"));
         assertEquals(1, model.getAttribute("finalPage"));
 
         verify(userService).getUsers(0, "Kim", null);
         verify(userService).getMaxPages("Kim", null);
+        verify(roleService).findAll();
         verify(session).getAttribute("recentSearches");
         verify(session).setAttribute(eq("recentSearches"), any(ArrayDeque.class));
     }
@@ -76,26 +94,39 @@ class UserControllerTest {
 
         when(userService.getUsers(0, null, true)).thenReturn(users);
         when(userService.getMaxPages(null, true)).thenReturn(1);
+        when(roleService.findAll()).thenReturn(List.of());
         when(session.getAttribute("recentSearches")).thenReturn(null);
 
         String result = userController.manageUserPage(0, null, true, model, session);
 
         assertEquals("pages/manage-users", result);
-        assertEquals(users, model.getAttribute("users"));
+
+        @SuppressWarnings("unchecked")
+        List<UserViewDto> userDtos = (List<UserViewDto>) model.getAttribute("users");
+        assertNotNull(userDtos);
+        assertEquals(1, userDtos.size());
+
         assertEquals(0, model.getAttribute("currentPage"));
         assertEquals(1, model.getAttribute("finalPage"));
 
         verify(userService).getUsers(0, null, true);
         verify(userService).getMaxPages(null, true);
+        verify(roleService).findAll();
         verify(session).getAttribute("recentSearches");
         verify(session, never()).setAttribute(eq("recentSearches"), any());
     }
 
     @Test
     void createUserPage_returnsView() {
-        String result = userController.createUserPage();
+        Model model = new ConcurrentModel();
+        List<Role> roles = List.of(mock(Role.class));
+        when(roleService.findAll()).thenReturn(roles);
+
+        String result = userController.createUserPage(model);
 
         assertEquals("pages/create-user", result);
+        assertEquals(roles, model.getAttribute("roles"));
+        verify(roleService).findAll();
     }
 
     @Test
@@ -103,16 +134,20 @@ class UserControllerTest {
         Model model = new ConcurrentModel();
         UUID id = UUID.randomUUID();
         User user = mock(User.class);
+        List<Role> roles = List.of(mock(Role.class));
 
         when(userService.findById(id)).thenReturn(user);
+        when(roleService.findAll()).thenReturn(roles);
 
         String result = userController.editUser(id, model);
 
         assertEquals("pages/edit-user", result);
         assertEquals(user, model.getAttribute("currentUser"));
         assertEquals(id, model.getAttribute("currentUserId"));
+        assertEquals(roles, model.getAttribute("roles"));
 
         verify(userService).findById(id);
+        verify(roleService).findAll();
     }
 
     @Test
@@ -131,24 +166,27 @@ class UserControllerTest {
     @Test
     void createNewUser_success() {
         Model model = new ConcurrentModel();
+        UUID roleId = UUID.randomUUID();
+        List<Role> roles = List.of(mock(Role.class));
+        when(roleService.findAll()).thenReturn(roles);
 
-        String result = userController.createNewUser("Kim", "", "Possible", "kp@example.com", "secret", model);
+        String result = userController.createNewUser("Kim", "", "Possible", "kp@example.com", "secret", roleId, model);
 
         assertEquals("pages/create-user", result);
         assertEquals(true, model.getAttribute("inserted"));
+        assertEquals(roles, model.getAttribute("roles"));
 
-        verify(userService).insertUser("Kim", "", "Possible", "kp@example.com", "secret");
+        verify(userService).insertUser("Kim", "", "Possible", "kp@example.com", "secret", roleId);
+        verify(roleService).findAll();
     }
 
     @Test
     void updateUser_success() {
-        Model model = new ConcurrentModel();
-
         UUID id = UUID.randomUUID();
         UUID roleId = UUID.randomUUID();
         UUID orgId = UUID.randomUUID();
 
-        String result = userController.updateUser(id, "New", "de", "Name", "new@test.com", roleId, orgId, model);
+        String result = userController.updateUser(id, "New", "de", "Name", "new@test.com", roleId, orgId);
 
         assertEquals("redirect:/manage-users", result);
 
@@ -157,10 +195,9 @@ class UserControllerTest {
 
     @Test
     void changeActiveStatus_success() {
-        Model model = new ConcurrentModel();
         UUID id = UUID.randomUUID();
 
-        String result = userController.changeActiveStatus(id, true, model);
+        String result = userController.changeActiveStatus(id, true);
 
         assertEquals("redirect:/manage-users", result);
         verify(userService).updateActivityById(id, true);

@@ -1,6 +1,6 @@
 package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
-import nl.hardwerkendenederlanders.hrcms.database.DatabaseMutableRepository;
+import nl.hardwerkendenederlanders.hrcms.database.interfaces.DatabaseMutableRepository;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 

@@ -5,7 +5,7 @@ import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import nl.hardwerkendenederlanders.hrcms.database.ArticleRepository;
+import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.PublicationStatus;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleFullDetailsDto;

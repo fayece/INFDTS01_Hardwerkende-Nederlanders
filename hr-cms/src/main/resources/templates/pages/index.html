@@ -1,13 +1,20 @@
-<head>
-    <title>Spotlight!</title>
-    <link rel="stylesheet" th:href="${cssRef}" th:each="cssRef: ${@cssDiscoveryService.getAllCssPaths()}">
-</head>
-<body>
-    <div th:insert="~{fragments/app-wide/navbar :: navbar}" class="navbar"></div>
-    <main class="standard-page-layout">
-        <h1>Your Personal Feed</h1>
-        <div th:replace="~{fragments/articles/article-list :: article-list(articles=${articles}, url=${'/article/'})}"></div>
-        <div th:replace="~{fragments/app-wide/pagination-navigator :: pagination-navigator(${currentPage}, ${articles.length >= 20})}"/>
-    </main>
-    <footer th:replace="~{fragments/app-wide/footer :: footer}"></footer>
-</body>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <title>Login</title>
+        <link rel="stylesheet"
+              th:each="cssRef : ${@cssDiscoveryService.getAllCssPaths()}"
+              th:href="${cssRef}">
+    </head>
+
+    <body>
+        <div th:insert="~{fragments/app-wide/navbar :: navbar}" class="navbar"></div>
+        <main class="standard-page-layout">
+            <h1>Your Personal Feed</h1>
+
+            <div th:replace="~{fragments/articles/article-list :: article-list(articles=${articles}, url=${'/article/'})}"></div>
+            <div th:replace="~{fragments/app-wide/pagination-navigator :: pagination-navigator(${currentPage}, ${articles.length >= 20})}"></div>
+        </main>
+        <footer th:replace="~{fragments/app-wide/footer :: footer}"></footer>
+    </body>
+</html>

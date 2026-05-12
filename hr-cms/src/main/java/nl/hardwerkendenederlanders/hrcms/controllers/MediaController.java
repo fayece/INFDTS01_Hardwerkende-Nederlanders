@@ -1,5 +1,6 @@
 package nl.hardwerkendenederlanders.hrcms.controllers;
 
+import nl.hardwerkendenederlanders.hrcms.configuration.RequiresPermission;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.media.UploadUrl;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.MediaService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,7 @@ public class MediaController {
         this.mediaService = mediaService;
     }
 
+    @RequiresPermission("media:upload")
     @PostMapping("/upload")
     public UploadUrl upload(@RequestParam("file") MultipartFile file) {
         String url = mediaService.store(file);
