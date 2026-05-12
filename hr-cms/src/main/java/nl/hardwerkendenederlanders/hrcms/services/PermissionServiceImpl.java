@@ -17,9 +17,4 @@ public class PermissionServiceImpl implements PermissionService {
     public boolean hasPermission(UUID userId, String permissionKey) {
         return permissionRepository.hasPermission(userId, permissionKey);
     }
-
-    @Override
-    public Set<String> getUserPermissions(UUID userId) {
-        return Set.of();
-    }
 }
