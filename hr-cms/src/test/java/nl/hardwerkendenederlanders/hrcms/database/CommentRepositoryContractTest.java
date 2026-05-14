@@ -44,23 +44,6 @@ public abstract class CommentRepositoryContractTest {
     }
 
     @Test
-    void update_withModifiedFields_shouldReflectChanges() {
-        Comment comment = Comment.builder()
-                .articleId(getValidArticleId())
-                .creatorId(getValidAuthorId())
-                .commentBody("This is a test comment.")
-                .build();
-        getRepository().insert(comment);
-
-        comment.setCommentBody("This is an updated test comment.");
-        getRepository().update(comment);
-
-        Comment retrieved = getRepository().findById(comment.getId()).orElse(null);
-        assertNotNull(retrieved);
-        assertEquals("This is an updated test comment.", retrieved.getCommentBody());
-    }
-
-    @Test
     void delete_withExistingId_shouldSoftDeleteComment() {
         Comment comment = Comment.builder()
                 .articleId(getValidArticleId())

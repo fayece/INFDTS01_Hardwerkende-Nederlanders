@@ -1,8 +1,6 @@
 package nl.hardwerkendenederlanders.hrcms.database.interfaces;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 
 public interface UserRepository {
@@ -23,6 +21,8 @@ public interface UserRepository {
     List<User> findByNameOrEmailPaginated(String name, int page, int amount);
 
     List<User> findUserOnActivityPaginated(boolean isActive, int page, int amount);
+
+    Map<UUID, String> findNamesByUserIds(Set<UUID> ids);
 
     void deleteById(UUID id);
 

@@ -55,7 +55,7 @@ services:
     volumes:
       - neo4jdata:/data
     healthcheck:
-      test: ["CMD-SHELL", "cypher-shell -a bolt://localhost:7687 -u neo4j -p \"$$CYPHER_PASSWORD\" 'RETURN 1' || exit 1"]
+      test: ["CMD-SHELL", "cypher-shell -a bolt://localhost:7687 -u neo4j -p \"$$SPRING_NEO4J_AUTHENTICATION_PASSWORD\" 'RETURN 1' || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 10

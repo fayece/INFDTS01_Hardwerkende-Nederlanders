@@ -6,7 +6,7 @@ import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.models.Comment;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentWithAuthor;
 
-public interface CommentRepository extends DatabaseMutableRepository<Comment> {
+public interface CommentRepository extends DatabaseRepository<Comment> {
 
     CommentWithAuthor insertReturning(Comment comment);
 
