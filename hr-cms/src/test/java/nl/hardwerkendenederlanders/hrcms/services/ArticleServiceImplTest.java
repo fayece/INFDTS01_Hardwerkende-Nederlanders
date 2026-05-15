@@ -4,8 +4,8 @@ import static org.mockito.Mockito.*;
 
 import java.util.List;
 import java.util.UUID;
-import nl.hardwerkendenederlanders.hrcms.database.ArticleRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleAuthorRepository;
+import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.PublicationStatus;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleFullDetailsDto;

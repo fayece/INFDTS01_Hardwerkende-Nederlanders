@@ -11,7 +11,7 @@ public interface UserService {
 
     void insertUser(User user);
 
-    void insertUser(String firstName, String prefix, String lastName, String email, String password);
+    void insertUser(String firstName, String prefix, String lastName, String email, String password, UUID roleId);
 
     User findByEmail(String email);
 

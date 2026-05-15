@@ -3,6 +3,7 @@ package nl.hardwerkendenederlanders.hrcms.controllers;
 import jakarta.servlet.http.HttpSession;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import nl.hardwerkendenederlanders.hrcms.configuration.RequiresPermission;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentActionException;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.ArticleService;
@@ -28,6 +29,7 @@ public class EditorArticleController {
     }
 
     // start empty editor
+    @RequiresPermission("article:create")
     @GetMapping("")
     public String getArticle(Model model) {
         model.addAttribute("articleForm", Article.builder().build());
@@ -36,6 +38,7 @@ public class EditorArticleController {
     }
 
     // load existing article
+    @RequiresPermission("article:update")
     @GetMapping("/{articleId}")
     public String getArticle(Model model, @PathVariable(value = "articleId") UUID id) {
         Article article = articleService.findById(id);
@@ -48,6 +51,7 @@ public class EditorArticleController {
 
     // method must be Post for HTML form (it does not support put)
     // save draft
+    @RequiresPermission("article:publish")
     @PostMapping("/save")
     public String putArticle(Model model, @ModelAttribute("articleForm") Article articleForm, HttpSession httpSession) {
         model.addAttribute("articleForm", articleForm);

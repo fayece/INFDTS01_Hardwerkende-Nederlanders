@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <title>403</title>
+        <link rel="stylesheet"
+              th:each="cssRef : ${@cssDiscoveryService.getAllCssPaths()}"
+              th:href="${cssRef}">
+    </head>
+
+    <body>
+        <div th:insert="~{fragments/app-wide/navbar :: navbar}" class="navbar"></div>
+        <main class="standard-page-layout">
+            <h1>error 403!</h1>
+            <strong>Hmm, seems you don't have permission to access this page.</strong>
+            <p>There are many reasons why this could be the case, for example:</p>
+            <ul>
+                <li>You are not logged in.</li>
+                <li>You are trying to access a page that is only for administrators.</li>
+                <li>You are trying to access a page that is only for content managers.</li>
+            </ul>
+            <p>Whatever the case might be, press the button below to go back to the last page you could visit freely.</p>
+            <p>If you believe this is a mistake, contact an administrator.</p>
+            <a th:href="${session.lastSuccessfulUrl ?: '/login'}">Go back</a>
+        </main>
+        <footer th:replace="~{fragments/app-wide/footer :: footer}"></footer>
+    </body>
+</html>

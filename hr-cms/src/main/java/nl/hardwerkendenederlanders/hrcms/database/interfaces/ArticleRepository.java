@@ -1,4 +1,4 @@
-package nl.hardwerkendenederlanders.hrcms.database;
+package nl.hardwerkendenederlanders.hrcms.database.interfaces;
 
 import jakarta.annotation.Nullable;
 import java.util.List;
