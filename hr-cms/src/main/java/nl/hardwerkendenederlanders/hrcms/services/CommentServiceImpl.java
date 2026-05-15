@@ -58,7 +58,7 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
-    @CacheEvict(value = "topCommentsArticle", key="#comment.articleId")
+    @CacheEvict(value = "topCommentsArticle", key = "#comment.articleId")
     public CommentViewDto postComment(Comment comment, HttpSession session) {
         Optional<UUID> userId = userSessionService.getLoggedInUser(session);
         if (userId.isEmpty()) {

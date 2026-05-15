@@ -3,7 +3,6 @@ package nl.hardwerkendenederlanders.hrcms.services;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
-
 import lombok.AllArgsConstructor;
 import nl.hardwerkendenederlanders.hrcms.database.ArticleRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleAuthorRepository;
@@ -28,11 +27,11 @@ public class ArticleServiceImpl implements ArticleService {
 
     // ensures the given article is present in the database. If the ID doesn't exist a new article is made. If it does
     // the article is updated
-    @Caching(evict = {
-            @CacheEvict(value="publishedArticlesFull", allEntries = true),
-            @CacheEvict(value = "fullArticle", key = "#article.id")
-    })
-
+    @Caching(
+            evict = {
+                @CacheEvict(value = "publishedArticlesFull", allEntries = true),
+                @CacheEvict(value = "fullArticle", key = "#article.id")
+            })
     @Transactional
     public void ensureArticleExists(Article article, UUID authorId) {
         article = Article.fillOutNullFields(article);
@@ -75,13 +74,13 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    @Cacheable(value="publishedArticlesFull")
+    @Cacheable(value = "publishedArticlesFull", sync = true)
     public List<ArticleFullDetailsDto> findNewPublished(int pageSize, int page) {
         return articleRepository.findNewArticlesPublishedPaged(pageSize, page);
     }
 
     @Override
-    @Cacheable(value="fullArticle", key = "#id")
+    @Cacheable(value = "fullArticle", key = "#id", sync = true)
     public ArticleFullDetailsDto findArticleFullId(UUID id) {
         return articleRepository.findArticlePublished(id);
     }

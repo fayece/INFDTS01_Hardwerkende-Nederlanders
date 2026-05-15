@@ -3,6 +3,7 @@ package nl.hardwerkendenederlanders.hrcms.database;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
@@ -113,9 +114,9 @@ public class ArticleRepositoryTest {
                 .build();
         articleRepository.insert(article2);
 
-        ArticleFullDetailsDto[] articles = articleRepository.findAllPaged(100, 1);
-        assertEquals("Article 1", articles[1].getTitle());
-        assertEquals("Article 2", articles[0].getTitle());
+        List<ArticleFullDetailsDto> articles = articleRepository.findAllPaged(100, 1);
+        assertEquals("Article 1", articles.get(1).getTitle());
+        assertEquals("Article 2", articles.get(0).getTitle());
     }
 
     @Test
@@ -180,8 +181,8 @@ public class ArticleRepositoryTest {
         var page1 = articleRepository.findAllPaged(10, 1);
         var page2 = articleRepository.findAllPaged(10, 2);
 
-        assertEquals(10, page1.length);
-        assertEquals(5, page2.length);
+        assertEquals(10, page1.size());
+        assertEquals(5, page2.size());
     }
 
     static Stream<Arguments> invalidPaginationData() {
@@ -213,8 +214,8 @@ public class ArticleRepositoryTest {
 
         var recent = articleRepository.findNewArticlesPublishedPaged(10, 1);
 
-        assertEquals(1, recent.length);
-        assertEquals("Article Published", recent[0].getTitle());
+        assertEquals(1, recent.size());
+        assertEquals("Article Published", recent.getFirst().getTitle());
     }
 
     @Test
@@ -231,8 +232,8 @@ public class ArticleRepositoryTest {
         var page1 = articleRepository.findAllPaged(10, 1);
         var page2 = articleRepository.findAllPaged(10, 2);
 
-        assertEquals(10, page1.length);
-        assertEquals(5, page2.length);
+        assertEquals(10, page1.size());
+        assertEquals(5, page2.size());
     }
 
     @Test
@@ -240,7 +241,7 @@ public class ArticleRepositoryTest {
         var articles = articleRepository.findNewArticlesPublishedPaged(100, 1);
 
         assertNotNull(articles);
-        assertEquals(0, articles.length);
+        assertEquals(0, articles.size());
     }
 
     @Test

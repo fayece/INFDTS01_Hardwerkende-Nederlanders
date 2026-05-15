@@ -1,7 +1,6 @@
 package nl.hardwerkendenederlanders.hrcms.database;
 
 import jakarta.annotation.Nullable;
-
 import java.util.List;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.models.Article;

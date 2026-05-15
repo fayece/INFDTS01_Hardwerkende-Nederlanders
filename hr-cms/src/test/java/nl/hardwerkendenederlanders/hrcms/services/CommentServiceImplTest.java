@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,7 +19,9 @@ import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentWithAuthor;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.PagedComments;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
+@SpringBootTest
 class CommentServiceImplTest {
 
     // region Setup
@@ -41,9 +44,9 @@ class CommentServiceImplTest {
 
         PagedComments result = commentService.getTopLevelComments(articleId, 0, 10);
 
-        assertTrue(result.hasMore());
-        assertEquals(10, result.comments().size());
-        assertEquals("Author 0", result.comments().getFirst().authorName());
+        assertTrue(result.isHasMore());
+        assertEquals(10, result.getComments().size());
+        assertEquals("Author 0", result.getComments().getFirst().authorName());
     }
 
     @Test
@@ -57,8 +60,8 @@ class CommentServiceImplTest {
 
         PagedComments result = commentService.getTopLevelComments(articleId, 0, 10);
 
-        assertFalse(result.hasMore());
-        assertEquals(1, result.comments().size());
+        assertFalse(result.isHasMore());
+        assertEquals(1, result.getComments().size());
     }
 
     @Test
@@ -122,4 +125,41 @@ class CommentServiceImplTest {
         assertTrue(ex.getRedirectTarget().contains(comment.getArticleId().toString()));
     }
     // endregion
+
+    // region cache test
+    @Test
+    void getTopLevelComments_cacheHit_repoCalledOnce() {
+        UUID articleId = UUID.randomUUID();
+
+        when(commentRepository.findTopLevelCommentsByArticleIdPaged(any(), anyInt(), anyInt()))
+                .thenReturn(new ArrayList<>());
+        commentService.getTopLevelComments(articleId, 0, 10);
+        commentService.getTopLevelComments(articleId, 0, 10);
+
+        verify(commentRepository, times(2)).findTopLevelCommentsByArticleIdPaged(articleId, 0, 11);
+    }
+
+    @Test
+    void getTopLevelComments_PostBetweenCalls_repoCalledTwice() {
+        HttpSession session = mock(HttpSession.class);
+        UUID userId = UUID.randomUUID();
+        UUID articleId = UUID.randomUUID();
+        Comment inputComment = Comment.builder()
+                .articleId(articleId)
+                .commentBody("# Goodbye World")
+                .build();
+
+        when(commentRepository.findTopLevelCommentsByArticleIdPaged(any(), anyInt(), anyInt()))
+                .thenReturn(new ArrayList<>());
+        when(userSessionService.getLoggedInUser(session)).thenReturn(Optional.of(userId));
+
+        CommentWithAuthor savedRecord = new CommentWithAuthor(inputComment, "John Doe", 0);
+        when(commentRepository.insertReturning(any(Comment.class))).thenReturn(savedRecord);
+
+        commentService.getTopLevelComments(articleId, 0, 10);
+        commentService.postComment(inputComment, session);
+        commentService.getTopLevelComments(articleId, 0, 10);
+
+        verify(commentRepository, times(2)).findTopLevelCommentsByArticleIdPaged(articleId, 0, 11);
+    }
 }
