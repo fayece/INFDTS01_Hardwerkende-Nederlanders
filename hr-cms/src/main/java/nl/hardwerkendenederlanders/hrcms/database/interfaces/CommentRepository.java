@@ -15,4 +15,6 @@ public interface CommentRepository extends DatabaseRepository<Comment> {
     List<CommentWithAuthor> findTopLevelCommentsByArticleIdPaged(UUID articleId, int offset, int limit);
 
     List<CommentWithAuthor> findCommentsByParentId(UUID parentId);
+
+    int countByArticleId(UUID articleId);
 }

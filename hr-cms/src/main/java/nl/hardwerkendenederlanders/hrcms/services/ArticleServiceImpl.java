@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleAuthorRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleRepository;
+import nl.hardwerkendenederlanders.hrcms.database.interfaces.CommentRepository;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentActionException;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.ArticleAuthor;
@@ -18,10 +19,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class ArticleServiceImpl implements ArticleService {
     private final ArticleRepository articleRepository;
     private final ArticleAuthorRepository articleAuthorRepository;
+    private final CommentRepository commentRepository;
 
-    public ArticleServiceImpl(ArticleRepository articleRepository, ArticleAuthorRepository articleAuthorRepository) {
+    public ArticleServiceImpl(
+            ArticleRepository articleRepository,
+            ArticleAuthorRepository articleAuthorRepository,
+            CommentRepository commentRepository) {
         this.articleRepository = articleRepository;
         this.articleAuthorRepository = articleAuthorRepository;
+        this.commentRepository = commentRepository;
     }
 
     // ensures the given article is present in the database. If the ID doesn't exist a new article is made. If it does
@@ -64,16 +70,27 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public ArticleFullDetailsDto[] findAllPaged(int pageSize, int page) {
-        return articleRepository.findAllPaged(pageSize, page);
+        ArticleFullDetailsDto[] articles = articleRepository.findAllPaged(pageSize, page);
+        for (ArticleFullDetailsDto article : articles)
+            article.setCommentCount(commentRepository.countByArticleId(article.getId()));
+
+        return articles;
     }
 
     @Override
     public ArticleFullDetailsDto[] findNewPublished(int pageSize, int page) {
-        return articleRepository.findNewArticlesPublishedPaged(pageSize, page);
+        ArticleFullDetailsDto[] articles = articleRepository.findNewArticlesPublishedPaged(pageSize, page);
+        for (ArticleFullDetailsDto article : articles)
+            article.setCommentCount(commentRepository.countByArticleId(article.getId()));
+
+        return articles;
     }
 
     @Override
     public ArticleFullDetailsDto findArticleFullId(UUID id) {
-        return articleRepository.findArticlePublished(id);
+        ArticleFullDetailsDto article = articleRepository.findArticlePublished(id);
+        if (article != null) article.setCommentCount(commentRepository.countByArticleId(article.getId()));
+
+        return article;
     }
 }

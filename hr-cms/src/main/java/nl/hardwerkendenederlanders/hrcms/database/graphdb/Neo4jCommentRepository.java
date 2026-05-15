@@ -179,6 +179,22 @@ public class Neo4jCommentRepository implements CommentRepository {
     }
 
     @Override
+    public int countByArticleId(UUID articleId) {
+        return neo4jClient
+                .query(
+                        // language=Cypher
+                        """
+                MATCH (c:Comment {articleId: $articleId})
+                RETURN count(c) AS total
+                """)
+                .bindAll(Map.of("articleId", articleId.toString()))
+                .fetchAs(Integer.class)
+                .mappedBy((_, record) -> record.get("total").asInt(0))
+                .one()
+                .orElse(0);
+    }
+
+    @Override
     public List<Comment> findAllPaged(int page, int limit) {
         if (limit <= 0) throw new IllegalArgumentException("Limit must be greater than 0.");
         if (page <= 0) throw new IllegalArgumentException("Page must be greater than 0.");
@@ -251,14 +267,13 @@ public class Neo4jCommentRepository implements CommentRepository {
         Map<UUID, String> authors = userRepository.findNamesByUserIds(creatorIds);
 
         return rawResults.stream()
-            .map(c -> {
-                String authorName = authors.get(c.comment().getCreatorId());
-                String finalName = (c.comment().getDeletedAt() != null || authorName == null)
-                    ? HIDDEN_AUTHOR
-                    : authorName;
+                .map(c -> {
+                    String authorName = authors.get(c.comment().getCreatorId());
+                    String finalName =
+                            (c.comment().getDeletedAt() != null || authorName == null) ? HIDDEN_AUTHOR : authorName;
 
-                return new CommentWithAuthor(c.comment(), finalName, c.replyCount());
-            })
-            .toList();
+                    return new CommentWithAuthor(c.comment(), finalName, c.replyCount());
+                })
+                .toList();
     }
 }
