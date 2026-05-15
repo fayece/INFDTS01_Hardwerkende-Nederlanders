@@ -4,13 +4,11 @@ import jakarta.annotation.PostConstruct;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.CommentRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Comment;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentWithAuthor;
-import nl.hardwerkendenederlanders.hrcms.models.dtos.commonalities.FullName;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Value;
 import org.neo4j.driver.types.TypeSystem;
@@ -28,8 +26,10 @@ public class Neo4jCommentRepository implements CommentRepository {
     private final Neo4jClient neo4jClient;
 
     private final UserRepository userRepository;
+    private final Neo4jUserRepository neo4jUserRepository;
 
-    private record RawCommentResult(Comment comment, int replyCount) {}
+    private record RawCommentResult(
+            Comment comment, int replyCount, String firstName, String prefix, String lastName) {}
 
     @PostConstruct
     public void ensureIndexes() {
@@ -46,7 +46,15 @@ public class Neo4jCommentRepository implements CommentRepository {
 
     private final BiFunction<TypeSystem, Record, RawCommentResult> rawResultMapper =
             (_, record) -> new RawCommentResult(
-                    mapCommentNode(record.get("c")), record.get("replyCount").asInt(0));
+                    mapCommentNode(record.get("c")),
+                    record.get("replyCount").asInt(0),
+                    record.get("firstName").isNull()
+                            ? null
+                            : record.get("firstName").asString(),
+                    record.get("prefix").isNull() ? null : record.get("prefix").asString(),
+                    record.get("lastName").isNull()
+                            ? null
+                            : record.get("lastName").asString());
 
     @Override
     @Transactional
@@ -63,13 +71,28 @@ public class Neo4jCommentRepository implements CommentRepository {
                             // language=Cypher
                             """
                 MATCH (c:Comment {id: $childId}), (parent:Comment {id: $parentId})
-                CREATE (c)-[:REPLIED_TO]->(parent)
+                CREATE (c) -[:REPLIED_TO]-> (parent)
                 """)
                     .bindAll(Map.of(
                             "childId", comment.getId().toString(),
                             "parentId", comment.getParentCommentId().toString()))
                     .run();
         }
+
+        if (!neo4jUserRepository.existsById(comment.getCreatorId()))
+            userRepository.findById(comment.getCreatorId()).ifPresent(neo4jUserRepository::upsert);
+
+        neo4jClient
+                .query(
+                        // language=Cypher
+                        """
+                MATCH (c:Comment {id: $commentId}), (u:User {id: $userId})
+                CREATE (c) -[:AUTHORED_BY]-> (u)
+                """)
+                .bindAll(Map.of(
+                        "commentId", comment.getId().toString(),
+                        "userId", comment.getCreatorId().toString()))
+                .run();
     }
 
     @Override
@@ -81,28 +104,21 @@ public class Neo4jCommentRepository implements CommentRepository {
 
     @Override
     public Optional<CommentWithAuthor> findByIdWithAuthor(UUID id) {
-        Optional<RawCommentResult> result = neo4jClient
+        return neo4jClient
                 .query(
                         // language=Cypher
                         """
                 MATCH (c:Comment {id: $id})
-                OPTIONAL MATCH (reply:Comment)-[:REPLIED_TO]->(c)
-                RETURN c, count(reply) AS replyCount
+                OPTIONAL MATCH (reply:Comment) -[:REPLIED_TO]-> (c)
+                OPTIONAL MATCH (c) -[:AUTHORED_BY]-> (u:User)
+                RETURN c, count(reply) AS replyCount,
+                       u.firstName AS firstName, u.prefix AS prefix, u.lastName AS lastName
                 """)
                 .bindAll(Map.of("id", id.toString()))
                 .fetchAs(RawCommentResult.class)
                 .mappedBy(rawResultMapper)
-                .one();
-
-        return result.map(raw -> {
-            String authorName = raw.comment().getDeletedAt() != null
-                    ? HIDDEN_AUTHOR
-                    : userRepository
-                            .findById(raw.comment().getCreatorId())
-                            .map(FullName::getFullName)
-                            .orElse(HIDDEN_AUTHOR);
-            return new CommentWithAuthor(raw.comment(), authorName, raw.replyCount());
-        });
+                .one()
+                .map(this::toCommentWithAuthor);
     }
 
     @Override
@@ -117,7 +133,9 @@ public class Neo4jCommentRepository implements CommentRepository {
                 MATCH (c:Comment {articleId: $articleId})
                 WHERE NOT (c) -[:REPLIED_TO]-> ()
                 OPTIONAL MATCH (reply:Comment) -[:REPLIED_TO]-> (c)
-                RETURN c, count(reply) AS replyCount
+                OPTIONAL MATCH (c) -[:AUTHORED_BY]-> (u:User)
+                RETURN c, count(reply) AS replyCount,
+                       u.firstName AS firstName, u.prefix AS prefix, u.lastName AS lastName
                 ORDER BY c.createdAt DESC
                 SKIP $offset LIMIT $limit
                 """)
@@ -126,7 +144,7 @@ public class Neo4jCommentRepository implements CommentRepository {
                 .mappedBy(rawResultMapper)
                 .all();
 
-        return mapWithAuthorsBatch(records);
+        return records.stream().map(this::toCommentWithAuthor).toList();
     }
 
     @Override
@@ -135,9 +153,11 @@ public class Neo4jCommentRepository implements CommentRepository {
                 .query(
                         // language=Cypher
                         """
-                MATCH (c:Comment)-[:REPLIED_TO]->(parent:Comment {id: $parentId})
-                OPTIONAL MATCH (reply:Comment)-[:REPLIED_TO]->(c)
-                RETURN c, count(reply) AS replyCount
+                MATCH (c:Comment) -[:REPLIED_TO]-> (parent:Comment {id: $parentId})
+                OPTIONAL MATCH (reply:Comment) -[:REPLIED_TO]-> (c)
+                OPTIONAL MATCH (c) -[:AUTHORED_BY]-> (u:User)
+                RETURN c, count(reply) AS replyCount,
+                       u.firstName AS firstName, u.prefix AS prefix, u.lastName AS lastName
                 ORDER BY c.createdAt ASC
                 """)
                 .bindAll(Map.of("parentId", parentId.toString()))
@@ -145,7 +165,7 @@ public class Neo4jCommentRepository implements CommentRepository {
                 .mappedBy(rawResultMapper)
                 .all();
 
-        return mapWithAuthorsBatch(records);
+        return records.stream().map(this::toCommentWithAuthor).toList();
     }
 
     @Override
@@ -258,22 +278,20 @@ public class Neo4jCommentRepository implements CommentRepository {
         return props;
     }
 
-    private List<CommentWithAuthor> mapWithAuthorsBatch(Collection<RawCommentResult> rawResults) {
-        if (rawResults.isEmpty()) return List.of();
+    private CommentWithAuthor toCommentWithAuthor(RawCommentResult raw) {
+        String authorName;
+        if (raw.comment().getDeletedAt() != null || raw.firstName() == null) {
+            authorName = HIDDEN_AUTHOR;
+        } else {
+            authorName = buildFullName(raw.firstName(), raw.prefix(), raw.lastName());
+        }
+        return new CommentWithAuthor(raw.comment(), authorName, raw.replyCount());
+    }
 
-        Set<UUID> creatorIds =
-                rawResults.stream().map(c -> c.comment().getCreatorId()).collect(Collectors.toSet());
-
-        Map<UUID, String> authors = userRepository.findNamesByUserIds(creatorIds);
-
-        return rawResults.stream()
-                .map(c -> {
-                    String authorName = authors.get(c.comment().getCreatorId());
-                    String finalName =
-                            (c.comment().getDeletedAt() != null || authorName == null) ? HIDDEN_AUTHOR : authorName;
-
-                    return new CommentWithAuthor(c.comment(), finalName, c.replyCount());
-                })
-                .toList();
+    private String buildFullName(String firstName, String prefix, String lastName) {
+        if (prefix == null || prefix.isBlank()) {
+            return firstName + " " + lastName;
+        }
+        return firstName + " " + prefix + " " + lastName;
     }
 }

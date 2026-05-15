@@ -22,8 +22,6 @@ public interface UserRepository {
 
     List<User> findUserOnActivityPaginated(boolean isActive, int page, int amount);
 
-    Map<UUID, String> findNamesByUserIds(Set<UUID> ids);
-
     void deleteById(UUID id);
 
     Integer countByActive(boolean active);

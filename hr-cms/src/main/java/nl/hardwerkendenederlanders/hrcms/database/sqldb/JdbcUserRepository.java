@@ -2,7 +2,6 @@ package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
 import java.time.OffsetDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
 import nl.hardwerkendenederlanders.hrcms.models.User;
@@ -134,20 +133,6 @@ public class JdbcUserRepository implements UserRepository {
                 .addValue("offset", amount * page);
 
         return jdbc.query(sqlQuery, params, rowMapper);
-    }
-
-    @Override
-    public Map<UUID, String> findNamesByUserIds(Set<UUID> ids) {
-        String sqlQuery = """
-            SELECT *
-            FROM %s
-            WHERE id IN (:ids)
-            """.formatted(TABLE);
-
-        MapSqlParameterSource params = new MapSqlParameterSource().addValue("ids", ids);
-        List<User> users = jdbc.query(sqlQuery, params, rowMapper);
-
-        return users.stream().collect(Collectors.toMap(User::getId, User::getFullName));
     }
 
     @Override

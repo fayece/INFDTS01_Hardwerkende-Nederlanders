@@ -12,7 +12,6 @@ public class Neo4jTestcontainersConfiguration {
     @Bean
     @ServiceConnection
     public Neo4jContainer<?> neo4jContainer() {
-        return new Neo4jContainer<>(DockerImageName.parse("neo4j:2026.04.0-trixie"))
-                .withoutAuthentication();
+        return new Neo4jContainer<>(DockerImageName.parse("neo4j:2026.04.0-trixie")).withoutAuthentication();
     }
 }
