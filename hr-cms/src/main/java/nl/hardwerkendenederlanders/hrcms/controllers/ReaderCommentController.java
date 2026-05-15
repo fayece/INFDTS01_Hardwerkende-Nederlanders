@@ -38,9 +38,9 @@ public class ReaderCommentController {
         final int limit = 10;
         PagedComments result = commentService.getTopLevelComments(articleId, offset, limit);
 
-        model.addAttribute("comments", result.comments());
-        model.addAttribute("hasMore", result.hasMore());
-        model.addAttribute("offset", offset + result.comments().size());
+        model.addAttribute("comments", result.getComments());
+        model.addAttribute("hasMore", result.isHasMore());
+        model.addAttribute("offset", offset + result.getComments().size());
         model.addAttribute("articleId", articleId);
 
         return COMMENT_SECTION_VIEW;

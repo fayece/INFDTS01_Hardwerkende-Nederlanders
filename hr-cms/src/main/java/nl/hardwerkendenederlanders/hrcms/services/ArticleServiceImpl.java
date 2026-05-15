@@ -15,6 +15,7 @@ import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleFullDetailsD
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.ArticleService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +28,11 @@ public class ArticleServiceImpl implements ArticleService {
 
     // ensures the given article is present in the database. If the ID doesn't exist a new article is made. If it does
     // the article is updated
-    @CacheEvict("publishedArticlesFull")
+    @Caching(evict = {
+            @CacheEvict(value="publishedArticlesFull", allEntries = true),
+            @CacheEvict(value = "fullArticle", key = "#article.id")
+    })
+
     @Transactional
     public void ensureArticleExists(Article article, UUID authorId) {
         article = Article.fillOutNullFields(article);
@@ -70,16 +75,14 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    @Cacheable("publishedArticlesFull")
+    @Cacheable(value="publishedArticlesFull")
     public List<ArticleFullDetailsDto> findNewPublished(int pageSize, int page) {
-        System.out.println("Cache Miss");
         return articleRepository.findNewArticlesPublishedPaged(pageSize, page);
     }
 
     @Override
-    @Cacheable("fullArticle")
+    @Cacheable(value="fullArticle", key = "#id")
     public ArticleFullDetailsDto findArticleFullId(UUID id) {
-        System.out.println("Cache Miss");
         return articleRepository.findArticlePublished(id);
     }
 }

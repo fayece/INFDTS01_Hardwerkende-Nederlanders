@@ -13,6 +13,8 @@ import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentWithAuthor;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.PagedComments;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.CommentService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,6 +30,7 @@ public class CommentServiceImpl implements CommentService {
         this.userSessionService = userSessionService;
     }
 
+    @Cacheable(value = "topCommentsArticle", key = "#articleId")
     public PagedComments getTopLevelComments(UUID articleId, int offset, int limit) {
         try {
             List<CommentViewDto> comments =
@@ -55,6 +58,7 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
+    @CacheEvict(value = "topCommentsArticle", key="#comment.articleId")
     public CommentViewDto postComment(Comment comment, HttpSession session) {
         Optional<UUID> userId = userSessionService.getLoggedInUser(session);
         if (userId.isEmpty()) {

@@ -1,7 +1,6 @@
 package nl.hardwerkendenederlanders.hrcms.services;
 
 import lombok.AllArgsConstructor;
-import nl.hardwerkendenederlanders.hrcms.database.cache.interfaces.ArticleCache;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleViewersRepository;
 import nl.hardwerkendenederlanders.hrcms.models.ArticleViewer;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.ArticleViewersService;
