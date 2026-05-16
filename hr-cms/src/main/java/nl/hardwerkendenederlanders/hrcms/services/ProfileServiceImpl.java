@@ -1,6 +1,7 @@
-﻿package nl.hardwerkendenederlanders.hrcms.services;
+package nl.hardwerkendenederlanders.hrcms.services;
 
 import nl.hardwerkendenederlanders.hrcms.database.mongodb.ProfileRepository;
+import nl.hardwerkendenederlanders.hrcms.exceptions.ConflictException;
 import nl.hardwerkendenederlanders.hrcms.models.Profile;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.ProfileDTO;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.ProfileService;
@@ -18,6 +19,13 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     public void setProfile(UUID id, ProfileDTO profileDTO){
+        if(profileDTO.getUsername().isBlank())
+            throw new IllegalArgumentException("Username cannot be blank");
+
+        var alreadyExists = getProfileByUsername(profileDTO.getUsername());
+        if(alreadyExists != null && alreadyExists.getId() != id.toString())
+            throw new ConflictException("username already taken");
+
         if(profileDTO.getCustomFields().size() > 4)
             throw new IllegalArgumentException("Only 4 custom fields allowed. Delete one first or simply edit one");
         if(profileDTO.getSocials().size() > 4)

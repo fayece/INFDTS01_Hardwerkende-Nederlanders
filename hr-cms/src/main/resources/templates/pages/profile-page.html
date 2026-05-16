@@ -4,8 +4,45 @@
 </head>
 <body>
 <div th:insert="~{fragments/app-wide/navbar :: navbar}" class="navbar"></div>
-<main class="standard-page-layout">
-    <section th:insert="fragments/users/profile :: profile"></section>
-</main>
-<footer th:replace="~{fragments/app-wide/footer :: footer}"></footer>
+    <div class="profile-page">
+        <div class="profile-picture">profile pic</div>
+        <div class="profile-username" th:text="${profile.getUsername()}"></div>
+        <div class="profile-pronouns" th:text="${profile.getPronouns()}"></div>
+        <a th:if="${editable}" th:href="@{/profile/edit}">Edit profile</a>
+        <div class="profile-bio" th:text="${profile.getBio()}"></div>
+        <div class="profile-interests" th:text="${profile.getInterests()}"></div>
+        <div class="profile-customs" th:text="${profile.getCustomFields()}"></div>
+        <div class="profile-socials" th:text="${profile.getSocials()}"></div>
+    </div>
+
+
+<form th:action="@{/my-profile/update}" th:object="${profileDTO}" method="post">
+    <div>
+        <label>Username</label>
+        <input type="text" name="username" required>
+    </div>
+    <div>
+        <label>Pronouns</label>
+        <input type="text" name="pronouns">
+    </div>
+    <div>
+        <label>Bio</label>
+        <input type="text" name="bio">
+    </div>
+    <div>
+        <label>Interests</label>
+        <input type="text" name="interests">
+    </div>
+    <div>
+        <label>Custom</label>
+        <input type="text" name="custom label">
+        <input type="text" name="customs">
+    </div>
+    <div>
+        <label>Socials</label>
+        <input type="text" name="socials">
+    </div>
+
+    <button type="submit">Save profile</button>
+</form>
 </body>

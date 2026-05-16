@@ -1,4 +1,4 @@
-﻿package nl.hardwerkendenederlanders.hrcms.services.interfaces;
+package nl.hardwerkendenederlanders.hrcms.services.interfaces;
 
 import nl.hardwerkendenederlanders.hrcms.models.Profile;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.ProfileDTO;

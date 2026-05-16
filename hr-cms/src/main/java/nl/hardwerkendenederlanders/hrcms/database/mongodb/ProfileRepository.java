@@ -1,4 +1,4 @@
-﻿package nl.hardwerkendenederlanders.hrcms.database.mongodb;
+package nl.hardwerkendenederlanders.hrcms.database.mongodb;
 
 import nl.hardwerkendenederlanders.hrcms.models.Profile;
 import org.springframework.data.mongodb.repository.MongoRepository;

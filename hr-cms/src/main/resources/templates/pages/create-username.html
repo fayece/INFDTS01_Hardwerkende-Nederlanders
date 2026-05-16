@@ -1,0 +1,17 @@
+﻿<head>
+    <title>Profile Page</title>
+    <link rel="stylesheet" th:href="${cssRef}" th:each="cssRef: ${@cssDiscoveryService.getAllCssPaths()}">
+</head>
+<body>
+<div class="create-username">
+    <div class="username-header">
+        <h2>To Continue into the app, you have to set a username</h2>
+
+        <form th:action="@{/create-username}" th:object="${profileDTO}" method="post">
+            <input type="text" th:field="*{username}" />
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+</div>
+</body>

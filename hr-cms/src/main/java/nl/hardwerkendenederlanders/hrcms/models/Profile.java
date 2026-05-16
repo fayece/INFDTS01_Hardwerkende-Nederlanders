@@ -1,4 +1,4 @@
-﻿package nl.hardwerkendenederlanders.hrcms.models;
+package nl.hardwerkendenederlanders.hrcms.models;
 import com.mongodb.lang.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
