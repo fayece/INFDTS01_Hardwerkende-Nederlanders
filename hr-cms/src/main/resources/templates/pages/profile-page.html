@@ -7,42 +7,21 @@
     <div class="profile-page">
         <div class="profile-picture">profile pic</div>
         <div class="profile-username" th:text="${profile.getUsername()}"></div>
-        <div class="profile-pronouns" th:text="${profile.getPronouns()}"></div>
-        <a th:if="${editable}" th:href="@{/profile/edit}">Edit profile</a>
-        <div class="profile-bio" th:text="${profile.getBio()}"></div>
-        <div class="profile-interests" th:text="${profile.getInterests()}"></div>
-        <div class="profile-customs" th:text="${profile.getCustomFields()}"></div>
-        <div class="profile-socials" th:text="${profile.getSocials()}"></div>
-    </div>
+
+        <div th:each="pronoun : ${profile.pronouns}" th:text="${pronoun}"></div>
+
+        <a th:if="${editable}" th:href="@{/my-profile-edit}">Edit profile</a>
+        <div th:if="${profile.bio}" th:text="${profile.bio}"></div>
 
 
-<form th:action="@{/my-profile/update}" th:object="${profileDTO}" method="post">
-    <div>
-        <label>Username</label>
-        <input type="text" name="username" required>
-    </div>
-    <div>
-        <label>Pronouns</label>
-        <input type="text" name="pronouns">
-    </div>
-    <div>
-        <label>Bio</label>
-        <input type="text" name="bio">
-    </div>
-    <div>
-        <label>Interests</label>
-        <input type="text" name="interests">
-    </div>
-    <div>
-        <label>Custom</label>
-        <input type="text" name="custom label">
-        <input type="text" name="customs">
-    </div>
-    <div>
-        <label>Socials</label>
-        <input type="text" name="socials">
-    </div>
+        <div th:each="interest : ${profile.interests}" th:text="${interest}"></div>
 
-    <button type="submit">Save profile</button>
-</form>
+        <div th:each="field : ${profile.customFields}" th:if="${field.label != null}">
+            <span th:text="${field.label}"></span>: <span th:text="${field.value}"></span>
+        </div>
+
+        <div th:each="social : ${profile.socials}" th:if="${social.type != null}">
+            <span th:text="${social.type}"></span>: <span th:text="${social.username}"></span>
+        </div>
+    </div>
 </body>

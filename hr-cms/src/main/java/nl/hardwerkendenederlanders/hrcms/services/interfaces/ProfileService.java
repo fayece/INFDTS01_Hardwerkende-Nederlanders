@@ -10,4 +10,5 @@ public interface ProfileService {
     Profile getProfileById(UUID id);
     Profile getProfileByUsername(String username);
     void deleteById(UUID id);
+    public ProfileDTO toDTO(Profile profile);
 }

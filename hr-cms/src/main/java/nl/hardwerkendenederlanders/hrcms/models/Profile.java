@@ -25,33 +25,20 @@ public class Profile {
     private String bio;
 
     private List<String> interests;
-    private List<Pronoun> pronouns;
+    private List<String> pronouns;
     private List<CustomField> customFields;
     private List<Social> socials;
 
 
     @Data
     public static class Social{
-        private int id;
-        @NotBlank
         private String type;
-        @NotBlank
         private String username;
     }
 
     @Data
-    public static class Pronoun{
-        private int id;
-        @NotBlank
-        private String value;
-    }
-
-    @Data
     public static class CustomField {
-        private int id;
-        @NotBlank
         private String label;
-        @NotNull
         private String value;
     }
 
