@@ -5,23 +5,56 @@
 <body>
 <div th:insert="~{fragments/app-wide/navbar :: navbar}" class="navbar"></div>
     <div class="profile-page">
-        <div class="profile-picture">profile pic</div>
-        <div class="profile-username" th:text="${profile.getUsername()}"></div>
-
-        <div th:each="pronoun : ${profile.pronouns}" th:text="${pronoun}"></div>
-
-        <a th:if="${editable}" th:href="@{/my-profile-edit}">Edit profile</a>
-        <div th:if="${profile.bio}" th:text="${profile.bio}"></div>
-
-
-        <div th:each="interest : ${profile.interests}" th:text="${interest}"></div>
-
-        <div th:each="field : ${profile.customFields}" th:if="${field.label != null}">
-            <span th:text="${field.label}"></span>: <span th:text="${field.value}"></span>
+        <div class="profile-top-bar">
+            <div class="profile-pic-user">
+                <img th:src="${profile.profilePicture != null ? profile.profilePicture : '/images/default-profile.jpeg'}"
+                     class="profile-image"/>
+                <h2 class="profile" th:text="${profile.getUsername()}"></h2>
+                <div class="profile-pronouns">
+                    <div th:if="${not #lists.isEmpty(profile.pronouns)}">
+                        (<span class="profile-pronouns-text" th:each="pronoun, iterStat : ${profile.pronouns}"
+                               th:text="${pronoun + (iterStat.last ? '' : ' / ')}"></span>)
+                    </div>
+                </div>
+                <a class="profile-edit" th:if="${editable}" th:href="@{/my-profile-edit}">Edit profile</a>
+            </div>
+        </div>
+        <div class="profile-bio">
+            <div th:if="${not #strings.isEmpty(profile.bio)}">
+                <h3 class="profile">Bio</h3>
+                <span class="bio" th:text="${profile.bio}"></span>
+            </div>
         </div>
 
-        <div th:each="social : ${profile.socials}" th:if="${social.type != null}">
-            <span th:text="${social.type}"></span>: <span th:text="${social.username}"></span>
+        <div class="profile-interests">
+            <div th:if="${not #lists.isEmpty(profile.interests)}">
+                <h4 class="profile">Interests</h4>
+                <div class="profile-grid-six">
+                    <div th:each="interest : ${profile.interests}" th:text="${interest}"></div>
+                </div>
+        </div>
+        </div>
+
+        <div class="profile-customs">
+            <div th:if="${not #lists.isEmpty(profile.customFields)}">
+                <h4 class="profile">Custom fields</h4>
+                <div class="profile-grid-four">
+                    <div th:each="field : ${profile.customFields}" th:if="${field.label != null}">
+                        <span th:text="${field.label}"></span>: <span th:text="${field.value}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-socials">
+            <div th:if="${not #lists.isEmpty(profile.socials)}">
+                <h4 class="profile">Socials</h4>
+                <div class="profile-grid-four">
+                    <div th:each="social : ${profile.socials}" th:if="${social.type != null}">
+                        <span th:text="${social.type}"></span>: <span th:text="${social.username}"></span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </body>

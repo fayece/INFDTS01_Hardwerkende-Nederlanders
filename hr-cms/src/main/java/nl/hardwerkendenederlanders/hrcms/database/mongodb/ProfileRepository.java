@@ -2,8 +2,10 @@ package nl.hardwerkendenederlanders.hrcms.database.mongodb;
 
 import nl.hardwerkendenederlanders.hrcms.models.Profile;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public interface ProfileRepository extends MongoRepository<Profile, String> {
     //CREATE and UPDATE -> profilereposityory.save(profile)

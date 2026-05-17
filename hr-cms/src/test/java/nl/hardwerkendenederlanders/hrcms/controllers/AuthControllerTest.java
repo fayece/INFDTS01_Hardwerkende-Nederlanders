@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import jakarta.servlet.http.HttpSession;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.AuthService;
+import nl.hardwerkendenederlanders.hrcms.services.interfaces.ProfileService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
 import org.junit.jupiter.api.Test;
 import org.springframework.ui.ConcurrentModel;
@@ -17,9 +18,10 @@ import org.springframework.ui.Model;
 class AuthControllerTest {
 
     private final UserSessionService userSessionService = mock(UserSessionService.class);
+    private final ProfileService profileService = mock(ProfileService.class);
     private final AuthService authService = mock(AuthService.class);
 
-    private final AuthController authController = new AuthController(userSessionService, authService);
+    private final AuthController authController = new AuthController(userSessionService, profileService, authService);
 
     @Test
     void login_success_redirectsToHome() {

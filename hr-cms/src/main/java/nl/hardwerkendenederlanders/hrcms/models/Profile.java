@@ -22,6 +22,9 @@ public class Profile {
     private String username;
 
     @Nullable
+    private String profilePicture;
+
+    @Nullable
     private String bio;
 
     private List<String> interests;

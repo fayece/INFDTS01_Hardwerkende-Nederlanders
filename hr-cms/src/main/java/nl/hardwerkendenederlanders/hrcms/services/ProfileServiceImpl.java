@@ -6,7 +6,13 @@ import nl.hardwerkendenederlanders.hrcms.models.Profile;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.ProfileDTO;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.ProfileService;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,22 +26,16 @@ public class ProfileServiceImpl implements ProfileService {
         this.profileRepository = profileRepository;
     }
 
-    public void setProfile(UUID id, ProfileDTO profileDTO){
-        if(profileDTO.getUsername().isBlank())
-            throw new IllegalArgumentException("Username cannot be blank");
+    public Profile getProfileById(UUID id){
+        return profileRepository.findById(id.toString()).orElse(null);
+    }
 
-        var alreadyExists = getProfileByUsername(profileDTO.getUsername());
-        if(alreadyExists != null && !alreadyExists.getId().equals(id.toString()))
-            throw new ConflictException("username already taken");
+    public Profile getProfileByUsername(String username){
+        return profileRepository.findByUsername(username).orElse(null);
+    }
 
-        if(profileDTO.getCustomFields().size() > 4)
-            throw new IllegalArgumentException("Only 4 custom fields allowed. Delete one first or simply edit one");
-        if(profileDTO.getSocials().size() > 4)
-            throw new IllegalArgumentException("Only 4 social media fields allowed. Delete one first or simply edit one");
-        if(profileDTO.getPronouns().size() > 4)
-            throw new IllegalArgumentException("Only 4 pronouns allowed. Delete one first or simply edit one");
-        if(profileDTO.getInterests().size() > 10)
-            throw new IllegalArgumentException("Only 10 interests allowed. Delete one first or simply edit one");
+    public void setProfile(UUID id, ProfileDTO profileDTO, MultipartFile file){
+        validateProfile(id, profileDTO);
 
         Profile profile = new Profile();
         profile.setId(id.toString());
@@ -51,15 +51,48 @@ public class ProfileServiceImpl implements ProfileService {
         profile.getPronouns().removeIf(p -> p == null || p.isBlank());
         profile.getInterests().removeIf(i -> i == null || i.isBlank());
 
+        if (file != null && !file.isEmpty()) {
+            profile.setProfilePicture(saveProfilePicture(id, file));
+        } else {
+            Profile existing = getProfileById(id);
+            profile.setProfilePicture(existing != null ? existing.getProfilePicture() : null);
+        }
+
         profileRepository.save(profile);
     }
 
-    public Profile getProfileById(UUID id){
-        return profileRepository.findById(id.toString()).orElse(null);
+    private String saveProfilePicture(UUID id, MultipartFile file) {
+        try {
+            String filename = id.toString() + "_" + file.getOriginalFilename();
+            Path uploadPath = Paths.get("uploads");
+
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            Files.copy(file.getInputStream(), uploadPath.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
+            return "/uploads/" + filename;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save profile picture", e);
+        }
     }
 
-    public Profile getProfileByUsername(String username){
-        return profileRepository.findByUsername(username).orElse(null);
+    private void validateProfile(UUID id, ProfileDTO profileDTO){
+        if(profileDTO.getUsername().isBlank())
+            throw new IllegalArgumentException("Username cannot be blank");
+
+        var alreadyExists = getProfileByUsername(profileDTO.getUsername());
+        if(alreadyExists != null && !alreadyExists.getId().equals(id.toString()))
+            throw new ConflictException("username already taken");
+
+        if(profileDTO.getCustomFields().size() > 4)
+            throw new IllegalArgumentException("Only 4 custom fields allowed. Delete one first or simply edit one");
+        if(profileDTO.getSocials().size() > 4)
+            throw new IllegalArgumentException("Only 4 social media fields allowed. Delete one first or simply edit one");
+        if(profileDTO.getPronouns().size() > 4)
+            throw new IllegalArgumentException("Only 4 pronouns allowed. Delete one first or simply edit one");
+        if(profileDTO.getInterests().size() > 10)
+            throw new IllegalArgumentException("Only 10 interests allowed. Delete one first or simply edit one");
     }
 
     public void deleteById(UUID id){

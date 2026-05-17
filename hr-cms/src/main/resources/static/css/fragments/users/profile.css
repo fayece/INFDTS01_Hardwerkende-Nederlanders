@@ -4,3 +4,80 @@
     width: 2rem;
     height: 2rem;
 }
+
+.profile-page{
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-top-bar{
+    display: flex;
+    flex-direction: row;
+    padding: 10px;
+}
+
+.profile-pic-user{
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    align-items: center;
+}
+
+.profile-grid-six{
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    margin-bottom: 10px;
+}
+
+.profile-grid-four{
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    margin-bottom: 10px;
+}
+
+.profile-socials, .profile-customs,.profile-interests{
+    border: black solid 3px;
+    border-radius: 10px;
+    margin: 20px;
+    padding: 10px;
+}
+
+.profile-edit{
+    padding: 10px;
+    background-color: var(--accent);
+    font-size: large;
+    border-radius: 10px;
+}
+
+.profile-edit:hover{
+    cursor: pointer;
+}
+
+.profile-pronouns{
+    margin-left: 20px;
+}
+
+.profile-bio{
+    border: black solid 3px;
+    border-radius: 10px;
+    margin: 20px;
+    padding: 10px;
+
+}
+
+h4 .profile, h3 .profile, h2 .profile{
+    color: var(--accent);
+    margin-left: 20px;
+}
+
+.profile-pronouns-text{
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.profile-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+}
