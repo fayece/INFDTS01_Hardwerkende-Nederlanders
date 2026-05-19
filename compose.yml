@@ -12,14 +12,16 @@ services:
     ports:
       - "6031:${SERVER_PORT}"
     depends_on:
-      db:
+      db_postgres:
+        condition: service_healthy
+      cache_redis:
         condition: service_healthy
     mem_limit: 500mb
     cpus: 1
     volumes:
       - uploads:/app/uploads/media
 
-  db:
+  db_postgres:
     image: postgres:18.2-trixie
     container_name: hard-work-postgres
     env_file: ".env"
@@ -39,6 +41,21 @@ services:
       - "6032:5432" # Currently exposed. Should be removed for a production environment.
     mem_limit: 2g
     cpus: 1
+
+  cache_redis:
+    image: redis/redis-stack:7.4.0-v8
+    container_name: hard-work-redis
+    env_file: ".env"
+    environment:
+      REDIS_ARGS: "--requirepass ${REDIS_PASSWORD} --port 6033"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+    ports:
+      - "6033:6033"
+
+    mem_limit: 100mb
+    cpus: 1
+
 
 volumes:
   pgdata:

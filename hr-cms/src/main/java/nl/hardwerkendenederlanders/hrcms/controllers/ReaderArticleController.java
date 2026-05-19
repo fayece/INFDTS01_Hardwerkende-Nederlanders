@@ -59,11 +59,11 @@ public class ReaderArticleController {
 
         try {
             PagedComments result = commentService.getTopLevelComments(articleId, 0, 10);
-            model.addAttribute("comments", result.comments());
-            model.addAttribute("hasMore", result.hasMore());
+            model.addAttribute("comments", result.getComments());
+            model.addAttribute("hasMore", result.isHasMore());
             model.addAttribute("nextPage", 2);
             model.addAttribute("articleId", articleId);
-            model.addAttribute("offset", result.comments().size());
+            model.addAttribute("offset", result.getComments().size());
 
         } catch (ComponentUnavailableException e) {
             model.addAttribute("failedComponent", "comments");

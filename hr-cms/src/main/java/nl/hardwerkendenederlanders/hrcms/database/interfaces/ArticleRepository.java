@@ -1,6 +1,7 @@
 package nl.hardwerkendenederlanders.hrcms.database.interfaces;
 
 import jakarta.annotation.Nullable;
+import java.util.List;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleFullDetailsDto;
@@ -14,9 +15,9 @@ public interface ArticleRepository {
     @Nullable
     Article findById(UUID id);
 
-    ArticleFullDetailsDto[] findAllPaged(int limit, int offset);
+    List<ArticleFullDetailsDto> findAllPaged(int limit, int offset);
 
-    ArticleFullDetailsDto[] findNewArticlesPublishedPaged(int limit, int offset);
+    List<ArticleFullDetailsDto> findNewArticlesPublishedPaged(int limit, int offset);
 
     void delete(UUID id);
 
