@@ -78,14 +78,24 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     @Cacheable(value = "publishedArticlesFull", sync = true)
     public List<ArticleFullDetailsDto> findNewPublished(int pageSize, int page) {
-        return articleRepository.findNewArticlesPublishedPaged(pageSize, page);
+        List<ArticleFullDetailsDto> articles = articleRepository.findNewArticlesPublishedPaged(pageSize, page);
+        if (articles.isEmpty())
+            return articles;
+
+        for (ArticleFullDetailsDto article : articles) {
+            if (article != null)
+                article.setCommentCount(commentRepository.countByArticleId(article.getId()));
+        }
+
+        return articles;
     }
 
     @Override
     @Cacheable(value = "fullArticle", key = "#id", sync = true)
     public ArticleFullDetailsDto findArticleFullId(UUID id) {
         ArticleFullDetailsDto article = articleRepository.findArticlePublished(id);
-        if (article != null) article.setCommentCount(commentRepository.countByArticleId(article.getId()));
+        if (article != null)
+            article.setCommentCount(commentRepository.countByArticleId(article.getId()));
 
         return article;
     }
