@@ -43,7 +43,7 @@ services:
     cpus: 1
 
   cache_redis:
-    image: redis/redis-stack:latest
+    image: redis/redis-stack:7.4.0-v8
     container_name: hard-work-redis
     env_file: ".env"
     environment:

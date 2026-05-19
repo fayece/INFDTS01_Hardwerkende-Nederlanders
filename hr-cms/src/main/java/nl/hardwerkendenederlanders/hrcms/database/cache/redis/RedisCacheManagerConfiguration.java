@@ -12,7 +12,7 @@ import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 
 @Configuration
-public class RedisTemplateConfiguration {
+public class RedisCacheManagerConfiguration {
 
     @Bean
     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
