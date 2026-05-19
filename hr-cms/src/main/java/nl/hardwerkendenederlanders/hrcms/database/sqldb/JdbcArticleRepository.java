@@ -2,6 +2,7 @@ package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
 import jakarta.annotation.Nullable;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -108,7 +109,7 @@ public class JdbcArticleRepository implements ArticleRepository {
     }
 
     @Override
-    public ArticleFullDetailsDto[] findAllPaged(int limit, int offset) {
+    public List<ArticleFullDetailsDto> findAllPaged(int limit, int offset) {
         if (limit <= 0)
             throw new IllegalArgumentException(
                     "findAllPages was called with an limit of " + limit + " the minimum is 1");
@@ -126,11 +127,11 @@ public class JdbcArticleRepository implements ArticleRepository {
         mapping.addValue("limit", limit);
         mapping.addValue("offset", (offset - 1) * limit);
 
-        return jdbc.query(query, mapping, fullArticleMapper()).toArray(new ArticleFullDetailsDto[0]);
+        return jdbc.query(query, mapping, fullArticleMapper());
     }
 
     @Override
-    public ArticleFullDetailsDto[] findNewArticlesPublishedPaged(int limit, int offset) {
+    public List<ArticleFullDetailsDto> findNewArticlesPublishedPaged(int limit, int offset) {
         if (limit <= 0)
             throw new IllegalArgumentException(
                     "findAllPages was called with an limit of " + limit + " the minimum is 1");
@@ -149,7 +150,7 @@ public class JdbcArticleRepository implements ArticleRepository {
         MapSqlParameterSource mapping = new MapSqlParameterSource();
         mapping.addValue("limit", limit);
         mapping.addValue("offset", (offset - 1) * limit);
-        return jdbc.query(query, mapping, fullArticleMapper()).toArray(new ArticleFullDetailsDto[0]);
+        return jdbc.query(query, mapping, fullArticleMapper());
     }
 
     @Override

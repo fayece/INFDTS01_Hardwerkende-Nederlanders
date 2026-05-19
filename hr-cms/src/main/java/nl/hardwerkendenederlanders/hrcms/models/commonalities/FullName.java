@@ -1,4 +1,4 @@
-package nl.hardwerkendenederlanders.hrcms.models.dtos.commonalities;
+package nl.hardwerkendenederlanders.hrcms.models.commonalities;
 
 public interface FullName {
     String getFirstName();
