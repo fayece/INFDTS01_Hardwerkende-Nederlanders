@@ -370,8 +370,8 @@ public class UserServiceTest {
         List<User> result = userService.searchByNamePaginated("kim", 0, 10);
 
         assertEquals(2, result.size());
-        assertEquals("Kim", result.get(0).getFirstName());
-        assertEquals("kp@example.com", result.get(0).getEmail());
+        assertEquals("Kim", result.getFirst().getFirstName());
+        assertEquals("kp@example.com", result.getFirst().getEmail());
 
         verify(userRepository).findByNameOrEmailPaginated("kim", 0, 10);
     }
@@ -449,9 +449,10 @@ public class UserServiceTest {
 
     @Test
     void insertUser_withParams_success() {
+        UUID roleId = UUID.randomUUID();
         when(userRepository.findByEmail("kp@example.com")).thenReturn(Optional.empty());
 
-        userService.insertUser("Kim", null, "Possible", "kp@example.com", "secret");
+        userService.insertUser("Kim", null, "Possible", "kp@example.com", "secret", roleId);
 
         verify(userRepository).findByEmail("kp@example.com");
         verify(userRepository).insert(any(User.class));
@@ -459,9 +460,10 @@ public class UserServiceTest {
 
     @Test
     void insertUser_withParams_invalidFirstName_throws() {
+        UUID roleId = UUID.randomUUID();
         assertThrows(
                 IllegalArgumentException.class,
-                () -> userService.insertUser("K", null, "Possible", "kp@example.com", "secret"));
+                () -> userService.insertUser("K", null, "Possible", "kp@example.com", "secret", roleId));
 
         verify(userRepository, never()).findByEmail(any());
         verify(userRepository, never()).insert(any());

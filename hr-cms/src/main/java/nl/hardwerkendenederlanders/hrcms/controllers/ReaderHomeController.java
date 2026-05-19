@@ -1,9 +1,11 @@
 package nl.hardwerkendenederlanders.hrcms.controllers;
 
+import nl.hardwerkendenederlanders.hrcms.configuration.RequiresPermission;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.ArticleService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class ReaderHomeController {
@@ -13,9 +15,11 @@ public class ReaderHomeController {
         this.articleService = articleService;
     }
 
+    @RequiresPermission("article:read")
     @GetMapping("/")
-    public String getHomePage(Model model) {
-        model.addAttribute("articles", articleService.findAllPaged(100, 1));
+    public String getHomePage(Model model, @RequestParam(defaultValue = "1") int page) {
+        model.addAttribute("articles", articleService.findNewPublished(20, page));
+        model.addAttribute("currentPage", page);
         return "pages/index";
     }
 }

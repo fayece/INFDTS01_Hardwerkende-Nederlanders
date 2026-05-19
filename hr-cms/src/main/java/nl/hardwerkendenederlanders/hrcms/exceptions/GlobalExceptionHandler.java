@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNullElse;
 
 import nl.hardwerkendenederlanders.hrcms.models.dtos.exceptions.ErrorResponse;
 import org.springframework.http.HttpStatus;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -43,9 +42,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NotFoundException.class)
-    public String handleNotFound(NotFoundException e, RedirectAttributes redirectAttributes){
+    public String handleNotFound(NotFoundException e, RedirectAttributes redirectAttributes) {
         redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         return "redirect:/manage-users";
     }
-
 }

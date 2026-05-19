@@ -129,7 +129,64 @@ export const initCommentForm = () => {
 
         const loadMoreBtn = document.getElementById("load-more-comments");
         if (loadMoreBtn) loadMoreBtn.dataset.offset = String(Number(loadMoreBtn.dataset.offset) + 1);
+
+        restoreButton();
     });
+};
+
+export const initDeleteInteractions = () => {
+    const modal = document.querySelector(".confirm-modal");
+    if (!modal) return;
+
+    document.addEventListener("click", (event) => {
+        const deleteBtn = event.target.closest(".delete-button");
+        if (deleteBtn) {
+            modal.dataset.pendingId = deleteBtn.dataset.commentId;
+            modal.showModal();
+            return;
+        }
+
+        if (event.target.closest(".cancel-action")) {
+            modal.dataset.pendingId = "";
+            modal.close();
+            return;
+        }
+
+        if (event.target.closest(".confirm-action")) return handleConfirmDelete(modal);
+    });
+};
+
+const handleConfirmDelete = async (modal) => {
+    const commentId = modal.dataset.pendingId;
+    if (!commentId) return;
+
+    const commentEl = document.querySelector(`.delete-button[data-comment-id="${commentId}"]`)?.closest(".comment");
+
+    const restoreButton = setButtonLoading(modal.querySelector(".confirm-action"), "Deleting...");
+    const response = await fetch(`/comment/${commentId}`, { method: "DELETE" }).catch(() => null);
+
+    modal.dataset.pendingId = "";
+    modal.close();
+    restoreButton();
+
+    if (!response || !response.ok) {
+        if (commentEl) {
+            let errorEl = commentEl.querySelector(".delete-error");
+            if (!errorEl) {
+                errorEl = document.createElement("p");
+                errorEl.className = "delete-error error-container";
+                commentEl.appendChild(errorEl);
+            }
+            errorEl.textContent = "Failed to delete comment. Please try again.";
+        }
+        return;
+    }
+
+    const updatedComment = extractHtmlFragment(await response.text(), ".comment");
+    if (commentEl && updatedComment) {
+        commentEl.replaceWith(updatedComment);
+        initializeNewContent(updatedComment);
+    }
 };
 
 export const initReplyInteractions = () => {

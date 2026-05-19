@@ -1,11 +1,14 @@
 package nl.hardwerkendenederlanders.hrcms.controllers;
 
+import jakarta.servlet.http.HttpSession;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import nl.hardwerkendenederlanders.hrcms.configuration.RequiresPermission;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentActionException;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.ArticleService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.SubjectService;
+import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,13 +19,17 @@ import org.springframework.web.bind.annotation.*;
 public class EditorArticleController {
     private final ArticleService articleService;
     private final SubjectService subjectService;
+    private final UserSessionService userSessionService;
 
-    public EditorArticleController(ArticleService articleService, SubjectService subjectService) {
+    public EditorArticleController(
+            ArticleService articleService, SubjectService subjectService, UserSessionService userSessionService) {
         this.articleService = articleService;
         this.subjectService = subjectService;
+        this.userSessionService = userSessionService;
     }
 
     // start empty editor
+    @RequiresPermission("article:create")
     @GetMapping("")
     public String getArticle(Model model) {
         model.addAttribute("articleForm", Article.builder().build());
@@ -30,7 +37,8 @@ public class EditorArticleController {
         return "pages/article-editor-page";
     }
 
-    // load exisiting article
+    // load existing article
+    @RequiresPermission("article:update")
     @GetMapping("/{articleId}")
     public String getArticle(Model model, @PathVariable(value = "articleId") UUID id) {
         Article article = articleService.findById(id);
@@ -43,12 +51,17 @@ public class EditorArticleController {
 
     // method must be Post for HTML form (it does not support put)
     // save draft
+    @RequiresPermission("article:publish")
     @PostMapping("/save")
-    public String putArticle(Model model, @ModelAttribute("articleForm") Article articleForm) {
+    public String putArticle(Model model, @ModelAttribute("articleForm") Article articleForm, HttpSession httpSession) {
         model.addAttribute("articleForm", articleForm);
-
         try {
-            articleService.ensureArticleExists(articleForm);
+            var user = userSessionService.getLoggedInUser(httpSession);
+            if (user.isEmpty()) {
+                return "redirect:/login";
+            }
+            articleService.ensureArticleExists(articleForm, user.get());
+
         } catch (ComponentActionException e) {
             if (e.getAction() == ComponentActionException.Action.CREATE) {
                 return "redirect:/article/editor?error=INSERT";

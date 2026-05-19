@@ -1,4 +1,4 @@
-package nl.hardwerkendenederlanders.hrcms.database;
+package nl.hardwerkendenederlanders.hrcms.database.interfaces;
 
 import nl.hardwerkendenederlanders.hrcms.models.MediaItem;
 

@@ -1,8 +1,19 @@
-<body>
-<h1>
-    error 500!
-</h1>
-    <strong>You have upset the server.</strong>
-    <a th:href="@{/}">Home</a>
-    <link rel="stylesheet" th:href="@{/css/main.css}"/>
-</body>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <title>500</title>
+        <link rel="stylesheet"
+              th:each="cssRef : ${@cssDiscoveryService.getAllCssPaths()}"
+              th:href="${cssRef}">
+    </head>
+
+    <body>
+        <div th:insert="~{fragments/app-wide/navbar :: navbar}" class="navbar"></div>
+        <main class="standard-page-layout">
+            <h1>500</h1>
+            <strong>You have upset the server.</strong>
+            <a th:href="@{/}">Home</a>
+        </main>
+        <footer th:replace="~{fragments/app-wide/footer :: footer}"></footer>
+    </body>
+</html>
