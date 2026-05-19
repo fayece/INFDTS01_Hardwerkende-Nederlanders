@@ -1,5 +1,6 @@
 <span
     th:fragment="engagement(views, comments)"
     th:text="'👁️: ' + ${views} + '|💬: '+ ${comments}"
+    th:data-comment-count="${comments}"
     class="likes-dislikes">
 </span>

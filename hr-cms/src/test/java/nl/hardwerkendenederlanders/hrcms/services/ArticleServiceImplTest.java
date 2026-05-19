@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleAuthorRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleRepository;
+import nl.hardwerkendenederlanders.hrcms.database.interfaces.CommentRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.PublicationStatus;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleFullDetailsDto;
@@ -21,8 +22,10 @@ public class ArticleServiceImplTest {
     private final ArticleRepository articleRepository = mock(ArticleRepository.class);
 
     private final ArticleAuthorRepository authorRepo = mock(ArticleAuthorRepository.class);
+    private final CommentRepository commentRepo = mock(CommentRepository.class);
 
-    private final ArticleServiceImpl articleService = new ArticleServiceImpl(articleRepository, authorRepo);
+    private final ArticleServiceImpl articleService =
+            new ArticleServiceImpl(articleRepository, commentRepo, authorRepo);
 
     @Test
     void ensureCreated_AddArticleWhenNotExists_ShouldAddArticle() {

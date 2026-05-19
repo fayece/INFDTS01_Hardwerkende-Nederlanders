@@ -6,6 +6,7 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleAuthorRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleRepository;
+import nl.hardwerkendenederlanders.hrcms.database.interfaces.CommentRepository;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentActionException;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.ArticleAuthor;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ArticleServiceImpl implements ArticleService {
     private final ArticleRepository articleRepository;
+    private final CommentRepository commentRepository;
     private final ArticleAuthorRepository articleAuthorRepository;
 
     // ensures the given article is present in the database. If the ID doesn't exist a new article is made. If it does
@@ -76,12 +78,22 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     @Cacheable(value = "publishedArticlesFull", sync = true)
     public List<ArticleFullDetailsDto> findNewPublished(int pageSize, int page) {
-        return articleRepository.findNewArticlesPublishedPaged(pageSize, page);
+        List<ArticleFullDetailsDto> articles = articleRepository.findNewArticlesPublishedPaged(pageSize, page);
+        if (articles.isEmpty()) return articles;
+
+        for (ArticleFullDetailsDto article : articles) {
+            if (article != null) article.setCommentCount(commentRepository.countByArticleId(article.getId()));
+        }
+
+        return articles;
     }
 
     @Override
     @Cacheable(value = "fullArticle", key = "#id", sync = true)
     public ArticleFullDetailsDto findArticleFullId(UUID id) {
-        return articleRepository.findArticlePublished(id);
+        ArticleFullDetailsDto article = articleRepository.findArticlePublished(id);
+        if (article != null) article.setCommentCount(commentRepository.countByArticleId(article.getId()));
+
+        return article;
     }
 }

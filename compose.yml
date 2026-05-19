@@ -16,6 +16,8 @@ services:
         condition: service_healthy
       cache_redis:
         condition: service_healthy
+      neo4j:
+        condition: service_healthy
     mem_limit: 500mb
     cpus: 1
     volumes:
@@ -49,14 +51,40 @@ services:
     environment:
       REDIS_ARGS: "--requirepass ${REDIS_PASSWORD} --port 6033"
     healthcheck:
-      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      test: ["CMD-SHELL", "redis-cli -p 6033 -a $$REDIS_PASSWORD ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     ports:
       - "6033:6033"
 
     mem_limit: 100mb
     cpus: 1
 
+  neo4j:
+    image: neo4j:2026.04.0-trixie
+    container_name: hard-work-neo4j
+    env_file: ".env"
+    restart: unless-stopped
+    environment:
+      NEO4J_AUTH: ${NEO4J_AUTH}
+      NEO4J_dbms_memory_heap_initial__size: 256m
+      NEO4J_dbms_memory_heap_max__size: 256m
+      NEO4J_dbms_memory_pagecache_size: 256m
+    volumes:
+      - neo4jdata:/data
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -a bolt://localhost:7687 -u neo4j -p \"$$SPRING_NEO4J_AUTHENTICATION_PASSWORD\" 'RETURN 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "7474:7474" # HTTP
+      - "7687:7687" # Bolt protocol (application communication)
+    mem_limit: 1g
+    cpus: 1
 
 volumes:
   pgdata:
   uploads:
+  neo4jdata:
