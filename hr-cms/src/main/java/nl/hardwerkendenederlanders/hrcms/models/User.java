@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import nl.hardwerkendenederlanders.hrcms.models.dtos.commonalities.FullName;
+import nl.hardwerkendenederlanders.hrcms.models.commonalities.FullName;
 import org.jetbrains.annotations.Nullable;
 
 @SuperBuilder

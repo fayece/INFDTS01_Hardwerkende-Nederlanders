@@ -2,15 +2,15 @@ package nl.hardwerkendenederlanders.hrcms.models.dtos.article;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import nl.hardwerkendenederlanders.hrcms.models.PublicationStatus;
 import org.jetbrains.annotations.Nullable;
 
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ArticleFullDetailsDto {
 
     private UUID id;
