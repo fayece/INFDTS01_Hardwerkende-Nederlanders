@@ -1,7 +1,5 @@
 package nl.hardwerkendenederlanders.hrcms.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import lombok.Data;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
