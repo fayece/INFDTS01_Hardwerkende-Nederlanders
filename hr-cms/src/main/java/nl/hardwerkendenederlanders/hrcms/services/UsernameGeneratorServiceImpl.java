@@ -1,0 +1,59 @@
+package nl.hardwerkendenederlanders.hrcms.services;
+
+import nl.hardwerkendenederlanders.hrcms.database.mongodb.ProfileRepository;
+import nl.hardwerkendenederlanders.hrcms.models.Profile;
+import nl.hardwerkendenederlanders.hrcms.services.interfaces.UsernameGeneratorService;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+import java.util.Random;
+
+@Service
+
+public class UsernameGeneratorServiceImpl implements UsernameGeneratorService {
+
+    private final ProfileRepository profileRepository;
+
+    public UsernameGeneratorServiceImpl(ProfileRepository profileRepository){
+        this.profileRepository = profileRepository;
+    }
+
+    private static final String[] ANIMALS = {
+            "frog", "tiger", "falcon", "wolf", "bear", "eagle", "shark", "lion", "cobra", "panda", "raven", "lynx", "otter", "moose", "bison", "crane", "gecko", "viper", "hyena", "lemur", "finch", "tapir", "dingo", "stoat", "shrew", "mamba", "quail", "okapi", "oriole", "bison", "kite", "ibis", "swift", "snipe", "booby", "macaw", "robin", "finch", "wren", "dove", "lark", "mink", "sable", "stoat", "ferret", "badger", "weasel", "skunk", "panda", "koala", "sloth", "tapir", "capybara", "iguana", "chameleon", "axolotl", "salamander", "newt", "toad", "python", "boa", "anaconda", "moccasin", "rattler", "gecko", "monitor", "skink", "tuatara", "caiman", "croc", "pelican", "albatross", "condor", "osprey", "harrier", "kestrel", "merlin", "hobby", "buzzard", "kite", "magpie", "jackdaw", "rook", "chough", "starling", "thrush", "ouzel", "dipper", "warbler", "bunting", "pipit", "wagtail", "nuthatch", "treecreeper", "kingfisher", "bee-eater", "roller", "hoopoe", "cuckoo", "nightjar", "owl", "tawny", "barn", "snowy", "eagle-owl", "scops", "pygmy", "burrowing", "fishing", "hawk-owl", "toucan", "hornbill", "parrot", "lorikeet", "cockatoo", "corella", "galah", "budgie", "parakeet", "conure", "marlin", "swordfish", "tuna", "barracuda", "mahi", "wahoo", "tarpon", "bonefish", "permit", "snook", "grouper", "snapper", "flounder", "halibut", "sole", "plaice", "turbot", "dab", "brill", "skate", "ray", "hammerhead", "thresher", "mako", "nurse", "bull", "tiger-shark", "wobbegong", "catshark", "dogfish"
+    };
+
+    private static final String[] ADJECTIVES = {
+            "swift", "brave", "fierce", "calm", "bold", "dark", "wild", "keen", "vast", "deep", "sharp", "quiet", "bright", "cold", "warm", "smooth", "rough", "hard", "soft", "firm", "fast", "slow", "large", "small", "tall", "short", "light", "heavy", "young", "old", "clear", "dim", "pure", "raw", "dry", "wet", "hot", "cool", "free", "lost", "proud", "wise", "kind", "fair", "true", "real", "safe", "neat", "rare", "rich", "noble", "epic", "grand", "royal", "prime", "sonic", "lunar", "solar", "astral", "cosmic", "iron", "steel", "stone", "jade", "amber", "ivory", "azure", "crimson", "scarlet", "golden", "silver", "bronze", "onyx", "coral", "obsidian", "emerald", "sapphire", "ruby", "topaz", "pearl", "frozen", "blazing", "stormy", "silent", "hollow", "broken", "hidden", "ancient", "mystic", "shadow", "mighty", "fearless", "daring", "cunning", "nimble", "agile", "sturdy", "rugged", "sleek", "stark", "toxic", "rogue", "rebel", "chaos", "order", "primal", "feral", "savage", "brutal", "vicious", "gentle", "serene", "tranquil", "radiant", "vibrant", "vivid", "glowing", "shining", "burning", "flashing", "stellar", "orbital", "galactic", "nebular", "quantum", "atomic", "nuclear", "plasma", "electric", "magnetic", "tidal", "glacial", "volcanic", "seismic", "arctic", "tropical", "arid", "humid", "alpine", "coastal", "hollow", "ancient", "eternal", "infinite", "supreme", "ultimate", "absolute", "perfect", "flawless", "supreme"
+    };
+
+    private String generateUsername(){
+        Random random = new Random();
+
+        int index_adjective = random.nextInt(ADJECTIVES.length);
+        String adjective = ADJECTIVES[index_adjective];
+
+        int index = random.nextInt(ANIMALS.length);
+        String animal = ANIMALS[index];
+
+        int number = random.nextInt(100000);
+
+        String username = adjective + animal + String.valueOf(number);
+
+        return username;
+    }
+
+    public String generateUniqueUsername(){
+        String username = "";
+
+        while(true){
+            String generatedName = generateUsername();
+            Optional<Profile> usernameExists = profileRepository.findByUsername(username);
+            if(usernameExists.isEmpty()){
+                username = generatedName;
+                break;
+            }
+        }
+
+        return username;
+    }
+}

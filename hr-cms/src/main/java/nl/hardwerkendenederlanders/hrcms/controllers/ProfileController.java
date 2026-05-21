@@ -2,9 +2,10 @@ package nl.hardwerkendenederlanders.hrcms.controllers;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import java.util.Optional;
+import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ConflictException;
 import nl.hardwerkendenederlanders.hrcms.models.Profile;
-import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.ProfileDTO;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.ProfileService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
@@ -14,25 +15,20 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.Optional;
-import java.util.UUID;
-
 @Controller
 public class ProfileController {
     private final ProfileService profileService;
     private final UserSessionService userSessionService;
 
-    public ProfileController(ProfileService profileService, UserSessionService userSessionService){
+    public ProfileController(ProfileService profileService, UserSessionService userSessionService) {
         this.profileService = profileService;
         this.userSessionService = userSessionService;
     }
 
     @GetMapping("/my-profile")
-    public String getProfilePageOfCurrentUser(Model model, HttpSession session){
+    public String getProfilePageOfCurrentUser(Model model, HttpSession session) {
         Optional<UUID> userId = userSessionService.getLoggedInUser(session);
-        if(userId.isEmpty())
-            return "pages/login";
+        if (userId.isEmpty()) return "pages/login";
 
         Profile profile = profileService.getProfileById(userId.get());
 
@@ -43,7 +39,7 @@ public class ProfileController {
     }
 
     @GetMapping("/profile/{username}")
-    public String getProfilePageOfOtherUser(@PathVariable String username, Model model){
+    public String getProfilePageOfOtherUser(@PathVariable String username, Model model) {
         Profile profile = profileService.getProfileByUsername(username);
 
         model.addAttribute("editable", false);
@@ -53,17 +49,15 @@ public class ProfileController {
     }
 
     @GetMapping("/create-new-profile")
-    public String createUsernamePage(Model model)
-    {
+    public String createUsernamePage(Model model) {
         model.addAttribute("profileDTO", new ProfileDTO());
         return "pages/create-username";
     }
 
     @GetMapping("/my-profile-edit")
-    public String editProfile(Model model, HttpSession session){
+    public String editProfile(Model model, HttpSession session) {
         Optional<UUID> userId = userSessionService.getLoggedInUser(session);
-        if(userId.isEmpty())
-            return "pages/login";
+        if (userId.isEmpty()) return "pages/login";
 
         Profile profile = profileService.getProfileById(userId.get());
         model.addAttribute("profileDTO", profileService.toDTO(profile));
@@ -72,43 +66,27 @@ public class ProfileController {
     }
 
     @PostMapping("/my-profile/update")
-    public String updateProfile(@Valid @ModelAttribute ProfileDTO profileDTO,
+    public String updateProfile(
+            @Valid @ModelAttribute ProfileDTO profileDTO,
             @RequestParam(value = "file", required = false) MultipartFile file,
-                                BindingResult result, HttpSession session)
-    {
-        if (result.hasErrors()){
+            BindingResult result,
+            HttpSession session) {
+        if (result.hasErrors()) {
             result.getAllErrors().forEach(e -> System.out.println(e));
-            return "pages/edit-profile";}
+            return "pages/edit-profile";
+        }
 
         Optional<UUID> userId = userSessionService.getLoggedInUser(session);
-        if(userId.isEmpty())
-            return "pages/login";
+        if (userId.isEmpty()) return "pages/login";
 
-        try{
+        try {
             profileService.setProfile(userId.get(), profileDTO, file);
             return "redirect:/my-profile";
         } catch (ConflictException e) {
-        result.rejectValue("username", "error.username", "Username is already taken");
-        return "pages/edit-profile";
-    } catch (Exception e) {
-        return "pages/edit-profile";
-    }}
-
-    @PostMapping("/create-username")
-    public String createUsername(@Valid @ModelAttribute ProfileDTO profileDTO, BindingResult result, Model model, HttpSession session){
-        if (result.hasErrors())
-            return "pages/create-username";
-
-        Optional<UUID> userId = userSessionService.getLoggedInUser(session);
-        if(userId.isEmpty())
-            return "pages/login";
-
-        try{
-            profileService.setProfile((userId.get()), profileDTO, null);
-            return "redirect:/my-profile";
-        }catch(ConflictException e){
             result.rejectValue("username", "error.username", "Username is already taken");
-            return "pages/create-username";
+            return "pages/edit-profile";
+        } catch (Exception e) {
+            return "pages/edit-profile";
         }
     }
 }

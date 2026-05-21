@@ -18,10 +18,9 @@ import org.springframework.ui.Model;
 class AuthControllerTest {
 
     private final UserSessionService userSessionService = mock(UserSessionService.class);
-    private final ProfileService profileService = mock(ProfileService.class);
     private final AuthService authService = mock(AuthService.class);
 
-    private final AuthController authController = new AuthController(userSessionService, profileService, authService);
+    private final AuthController authController = new AuthController(userSessionService, authService);
 
     @Test
     void login_success_redirectsToHome() {

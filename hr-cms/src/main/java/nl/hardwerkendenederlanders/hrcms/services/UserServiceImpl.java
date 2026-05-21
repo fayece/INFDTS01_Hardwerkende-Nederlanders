@@ -5,22 +5,34 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
+import nl.hardwerkendenederlanders.hrcms.database.mongodb.ProfileRepository;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ConflictException;
 import nl.hardwerkendenederlanders.hrcms.exceptions.NotFoundException;
+import nl.hardwerkendenederlanders.hrcms.models.Profile;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserService;
+import nl.hardwerkendenederlanders.hrcms.services.interfaces.UsernameGeneratorService;
 import org.jspecify.annotations.NonNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static nl.hardwerkendenederlanders.hrcms.services.UsernameGeneratorServiceImpl.generateUsername;
+
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final ProfileRepository profileRepository;
+
+    private final UsernameGeneratorService usernameGeneratorService;
+
     private final int pageSize = 13;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, ProfileRepository profileRepository, UsernameGeneratorService usernameGeneratorService) {
         this.userRepository = userRepository;
+        this.profileRepository = profileRepository;
+        this.usernameGeneratorService = usernameGeneratorService;
     }
 
     public List<User> getUsers(int page, String searchName, Boolean sortActive) {
@@ -58,8 +70,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void insertUser(
-            String firstName, String prefix, String lastName, String email, String password, UUID roleId) {
+    public void insertUser(String firstName, String prefix, String lastName, String email, String password, UUID roleId) {
         User toInsert = new User(
                 UUID.randomUUID(),
                 firstName,
@@ -74,6 +85,12 @@ public class UserServiceImpl implements UserService {
 
         validateUserAttributes(toInsert);
         insertUser(toInsert);
+
+        //Profile username creation
+        String username = usernameGeneratorService.generateUniqueUsername();
+        Profile profile = new Profile();
+        profile.setUsername(username);
+        profileRepository.save(profile);
     }
 
     @Override
@@ -137,11 +154,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteById(UUID id, UUID currentUserId) {
         if (id == currentUserId) {
             throw new ConflictException("Cannot delete your own account when logged in");
         }
         userRepository.deleteById(id);
+        profileRepository.deleteById(id.toString());
     }
 
     @Override
