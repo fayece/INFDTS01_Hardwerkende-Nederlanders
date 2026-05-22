@@ -20,7 +20,7 @@ public class RedisCacheManagerConfiguration {
                 .activateDefaultTyping(
                         BasicPolymorphicTypeValidator.builder()
                                 .allowIfSubType(Object.class)
-                                .allowIfBaseType("nl.hardwerkendenederlanders.hrcms.models")
+                                .allowIfBaseType("nl.hardwerkendenederlanders.hrcms")
                                 .build(),
                         DefaultTyping.NON_FINAL)
                 .build();

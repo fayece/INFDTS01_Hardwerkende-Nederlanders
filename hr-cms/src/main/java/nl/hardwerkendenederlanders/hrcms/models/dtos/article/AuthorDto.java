@@ -7,12 +7,11 @@ import lombok.Setter;
 import nl.hardwerkendenederlanders.hrcms.models.commonalities.FullName;
 import org.jetbrains.annotations.Nullable;
 
-@AllArgsConstructor
-@Builder
 @Getter
-@Setter
-public class AuthorDto implements FullName {
-    private String firstName;
-    private @Nullable String prefix;
-    private String lastName;
+public class AuthorDto {
+    private final String username;
+
+    public AuthorDto(String username) {
+        this.username = username;
+    }
 }
