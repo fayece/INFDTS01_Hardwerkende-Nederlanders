@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,10 +28,10 @@ public class Profile {
     @Nullable
     private String bio;
 
-    private List<String> interests;
-    private List<String> pronouns;
-    private List<CustomField> customFields;
-    private List<Social> socials;
+    private List<String> interests = new ArrayList<>();
+    private List<String> pronouns = new ArrayList<>();
+    private List<CustomField> customFields = new ArrayList<>();
+    private List<Social> socials = new ArrayList<>();
 
 
     @Data
