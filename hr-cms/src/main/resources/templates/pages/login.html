@@ -12,13 +12,13 @@
         <main class="standard-page-layout">
             <h1>Login</h1>
             <p th:if="${error}" style="color:red;">
-                Invalid email or password
+                Invalid username or password
             </p>
 
             <form th:action="@{/login}" method="post">
                 <div>
-                    <label>Email:
-                        <input type="text" name="email"/>
+                    <label>Username:
+                        <input type="text" name="username"/>
                     </label>
                 </div>
 

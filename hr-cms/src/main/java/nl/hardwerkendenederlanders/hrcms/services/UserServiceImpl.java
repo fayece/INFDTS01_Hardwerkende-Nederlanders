@@ -87,6 +87,7 @@ public class UserServiceImpl implements UserService {
         //Profile username creation
         String username = usernameGeneratorService.generateUniqueUsername();
         Profile profile = new Profile();
+        profile.setId(toInsert.getId().toString());
         profile.setUsername(username);
         profileRepository.save(profile);
     }
