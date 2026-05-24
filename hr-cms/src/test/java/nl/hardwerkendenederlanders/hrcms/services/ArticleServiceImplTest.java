@@ -24,7 +24,8 @@ public class ArticleServiceImplTest {
     private final ArticleAuthorRepository authorRepo = mock(ArticleAuthorRepository.class);
     private final ProfileRepository profileRepository = mock(ProfileRepository.class);
 
-    private final ArticleServiceImpl articleService = new ArticleServiceImpl(articleRepository, authorRepo, profileRepository);
+    private final ArticleServiceImpl articleService =
+            new ArticleServiceImpl(articleRepository, authorRepo, profileRepository);
 
     @Test
     void ensureCreated_AddArticleWhenNotExists_ShouldAddArticle() {

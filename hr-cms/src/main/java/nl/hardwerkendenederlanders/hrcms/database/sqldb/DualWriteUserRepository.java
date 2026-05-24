@@ -49,7 +49,6 @@ public class DualWriteUserRepository implements UserRepository {
         return jdbcUserRepository.findById(id);
     }
 
-
     @Override
     public List<User> findAllUsers() {
         return jdbcUserRepository.findAllUsers();

@@ -107,15 +107,6 @@ class DualWriteUserRepositoryTest {
     }
 
     private User testUser() {
-        return new User(
-                UUID.randomUUID(),
-                "Test",
-                null,
-                "User",
-                "hash",
-                null,
-                null,
-                true,
-                OffsetDateTime.now());
+        return new User(UUID.randomUUID(), "Test", null, "User", "hash", null, null, true, OffsetDateTime.now());
     }
 }
