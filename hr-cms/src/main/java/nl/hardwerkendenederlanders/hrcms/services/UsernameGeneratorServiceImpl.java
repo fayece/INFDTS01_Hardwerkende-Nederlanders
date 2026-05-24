@@ -343,7 +343,7 @@ public class UsernameGeneratorServiceImpl implements UsernameGeneratorService {
 
         while (true) {
             String generatedName = generateUsername();
-            Optional<Profile> usernameExists = profileRepository.findByUsername(username);
+            Optional<Profile> usernameExists = profileRepository.findByUsername(generatedName);
             if (usernameExists.isEmpty()) {
                 username = generatedName;
                 break;

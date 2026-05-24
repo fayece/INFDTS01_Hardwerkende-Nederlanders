@@ -13,7 +13,7 @@ import nl.hardwerkendenederlanders.hrcms.models.Profile;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.ProfileDTO;
 import org.junit.jupiter.api.Test;
 
-class ProfileServiceTest {
+class ProfileServiceImplTest {
 
     private final ProfileRepository profileRepository = mock(ProfileRepository.class);
     private final ProfileServiceImpl profileService = new ProfileServiceImpl(profileRepository);
