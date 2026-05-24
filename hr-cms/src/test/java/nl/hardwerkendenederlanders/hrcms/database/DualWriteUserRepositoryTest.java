@@ -112,7 +112,6 @@ class DualWriteUserRepositoryTest {
                 "Test",
                 null,
                 "User",
-                "testuser@example.com",
                 "hash",
                 null,
                 null,

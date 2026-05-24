@@ -280,18 +280,11 @@ public class Neo4jCommentRepository implements CommentRepository {
 
     private CommentWithAuthor toCommentWithAuthor(RawCommentResult raw) {
         String authorName;
-        if (raw.comment().getDeletedAt() != null || raw.firstName() == null) {
+        if (raw.comment().getDeletedAt() != null) {
             authorName = HIDDEN_AUTHOR;
         } else {
-            authorName = buildFullName(raw.firstName(), raw.prefix(), raw.lastName());
+            authorName = raw.comment().getCreatorId().toString();
         }
         return new CommentWithAuthor(raw.comment(), authorName, raw.replyCount());
-    }
-
-    private String buildFullName(String firstName, String prefix, String lastName) {
-        if (prefix == null || prefix.isBlank()) {
-            return firstName + " " + lastName;
-        }
-        return firstName + " " + prefix + " " + lastName;
     }
 }

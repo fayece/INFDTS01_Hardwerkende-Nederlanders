@@ -32,7 +32,7 @@ public class DataIntegrityScheduler {
     @Autowired
     private UsernameGeneratorService usernameGeneratorService;
 
-    @Scheduled(fixedRate = 3600000) // elk uur
+    @Scheduled(cron = "0 0 3 * * *") // elke nacht om 3 uur
     public void checkUsersWithoutProfile() {
         List<User> users = userRepository.findAllUsers();
 
@@ -57,7 +57,7 @@ public class DataIntegrityScheduler {
         }
     }
 
-    @Scheduled(fixedRate = 3600000)
+    @Scheduled(cron = "0 0 3 * * *") // elke nacht om 3 uur
     public void checkProfilesWithoutUser() {
         List<Profile> profiles = profileRepository.findAll();
 

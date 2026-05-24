@@ -29,7 +29,7 @@ public class RedisCacheManagerConfiguration {
 
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(RedisCacheConfiguration.defaultCacheConfig()
-                        .entryTtl(Duration.ofMinutes(10))
+                        .entryTtl(Duration.ofMinutes(1))
                         .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer)))
                 .transactionAware()
                 .build();
