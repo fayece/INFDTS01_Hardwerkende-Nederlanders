@@ -11,9 +11,8 @@ public interface UserService {
 
     void insertUser(User user);
 
-    void insertUser(String firstName, String prefix, String lastName, String email, String password, UUID roleId);
+    String insertUser(String firstName, String prefix, String lastName, String password, UUID roleId);
 
-    User findByEmail(String email);
 
     User findById(UUID id);
 
@@ -24,7 +23,7 @@ public interface UserService {
     void updateUser(User user);
 
     void updateUser(
-            UUID id, String firstName, String prefix, String lastName, String email, UUID roleId, UUID organisationId);
+            UUID id, String firstName, String prefix, String lastName, UUID roleId, UUID organisationId);
 
     void deleteById(UUID id, UUID currentUserId);
 
@@ -38,5 +37,5 @@ public interface UserService {
 
     int countAll();
 
-    int countByNameOrEmailPaginated(String name);
+    int countByNamePaginated(String name);
 }

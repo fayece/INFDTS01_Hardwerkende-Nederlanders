@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public class DataIntegrityLogRepository {
+public class JdbcIntegrityLogRepository {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -15,11 +15,13 @@ public class DataIntegrityLogRepository {
 
     public void save(LoggingEntity log) {
         jdbcTemplate.update(
-                String.format("INSERT INTO %s (id, message, severity, timestamp) VALUES (?, ?, ?, ?)", TABLE),
+                String.format("INSERT INTO %s (id, message, severity, timestamp, user_id, profile_id) VALUES (?, ?, ?, ?, ?, ?)", TABLE),
                 UUID.randomUUID(),
                 log.getMessage(),
                 log.getSeverity(),
-                log.getTimestamp()
+                log.getTimestamp(),
+                log.getUserId(),
+                log.getProfileId()
         );
     }
 }

@@ -27,9 +27,6 @@
                         <label><b>Last name:</b>
                             <input type="text" name="lastName" th:value="${currentUser.lastName}">
                         </label>
-                        <label><b>Email:</b>
-                            <input type="text" name="email" th:value="${currentUser.email}">
-                        </label>
                         <label><b>Role:</b>
                             <select name="roleId">
                                 <option th:each="role : ${roles}"
@@ -37,9 +34,6 @@
                                         th:text="${role.roleName}"
                                         th:selected="${role.id == currentUser.roleId}"></option>
                             </select>
-                        </label>
-                        <label><b>OrganisationId</b>
-                            <input type="text" name="organisationId" th:value="${currentUser.organizationId}">
                         </label>
                         <button class="create-user-button" type="submit">Update user</button>
                     </form>

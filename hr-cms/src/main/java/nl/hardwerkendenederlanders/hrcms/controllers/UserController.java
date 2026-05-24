@@ -4,9 +4,11 @@ import jakarta.servlet.http.HttpSession;
 import java.util.*;
 import java.util.stream.Collectors;
 import nl.hardwerkendenederlanders.hrcms.configuration.RequiresPermission;
+import nl.hardwerkendenederlanders.hrcms.models.Profile;
 import nl.hardwerkendenederlanders.hrcms.models.Role;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.userDtos.UserViewDto;
+import nl.hardwerkendenederlanders.hrcms.services.interfaces.ProfileService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.RoleService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
@@ -22,11 +24,13 @@ public class UserController {
     private final UserService userService;
     private final UserSessionService userSessionService;
     private final RoleService roleService;
+    private final ProfileService profileService;
 
-    public UserController(UserService userService, UserSessionService userSessionService, RoleService roleService) {
+    public UserController(UserService userService, UserSessionService userSessionService, RoleService roleService, ProfileService profileService) {
         this.userService = userService;
         this.userSessionService = userSessionService;
         this.roleService = roleService;
+        this.profileService = profileService;
     }
 
     @RequiresPermission("admin:manage_users")
@@ -100,13 +104,15 @@ public class UserController {
             @RequestParam String firstName,
             @RequestParam(required = false) String prefix,
             @RequestParam String lastName,
-            @RequestParam String email,
             @RequestParam String password,
             @RequestParam UUID roleId,
             Model model) {
 
-        userService.insertUser(firstName, prefix, lastName, email, password, roleId);
+        userService.insertUser(firstName, prefix, lastName, password, roleId);
         model.addAttribute("inserted", true);
+        String username = userService.insertUser(firstName, prefix, lastName, password, roleId);
+        model.addAttribute("successMessage", "User \"" + username + "\" created successfully!");
+
         model.addAttribute("roles", roleService.findAll());
         return "pages/create-user";
     }
@@ -118,10 +124,9 @@ public class UserController {
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String prefix,
             @RequestParam(required = false) String lastName,
-            @RequestParam(required = false) String email,
             @RequestParam(required = false) UUID roleId,
             @RequestParam(required = false) UUID organisationId) {
-        userService.updateUser(id, firstName, prefix, lastName, email, roleId, organisationId);
+        userService.updateUser(id, firstName, prefix, lastName, roleId, organisationId);
         return "redirect:/manage-users"; // or a successpage -> manage-users
     }
 
@@ -139,7 +144,6 @@ public class UserController {
         User user = userService.findById(userId);
         model.addAttribute("userFirstName", user.getFirstName());
         model.addAttribute("userLastName", user.getLastName());
-        model.addAttribute("userEmail", user.getEmail());
 
         model.addAttribute("userToDeleteId", userId);
         return "pages/confirm-delete-user";
@@ -155,12 +159,15 @@ public class UserController {
     }
 
     private UserViewDto toUserViewDto(User user, Map<UUID, String> roleNames) {
+        UUID id = user.getId();
+        Profile profile = profileService.getProfileById(id);
+
         return UserViewDto.builder()
                 .id(user.getId())
+                .userName(profile.getUsername())
                 .firstName(user.getFirstName())
                 .prefix(user.getPrefix())
                 .lastName(user.getLastName())
-                .email(user.getEmail())
                 .roleId(user.getRoleId())
                 .roleName(user.getRoleId() != null ? roleNames.get(user.getRoleId()) : null)
                 .organizationId(user.getOrganizationId())

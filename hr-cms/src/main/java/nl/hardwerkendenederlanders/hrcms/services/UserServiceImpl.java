@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
 
     public List<User> getUsers(int page, String searchName, Boolean sortActive) {
         if (searchName != null) {
-            return userRepository.findByNameOrEmailPaginated(searchName, page, pageSize);
+            return userRepository.findByNamePaginated(searchName, page, pageSize);
         } else if (sortActive != null) {
             return userRepository.findUserOnActivityPaginated(sortActive, page, pageSize);
         }
@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
 
     public int getMaxPages(String searchName, Boolean sortActive) {
         if (searchName != null) {
-            return (int) Math.ceil(((double) countByNameOrEmailPaginated(searchName)) / pageSize);
+            return (int) Math.ceil(((double) countByNamePaginated(searchName)) / pageSize);
         } else if (sortActive != null) {
             return (int) Math.ceil(((double) countByActive(sortActive)) / pageSize);
         }
@@ -54,11 +54,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void insertUser(@NonNull User user) {
-        Optional<User> alreadyExists = userRepository.findByEmail(user.getEmail());
-        if (alreadyExists.isPresent()) {
-            throw new ConflictException("email address already taken");
-        }
-
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String hash = encoder.encode(user.getPasswordHash());
         user.setPasswordHash(hash);
@@ -68,13 +63,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void insertUser(String firstName, String prefix, String lastName, String email, String password, UUID roleId) {
+    public String insertUser(String firstName, String prefix, String lastName, String password, UUID roleId) {
         User toInsert = new User(
                 UUID.randomUUID(),
                 firstName,
                 prefix,
                 lastName,
-                email,
                 password,
                 roleId,
                 null,
@@ -90,16 +84,13 @@ public class UserServiceImpl implements UserService {
         profile.setId(toInsert.getId().toString());
         profile.setUsername(username);
         profileRepository.save(profile);
+
+        return username;
     }
 
     @Override
     public User findById(UUID id) {
         return userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
-    }
-
-    @Override
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("User not found"));
     }
 
     @Override
@@ -115,18 +106,13 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void updateUser(@NonNull User user) {
-        Optional<User> alreadyExists = userRepository.findByEmail(user.getEmail());
-        if (alreadyExists.isPresent()
-                && !java.util.Objects.equals(alreadyExists.get().getId(), user.getId())) {
-            throw new ConflictException("Email address already taken");
-        }
         userRepository.update(user);
     }
 
     @Override
     @Transactional
     public void updateUser(
-            UUID id, String firstName, String prefix, String lastName, String email, UUID roleId, UUID organisationId) {
+            UUID id, String firstName, String prefix, String lastName, UUID roleId, UUID organisationId) {
         User currentUser = findById(id);
         if (firstName != null) {
             currentUser.setFirstName(firstName);
@@ -136,9 +122,6 @@ public class UserServiceImpl implements UserService {
         }
         if (lastName != null) {
             currentUser.setLastName(lastName);
-        }
-        if (email != null) {
-            currentUser.setEmail(email);
         }
         if (roleId != null) {
             currentUser.setRoleId(roleId);
@@ -169,7 +152,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> searchByNamePaginated(String name, int page, int amount) {
-        return userRepository.findByNameOrEmailPaginated(name, page, amount);
+        return userRepository.findByNamePaginated(name, page, amount);
     }
 
     @Override
@@ -188,8 +171,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int countByNameOrEmailPaginated(String name) {
-        return userRepository.countByNameOrEmailPaginated(name);
+    public int countByNamePaginated(String name) {
+        return userRepository.countByNamePaginated(name);
     }
 
     public void validateUserAttributes(User user) {
@@ -199,7 +182,6 @@ public class UserServiceImpl implements UserService {
 
         String firstName = user.getFirstName();
         String lastName = user.getLastName();
-        String email = user.getEmail();
 
         if (user.getId() == null) {
             throw new IllegalArgumentException("user id is required");
@@ -209,9 +191,6 @@ public class UserServiceImpl implements UserService {
         }
         if (lastName == null || lastName.isBlank() || lastName.length() < 2) {
             throw new IllegalArgumentException("last name should be at least 2 characters long");
-        }
-        if (email == null || email.isBlank() || !email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-            throw new IllegalArgumentException("invalid email address");
         }
     }
 }

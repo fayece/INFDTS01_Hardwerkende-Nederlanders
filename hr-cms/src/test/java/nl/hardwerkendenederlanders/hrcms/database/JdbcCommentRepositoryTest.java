@@ -65,7 +65,6 @@ public class JdbcCommentRepositoryTest extends CommentRepositoryContractTest {
         User author = User.builder()
                 .firstName("Test")
                 .lastName("Author")
-                .email(UUID.randomUUID() + "@example.com")
                 .passwordHash("R@ndomP4ssw0rd1!@x")
                 .roleId(role.getId())
                 .build();

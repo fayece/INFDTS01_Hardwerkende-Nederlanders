@@ -16,4 +16,6 @@ public class LoggingEntity {
     private String message;
     private String severity;
     private OffsetDateTime timestamp;
+    private UUID userId;
+    private String profileId;
 }
