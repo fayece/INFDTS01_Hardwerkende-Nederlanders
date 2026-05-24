@@ -1,8 +1,6 @@
 package nl.hardwerkendenederlanders.hrcms.database.interfaces;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 
 public interface UserRepository {

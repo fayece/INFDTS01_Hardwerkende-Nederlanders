@@ -35,6 +35,14 @@ const setButtonLoading = (button, loadingText) => {
     };
 };
 
+const incrementCommentCount = () => {
+    const el = document.querySelector(".likes-dislikes[data-comment-count]");
+    if (!el) return;
+    const count = Number(el.dataset.commentCount) + 1;
+    el.dataset.commentCount = String(count);
+    el.textContent = el.textContent.replace(/💬: \d+/, `💬: ${count}`);
+};
+
 const postUrlEncoded = (url, body) => fetch(url, {
     method: "POST",
     headers: {"Content-Type": "application/x-www-form-urlencoded"},
@@ -125,6 +133,7 @@ export const initCommentForm = () => {
             li.appendChild(newComment);
             list.prepend(li);
             initializeNewContent(li);
+            incrementCommentCount();
         }
 
         const loadMoreBtn = document.getElementById("load-more-comments");
@@ -298,6 +307,7 @@ const handleSubmitReply = async (button) => {
         container.appendChild(newReply);
         delete activeEditors[commentId];
         initializeNewContent(newReply);
+        incrementCommentCount();
     } else {
         alert("Failed to load the new reply. Please refresh the page.");
         restoreButton();

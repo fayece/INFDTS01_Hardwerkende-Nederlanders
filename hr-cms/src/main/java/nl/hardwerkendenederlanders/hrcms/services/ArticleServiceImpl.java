@@ -6,14 +6,11 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleAuthorRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleRepository;
-import nl.hardwerkendenederlanders.hrcms.database.mongodb.ProfileRepository;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentActionException;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
 import nl.hardwerkendenederlanders.hrcms.models.ArticleAuthor;
-import nl.hardwerkendenederlanders.hrcms.models.Profile;
 import nl.hardwerkendenederlanders.hrcms.models.PublicationStatus;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleFullDetailsDto;
-import nl.hardwerkendenederlanders.hrcms.models.dtos.article.AuthorDto;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.ArticleService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -27,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ArticleServiceImpl implements ArticleService {
     private final ArticleRepository articleRepository;
     private final ArticleAuthorRepository articleAuthorRepository;
-    private final ProfileRepository profileRepository;
 
     // ensures the given article is present in the database. If the ID doesn't exist a new article is made. If it does
     // the article is updated
@@ -86,15 +82,6 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     @Cacheable(value = "fullArticle", key = "#id", sync = true)
     public ArticleFullDetailsDto findArticleFullId(UUID id) {
-        ArticleFullDetailsDto article = articleRepository.findArticlePublished(id);
-        if (article == null) return null;
-
-        String username = profileRepository
-                .findById(article.getFirstAuthor().getUsername())
-                .map(Profile::getUsername)
-                .orElse("deleted_user");
-
-        article.setFirstAuthor(new AuthorDto(username));
-        return article;
+        return articleRepository.findArticlePublished(id);
     }
 }
