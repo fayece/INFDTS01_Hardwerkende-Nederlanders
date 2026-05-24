@@ -28,10 +28,8 @@ class AuthServiceImplTest {
 
         UUID userId = UUID.randomUUID();
 
-        Profile profile = Profile.builder()
-                .id(userId.toString())
-                .username("johndoe123")
-                .build();
+        Profile profile =
+                Profile.builder().id(userId.toString()).username("johndoe123").build();
 
         User user = new User(userId, "John", null, "Doe", hash, null, null, true, OffsetDateTime.now());
 
@@ -59,10 +57,8 @@ class AuthServiceImplTest {
 
         UUID userId = UUID.randomUUID();
 
-        Profile profile = Profile.builder()
-                .id(userId.toString())
-                .username("johndoe123")
-                .build();
+        Profile profile =
+                Profile.builder().id(userId.toString()).username("johndoe123").build();
 
         User user = new User(userId, "John", null, "Doe", hash, null, null, true, OffsetDateTime.now());
 

@@ -54,7 +54,8 @@ public class ProfileServiceImpl implements ProfileService {
                 .profilePicture(profilePicture)
                 .build();
 
-        profile.getCustomFields().removeIf(f -> f.getLabel() == null || f.getLabel().isBlank());
+        profile.getCustomFields()
+                .removeIf(f -> f.getLabel() == null || f.getLabel().isBlank());
         profile.getSocials().removeIf(s -> s.getType() == null || s.getType().isBlank());
         profile.getPronouns().removeIf(p -> p == null || p.isBlank());
         profile.getInterests().removeIf(i -> i == null || i.isBlank());
