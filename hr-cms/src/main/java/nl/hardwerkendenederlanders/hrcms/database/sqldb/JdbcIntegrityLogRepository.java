@@ -12,18 +12,15 @@ public class JdbcIntegrityLogRepository {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    private final String TABLE = "integrity_logs";
-
     public void save(LoggingEntity log) {
         jdbcTemplate.update(
                 String.format(
-                        "INSERT INTO %s (id, message, severity, timestamp, user_id, profile_id) VALUES (?, ?, ?, ?, ?, ?)",
-                        TABLE),
+                        "INSERT INTO integrity_logs (id, message, severity, timestamp, user_id, profile_id) VALUES (?, ?, ?, ?, ?, ?)",
                 UUID.randomUUID(),
                 log.getMessage(),
                 log.getSeverity(),
                 log.getTimestamp(),
                 log.getUserId(),
-                log.getProfileId());
+                log.getProfileId()));
     }
 }

@@ -14,5 +14,5 @@ public interface ProfileService {
 
     void deleteById(UUID id);
 
-    public ProfileDTO toDTO(Profile profile);
+    ProfileDTO toDTO(Profile profile);
 }

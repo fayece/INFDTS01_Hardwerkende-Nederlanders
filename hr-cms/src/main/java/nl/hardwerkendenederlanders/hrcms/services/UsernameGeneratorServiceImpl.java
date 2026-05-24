@@ -333,13 +333,13 @@ public class UsernameGeneratorServiceImpl implements UsernameGeneratorService {
 
         int number = random.nextInt(100000);
 
-        String username = adjective + animal + String.valueOf(number);
+        String username = adjective + animal + number;
 
         return username;
     }
 
     public String generateUniqueUsername() {
-        String username = "";
+        String username;
 
         while (true) {
             String generatedName = generateUsername();
