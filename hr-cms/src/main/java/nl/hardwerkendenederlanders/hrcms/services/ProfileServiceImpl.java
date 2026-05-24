@@ -35,27 +35,29 @@ public class ProfileServiceImpl implements ProfileService {
     public void setProfile(UUID id, ProfileDTO profileDTO, MultipartFile file) {
         validateProfile(id, profileDTO);
 
-        Profile profile = new Profile();
-        profile.setId(id.toString());
-        profile.setBio(profileDTO.getBio());
-        profile.setUsername(profileDTO.getUsername());
-        profile.setPronouns(profileDTO.getPronouns());
-        profile.setCustomFields(profileDTO.getCustomFields());
-        profile.setInterests(profileDTO.getInterests());
-        profile.setSocials(profileDTO.getSocials());
+        String profilePicture;
+        if (file != null && !file.isEmpty()) {
+            profilePicture = saveProfilePicture(id, file);
+        } else {
+            Profile existing = getProfileById(id);
+            profilePicture = existing != null ? existing.getProfilePicture() : null;
+        }
 
-        profile.getCustomFields()
-                .removeIf(f -> f.getLabel() == null || f.getLabel().isBlank());
+        Profile profile = Profile.builder()
+                .id(id.toString())
+                .bio(profileDTO.getBio())
+                .username(profileDTO.getUsername())
+                .pronouns(profileDTO.getPronouns())
+                .customFields(profileDTO.getCustomFields())
+                .interests(profileDTO.getInterests())
+                .socials(profileDTO.getSocials())
+                .profilePicture(profilePicture)
+                .build();
+
+        profile.getCustomFields().removeIf(f -> f.getLabel() == null || f.getLabel().isBlank());
         profile.getSocials().removeIf(s -> s.getType() == null || s.getType().isBlank());
         profile.getPronouns().removeIf(p -> p == null || p.isBlank());
         profile.getInterests().removeIf(i -> i == null || i.isBlank());
-
-        if (file != null && !file.isEmpty()) {
-            profile.setProfilePicture(saveProfilePicture(id, file));
-        } else {
-            Profile existing = getProfileById(id);
-            profile.setProfilePicture(existing != null ? existing.getProfilePicture() : null);
-        }
 
         profileRepository.save(profile);
     }

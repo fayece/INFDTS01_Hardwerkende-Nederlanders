@@ -5,12 +5,15 @@ import com.mongodb.lang.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
+
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "profiles")
 @Data
+@Builder
 public class Profile {
 
     @NonNull

@@ -49,9 +49,10 @@ public class DataIntegrityScheduler {
 
                 String username = usernameGeneratorService.generateUniqueUsername();
 
-                Profile newProfile = new Profile();
-                newProfile.setId(user.getId().toString());
-                newProfile.setUsername(username);
+                Profile newProfile = Profile.builder()
+                        .id(user.getId().toString())
+                        .username(username)
+                        .build();
                 profileRepository.save(newProfile);
             }
         }
