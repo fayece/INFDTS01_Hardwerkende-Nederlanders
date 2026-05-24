@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.IntStream;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.CommentRepository;
+import nl.hardwerkendenederlanders.hrcms.database.mongodb.ProfileRepository;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentActionException;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentUnavailableException;
 import nl.hardwerkendenederlanders.hrcms.models.Comment;
@@ -27,7 +28,9 @@ class CommentServiceImplTest {
     // region Setup
     private final CommentRepository commentRepository = mock(CommentRepository.class);
     private final UserSessionService userSessionService = mock(UserSessionService.class);
-    private final CommentServiceImpl commentService = new CommentServiceImpl(commentRepository, userSessionService);
+    private final ProfileRepository profileRepository = mock(ProfileRepository.class);
+    private final CommentServiceImpl commentService =
+            new CommentServiceImpl(commentRepository, userSessionService, profileRepository);
     // endregion
 
     // region getTopLevelComments tests

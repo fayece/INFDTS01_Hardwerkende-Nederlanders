@@ -26,7 +26,11 @@ public class UserController {
     private final RoleService roleService;
     private final ProfileService profileService;
 
-    public UserController(UserService userService, UserSessionService userSessionService, RoleService roleService, ProfileService profileService) {
+    public UserController(
+            UserService userService,
+            UserSessionService userSessionService,
+            RoleService roleService,
+            ProfileService profileService) {
         this.userService = userService;
         this.userSessionService = userSessionService;
         this.roleService = roleService;

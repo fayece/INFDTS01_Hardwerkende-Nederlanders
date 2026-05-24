@@ -11,6 +11,7 @@ import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.models.Role;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.userDtos.UserViewDto;
+import nl.hardwerkendenederlanders.hrcms.services.interfaces.ProfileService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.RoleService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
@@ -23,7 +24,9 @@ class UserControllerTest {
     private final UserService userService = mock(UserService.class);
     private final UserSessionService userSessionService = mock(UserSessionService.class);
     private final RoleService roleService = mock(RoleService.class);
-    private final UserController userController = new UserController(userService, userSessionService, roleService);
+    private final ProfileService profileService = mock(ProfileService.class);
+    private final UserController userController =
+            new UserController(userService, userSessionService, roleService, profileService);
 
     @Test
     void manageUserPage_default() {
@@ -170,13 +173,13 @@ class UserControllerTest {
         List<Role> roles = List.of(mock(Role.class));
         when(roleService.findAll()).thenReturn(roles);
 
-        String result = userController.createNewUser("Kim", "", "Possible", "kp@example.com", "secret", roleId, model);
+        String result = userController.createNewUser("Kim", "", "Possible", "secret", roleId, model);
 
         assertEquals("pages/create-user", result);
         assertEquals(true, model.getAttribute("inserted"));
         assertEquals(roles, model.getAttribute("roles"));
 
-        verify(userService).insertUser("Kim", "", "Possible", "kp@example.com", "secret", roleId);
+        verify(userService).insertUser("Kim", "", "Possible", "secret", roleId);
         verify(roleService).findAll();
     }
 
@@ -186,11 +189,11 @@ class UserControllerTest {
         UUID roleId = UUID.randomUUID();
         UUID orgId = UUID.randomUUID();
 
-        String result = userController.updateUser(id, "New", "de", "Name", "new@test.com", roleId, orgId);
+        String result = userController.updateUser(id, "New", "de", "Name", roleId, orgId);
 
         assertEquals("redirect:/manage-users", result);
 
-        verify(userService).updateUser(id, "New", "de", "Name", "new@test.com", roleId, orgId);
+        verify(userService).updateUser(id, "New", "de", "Name", roleId, orgId);
     }
 
     @Test
@@ -211,7 +214,6 @@ class UserControllerTest {
         User user = mock(User.class);
         when(user.getFirstName()).thenReturn("Kim");
         when(user.getLastName()).thenReturn("Possible");
-        when(user.getEmail()).thenReturn("kp@example.com");
 
         when(userService.findById(id)).thenReturn(user);
 

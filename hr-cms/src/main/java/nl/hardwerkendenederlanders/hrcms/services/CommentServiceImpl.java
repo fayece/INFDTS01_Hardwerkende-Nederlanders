@@ -28,7 +28,10 @@ public class CommentServiceImpl implements CommentService {
 
     private static final String UNAVAILABLE_FRAGMENT = "fragments/articles/comment-section :: comments-unavailable";
 
-    public CommentServiceImpl(CommentRepository commentRepository, UserSessionService userSessionService, ProfileRepository profileRepository) {
+    public CommentServiceImpl(
+            CommentRepository commentRepository,
+            UserSessionService userSessionService,
+            ProfileRepository profileRepository) {
         this.commentRepository = commentRepository;
         this.userSessionService = userSessionService;
         this.profileRepository = profileRepository;
@@ -40,7 +43,8 @@ public class CommentServiceImpl implements CommentService {
             List<CommentViewDto> comments =
                     commentRepository.findTopLevelCommentsByArticleIdPaged(articleId, offset, limit + 1).stream()
                             .map(record -> {
-                                String username = profileRepository.findById(record.authorName())
+                                String username = profileRepository
+                                        .findById(record.authorName())
                                         .map(Profile::getUsername)
                                         .orElse("deleted_user");
                                 return CommentViewDto.from(record.comment(), username, record.replyCount());
@@ -60,7 +64,8 @@ public class CommentServiceImpl implements CommentService {
         try {
             return commentRepository.findCommentsByParentId(parentId).stream()
                     .map(record -> {
-                        String username = profileRepository.findById(record.authorName())
+                        String username = profileRepository
+                                .findById(record.authorName())
                                 .map(Profile::getUsername)
                                 .orElse("deleted_user");
                         return CommentViewDto.from(record.comment(), username, record.replyCount());
@@ -83,7 +88,8 @@ public class CommentServiceImpl implements CommentService {
             comment.setCreatorId(userId.get());
             CommentWithAuthor result = commentRepository.insertReturning(comment);
 
-            String username = profileRepository.findById(result.comment().getCreatorId().toString())
+            String username = profileRepository
+                    .findById(result.comment().getCreatorId().toString())
                     .map(Profile::getUsername)
                     .orElse("deleted_user");
 
@@ -129,7 +135,8 @@ public class CommentServiceImpl implements CommentService {
                         null,
                         "Comment not found after deletion"));
 
-        String username = profileRepository.findById(deleted.comment().getCreatorId().toString())
+        String username = profileRepository
+                .findById(deleted.comment().getCreatorId().toString())
                 .map(Profile::getUsername)
                 .orElse("deleted_user");
 

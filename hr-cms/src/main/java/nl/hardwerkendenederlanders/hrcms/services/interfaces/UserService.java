@@ -13,7 +13,6 @@ public interface UserService {
 
     String insertUser(String firstName, String prefix, String lastName, String password, UUID roleId);
 
-
     User findById(UUID id);
 
     List<User> findAllUsers();
@@ -22,8 +21,7 @@ public interface UserService {
 
     void updateUser(User user);
 
-    void updateUser(
-            UUID id, String firstName, String prefix, String lastName, UUID roleId, UUID organisationId);
+    void updateUser(UUID id, String firstName, String prefix, String lastName, UUID roleId, UUID organisationId);
 
     void deleteById(UUID id, UUID currentUserId);
 

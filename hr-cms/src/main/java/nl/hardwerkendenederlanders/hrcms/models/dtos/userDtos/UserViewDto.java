@@ -14,7 +14,8 @@ public class UserViewDto {
     @Setter
     private UUID id;
 
-    @Setter String userName;
+    @Setter
+    String userName;
 
     @Setter
     private String firstName;

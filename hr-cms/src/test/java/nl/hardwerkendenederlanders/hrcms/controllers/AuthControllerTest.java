@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 import jakarta.servlet.http.HttpSession;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.AuthService;
-import nl.hardwerkendenederlanders.hrcms.services.interfaces.ProfileService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
 import org.junit.jupiter.api.Test;
 import org.springframework.ui.ConcurrentModel;

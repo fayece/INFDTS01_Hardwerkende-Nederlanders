@@ -14,7 +14,8 @@ public class ArticleAuthorsServiceImpl implements ArticleAuthorsService {
     private final ArticleAuthorRepository authorRepository;
     private final ProfileRepository profileRepository;
 
-    public ArticleAuthorsServiceImpl(ArticleAuthorRepository articleAuthorRepository, ProfileRepository profileRepository) {
+    public ArticleAuthorsServiceImpl(
+            ArticleAuthorRepository articleAuthorRepository, ProfileRepository profileRepository) {
         this.authorRepository = articleAuthorRepository;
         this.profileRepository = profileRepository;
     }
@@ -22,7 +23,8 @@ public class ArticleAuthorsServiceImpl implements ArticleAuthorsService {
     public AuthorDto[] findAuthorsForArticle(UUID articleId) {
         return Arrays.stream(authorRepository.findAuthorsForArticle(articleId))
                 .map(author -> {
-                    String username = profileRepository.findById(author.getUsername())
+                    String username = profileRepository
+                            .findById(author.getUsername())
                             .map(Profile::getUsername)
                             .orElse("deleted_user");
                     return new AuthorDto(username);

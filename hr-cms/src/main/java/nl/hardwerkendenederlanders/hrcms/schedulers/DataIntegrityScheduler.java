@@ -1,5 +1,9 @@
 package nl.hardwerkendenederlanders.hrcms.schedulers;
 
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
 import nl.hardwerkendenederlanders.hrcms.database.mongodb.ProfileRepository;
@@ -11,12 +15,6 @@ import nl.hardwerkendenederlanders.hrcms.services.interfaces.UsernameGeneratorSe
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 
 @Component
 @Slf4j
@@ -47,8 +45,7 @@ public class DataIntegrityScheduler {
                         .message("User " + user.getId() + " didn't have a profile, one was created")
                         .severity("WARN")
                         .timestamp(OffsetDateTime.now())
-                        .build()
-                );
+                        .build());
 
                 String username = usernameGeneratorService.generateUniqueUsername();
 
@@ -73,8 +70,7 @@ public class DataIntegrityScheduler {
                         .message("Profile " + profile.getId() + " didn't have a user, profile was deleted")
                         .severity("WARN")
                         .timestamp(OffsetDateTime.now())
-                        .build()
-                );
+                        .build());
 
                 profileRepository.deleteById(profile.getId());
             }

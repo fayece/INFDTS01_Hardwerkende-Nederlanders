@@ -89,7 +89,8 @@ public class ArticleServiceImpl implements ArticleService {
         ArticleFullDetailsDto article = articleRepository.findArticlePublished(id);
         if (article == null) return null;
 
-        String username = profileRepository.findById(article.getFirstAuthor().getUsername())
+        String username = profileRepository
+                .findById(article.getFirstAuthor().getUsername())
                 .map(Profile::getUsername)
                 .orElse("deleted_user");
 

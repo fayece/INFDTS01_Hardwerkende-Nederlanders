@@ -1,23 +1,19 @@
 package nl.hardwerkendenederlanders.hrcms.models;
+
 import com.mongodb.lang.Nullable;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-import lombok.Setter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "profiles")
 @Data
 public class Profile {
 
     @Id
-    String id; //the UUID from user saved as a string
+    String id; // the UUID from user saved as a string
 
     @NotBlank
     private String username;
@@ -33,9 +29,8 @@ public class Profile {
     private List<CustomField> customFields = new ArrayList<>();
     private List<Social> socials = new ArrayList<>();
 
-
     @Data
-    public static class Social{
+    public static class Social {
         private String type;
         private String username;
     }
@@ -45,6 +40,4 @@ public class Profile {
         private String label;
         private String value;
     }
-
-
 }

@@ -1,5 +1,13 @@
 package nl.hardwerkendenederlanders.hrcms.services;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.mongodb.ProfileRepository;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ConflictException;
 import nl.hardwerkendenederlanders.hrcms.models.Profile;
@@ -8,33 +16,23 @@ import nl.hardwerkendenederlanders.hrcms.services.interfaces.ProfileService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 @Service
 public class ProfileServiceImpl implements ProfileService {
     private final ProfileRepository profileRepository;
 
-    public ProfileServiceImpl(ProfileRepository profileRepository){
+    public ProfileServiceImpl(ProfileRepository profileRepository) {
         this.profileRepository = profileRepository;
     }
 
-    public Profile getProfileById(UUID id){
+    public Profile getProfileById(UUID id) {
         return profileRepository.findById(id.toString()).orElse(null);
     }
 
-    public Profile getProfileByUsername(String username){
+    public Profile getProfileByUsername(String username) {
         return profileRepository.findByUsername(username).orElse(null);
     }
 
-    public void setProfile(UUID id, ProfileDTO profileDTO, MultipartFile file){
+    public void setProfile(UUID id, ProfileDTO profileDTO, MultipartFile file) {
         validateProfile(id, profileDTO);
 
         Profile profile = new Profile();
@@ -46,7 +44,8 @@ public class ProfileServiceImpl implements ProfileService {
         profile.setInterests(profileDTO.getInterests());
         profile.setSocials(profileDTO.getSocials());
 
-        profile.getCustomFields().removeIf(f -> f.getLabel() == null || f.getLabel().isBlank());
+        profile.getCustomFields()
+                .removeIf(f -> f.getLabel() == null || f.getLabel().isBlank());
         profile.getSocials().removeIf(s -> s.getType() == null || s.getType().isBlank());
         profile.getPronouns().removeIf(p -> p == null || p.isBlank());
         profile.getInterests().removeIf(i -> i == null || i.isBlank());
@@ -77,25 +76,25 @@ public class ProfileServiceImpl implements ProfileService {
         }
     }
 
-    private void validateProfile(UUID id, ProfileDTO profileDTO){
-        if(profileDTO.getUsername().isBlank())
-            throw new IllegalArgumentException("Username cannot be blank");
+    private void validateProfile(UUID id, ProfileDTO profileDTO) {
+        if (profileDTO.getUsername().isBlank()) throw new IllegalArgumentException("Username cannot be blank");
 
         var alreadyExists = getProfileByUsername(profileDTO.getUsername());
-        if(alreadyExists != null && !alreadyExists.getId().equals(id.toString()))
+        if (alreadyExists != null && !alreadyExists.getId().equals(id.toString()))
             throw new ConflictException("username already taken");
 
-        if(profileDTO.getCustomFields().size() > 4)
+        if (profileDTO.getCustomFields().size() > 4)
             throw new IllegalArgumentException("Only 4 custom fields allowed. Delete one first or simply edit one");
-        if(profileDTO.getSocials().size() > 4)
-            throw new IllegalArgumentException("Only 4 social media fields allowed. Delete one first or simply edit one");
-        if(profileDTO.getPronouns().size() > 4)
+        if (profileDTO.getSocials().size() > 4)
+            throw new IllegalArgumentException(
+                    "Only 4 social media fields allowed. Delete one first or simply edit one");
+        if (profileDTO.getPronouns().size() > 4)
             throw new IllegalArgumentException("Only 4 pronouns allowed. Delete one first or simply edit one");
-        if(profileDTO.getInterests().size() > 10)
+        if (profileDTO.getInterests().size() > 10)
             throw new IllegalArgumentException("Only 10 interests allowed. Delete one first or simply edit one");
     }
 
-    public void deleteById(UUID id){
+    public void deleteById(UUID id) {
         profileRepository.deleteById(id.toString());
     }
 

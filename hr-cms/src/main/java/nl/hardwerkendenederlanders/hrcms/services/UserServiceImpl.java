@@ -2,7 +2,6 @@ package nl.hardwerkendenederlanders.hrcms.services;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
 import nl.hardwerkendenederlanders.hrcms.database.mongodb.ProfileRepository;
@@ -13,7 +12,6 @@ import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UsernameGeneratorService;
 import org.jspecify.annotations.NonNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +25,10 @@ public class UserServiceImpl implements UserService {
 
     private final int pageSize = 13;
 
-    public UserServiceImpl(UserRepository userRepository, ProfileRepository profileRepository, UsernameGeneratorService usernameGeneratorService) {
+    public UserServiceImpl(
+            UserRepository userRepository,
+            ProfileRepository profileRepository,
+            UsernameGeneratorService usernameGeneratorService) {
         this.userRepository = userRepository;
         this.profileRepository = profileRepository;
         this.usernameGeneratorService = usernameGeneratorService;
@@ -65,20 +66,12 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public String insertUser(String firstName, String prefix, String lastName, String password, UUID roleId) {
         User toInsert = new User(
-                UUID.randomUUID(),
-                firstName,
-                prefix,
-                lastName,
-                password,
-                roleId,
-                null,
-                true,
-                OffsetDateTime.now());
+                UUID.randomUUID(), firstName, prefix, lastName, password, roleId, null, true, OffsetDateTime.now());
 
         validateUserAttributes(toInsert);
         insertUser(toInsert);
 
-        //Profile username creation
+        // Profile username creation
         String username = usernameGeneratorService.generateUniqueUsername();
         Profile profile = new Profile();
         profile.setId(toInsert.getId().toString());

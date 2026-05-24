@@ -2,7 +2,6 @@ package nl.hardwerkendenederlanders.hrcms.database;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleViewersRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
@@ -45,8 +44,6 @@ public class JdbcArticleViewersTest {
                 .firstName("Siegfried")
                 .prefix("Von")
                 .lastName("Höhefelden")
-                .email(UUID.randomUUID() + "" + UUID.randomUUID() + "@" + UUID.randomUUID() + UUID.randomUUID()
-                        + ".com")
                 .passwordHash("pwwasswoert")
                 .active(true)
                 .build();
@@ -91,7 +88,6 @@ public class JdbcArticleViewersTest {
                     .firstName("inmate")
                     .prefix("nr.")
                     .lastName(String.valueOf(i))
-                    .email(String.valueOf(i) + "@bijlmerbajes.nl")
                     .passwordHash("strenge beveiliging")
                     .active(true)
                     .build();

@@ -1,13 +1,9 @@
 package nl.hardwerkendenederlanders.hrcms.models;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.experimental.SuperBuilder;
-import org.springframework.context.annotation.Primary;
-import org.springframework.data.annotation.Id;
-
 import java.time.OffsetDateTime;
 import java.util.UUID;
+import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
 @Getter
