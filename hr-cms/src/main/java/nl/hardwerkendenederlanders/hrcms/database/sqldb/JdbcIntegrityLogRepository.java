@@ -13,13 +13,13 @@ public class JdbcIntegrityLogRepository {
     private JdbcTemplate jdbcTemplate;
 
     public void save(LoggingEntity log) {
-        jdbcTemplate.update(String.format(
+        jdbcTemplate.update(
                 "INSERT INTO integrity_logs (id, message, severity, timestamp, user_id, profile_id) VALUES (?, ?, ?, ?, ?, ?)",
                 UUID.randomUUID(),
                 log.getMessage(),
                 log.getSeverity(),
                 log.getTimestamp(),
                 log.getUserId(),
-                log.getProfileId()));
+                log.getProfileId());
     }
 }

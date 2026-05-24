@@ -339,17 +339,13 @@ public class UsernameGeneratorServiceImpl implements UsernameGeneratorService {
     }
 
     public String generateUniqueUsername() {
-        String username;
 
         while (true) {
             String generatedName = generateUsername();
             Optional<Profile> usernameExists = profileRepository.findByUsername(generatedName);
             if (usernameExists.isEmpty()) {
-                username = generatedName;
-                break;
+                return generatedName;
             }
         }
-
-        return username;
     }
 }

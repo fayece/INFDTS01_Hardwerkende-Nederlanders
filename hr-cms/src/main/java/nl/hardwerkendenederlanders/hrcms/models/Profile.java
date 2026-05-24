@@ -1,5 +1,6 @@
 package nl.hardwerkendenederlanders.hrcms.models;
 
+import com.mongodb.lang.NonNull;
 import com.mongodb.lang.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 public class Profile {
 
+    @NonNull
     @Id
     String id; // the UUID from user saved as a string
 
