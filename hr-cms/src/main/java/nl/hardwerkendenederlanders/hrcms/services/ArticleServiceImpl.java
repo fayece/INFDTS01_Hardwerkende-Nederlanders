@@ -33,8 +33,8 @@ public class ArticleServiceImpl implements ArticleService {
     // the article is updated
     @Caching(
             evict = {
-                @CacheEvict(value = "publishedArticlesFull", allEntries = true),
-                @CacheEvict(value = "fullArticle", key = "#article.id")
+                    @CacheEvict(value = "publishedArticlesFull", allEntries = true),
+                    @CacheEvict(value = "fullArticle", key = "#article.id")
             })
     @Transactional
     public void ensureArticleExists(Article article, UUID authorId) {
@@ -77,7 +77,8 @@ public class ArticleServiceImpl implements ArticleService {
         return articleRepository.findAllPaged(pageSize, page)
                 .stream()
                 .map(article -> {
-                    String username = profileRepository.findById(article.getFirstAuthor().getUsername())
+                    String username = profileRepository
+                            .findById(article.getFirstAuthor().getUsername())
                             .map(Profile::getUsername)
                             .orElse("deleted_user");
                     article.setFirstAuthor(new AuthorDto(username));
@@ -92,7 +93,8 @@ public class ArticleServiceImpl implements ArticleService {
         return articleRepository.findNewArticlesPublishedPaged(pageSize, page)
                 .stream()
                 .map(article -> {
-                    String username = profileRepository.findById(article.getFirstAuthor().getUsername())
+                    String username = profileRepository
+                            .findById(article.getFirstAuthor().getUsername())
                             .map(Profile::getUsername)
                             .orElse("deleted_user");
                     article.setFirstAuthor(new AuthorDto(username));
@@ -106,9 +108,12 @@ public class ArticleServiceImpl implements ArticleService {
     public ArticleFullDetailsDto findArticleFullId(UUID id) {
         ArticleFullDetailsDto article = articleRepository.findArticlePublished(id);
         if (article == null) return null;
-        String username = profileRepository.findById(article.getFirstAuthor().getUsername())
+
+        String username = profileRepository
+                .findById(article.getFirstAuthor().getUsername())
                 .map(Profile::getUsername)
                 .orElse("deleted_user");
+
         article.setFirstAuthor(new AuthorDto(username));
         return article;
     }
