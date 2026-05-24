@@ -26,9 +26,8 @@ class ProfileControllerTest {
     @Test
     void getProfilePageOfCurrentUser_loggedIn_returnsProfilePage() {
         UUID userId = UUID.randomUUID();
-        Profile profile = new Profile();
-        profile.setId(userId.toString());
-        profile.setUsername("swift_frog42");
+        Profile profile =
+                Profile.builder().id(userId.toString()).username("swift_frog42").build();
 
         HttpSession session = mock(HttpSession.class);
         Model model = new ConcurrentModel();
@@ -57,8 +56,10 @@ class ProfileControllerTest {
 
     @Test
     void getProfilePageOfOtherUser_returnsProfilePage() {
-        Profile profile = new Profile();
-        profile.setUsername("swift_frog42");
+        Profile profile = Profile.builder()
+                .id(UUID.randomUUID().toString())
+                .username("swift_frog42")
+                .build();
 
         Model model = new ConcurrentModel();
 
@@ -74,8 +75,8 @@ class ProfileControllerTest {
     @Test
     void editProfile_loggedIn_returnsEditPage() {
         UUID userId = UUID.randomUUID();
-        Profile profile = new Profile();
-        profile.setId(userId.toString());
+        Profile profile =
+                Profile.builder().id(userId.toString()).username("swift_frog42").build();
 
         ProfileDTO profileDTO = new ProfileDTO();
         profileDTO.setUsername("swift_frog42");

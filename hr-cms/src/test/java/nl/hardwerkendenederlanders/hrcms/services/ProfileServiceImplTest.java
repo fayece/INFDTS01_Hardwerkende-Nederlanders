@@ -21,8 +21,8 @@ class ProfileServiceImplTest {
     @Test
     void getProfileById_success_returnsProfile() {
         UUID id = UUID.randomUUID();
-        Profile profile = new Profile();
-        profile.setId(id.toString());
+        Profile profile =
+                Profile.builder().id(id.toString()).username("swiftfrog42").build();
 
         when(profileRepository.findById(id.toString())).thenReturn(Optional.of(profile));
 
@@ -44,8 +44,10 @@ class ProfileServiceImplTest {
 
     @Test
     void getProfileByUsername_success_returnsProfile() {
-        Profile profile = new Profile();
-        profile.setUsername("swiftfrog42");
+        Profile profile = Profile.builder()
+                .id(UUID.randomUUID().toString())
+                .username("swiftfrog42")
+                .build();
 
         when(profileRepository.findByUsername("swiftfrog42")).thenReturn(Optional.of(profile));
 
@@ -93,9 +95,8 @@ class ProfileServiceImplTest {
         dto.setCustomFields(new ArrayList<>());
         dto.setSocials(new ArrayList<>());
 
-        Profile existing = new Profile();
-        existing.setId(otherId.toString());
-        existing.setUsername("taken");
+        Profile existing =
+                Profile.builder().id(otherId.toString()).username("taken").build();
 
         when(profileRepository.findByUsername("taken")).thenReturn(Optional.of(existing));
 
@@ -149,13 +150,15 @@ class ProfileServiceImplTest {
 
     @Test
     void toDTO_success_returnsDTO() {
-        Profile profile = new Profile();
-        profile.setUsername("swiftfrog42");
-        profile.setBio("hello");
-        profile.setInterests(new ArrayList<>());
-        profile.setPronouns(new ArrayList<>());
-        profile.setCustomFields(new ArrayList<>());
-        profile.setSocials(new ArrayList<>());
+        Profile profile = Profile.builder()
+                .id(UUID.randomUUID().toString())
+                .username("swiftfrog42")
+                .bio("hello")
+                .interests(new ArrayList<>())
+                .pronouns(new ArrayList<>())
+                .customFields(new ArrayList<>())
+                .socials(new ArrayList<>())
+                .build();
 
         ProfileDTO result = profileService.toDTO(profile);
 

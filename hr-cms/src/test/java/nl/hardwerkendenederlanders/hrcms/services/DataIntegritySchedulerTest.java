@@ -28,7 +28,6 @@ class DataIntegritySchedulerTest {
 
     @BeforeEach
     void setUp() {
-        // inject mocks manually since @Autowired doesn't work without Spring context
         ReflectionTestUtils.setField(scheduler, "userRepository", userRepository);
         ReflectionTestUtils.setField(scheduler, "profileRepository", profileRepository);
         ReflectionTestUtils.setField(scheduler, "jdbcIntegrityLogRepository", jdbcIntegrityLogRepository);
@@ -54,7 +53,11 @@ class DataIntegritySchedulerTest {
         User user = mock(User.class);
         when(user.getId()).thenReturn(UUID.randomUUID());
         when(userRepository.findAllUsers()).thenReturn(List.of(user));
-        when(profileRepository.findById(any())).thenReturn(Optional.of(new Profile()));
+        when(profileRepository.findById(any()))
+                .thenReturn(Optional.of(Profile.builder()
+                        .id(UUID.randomUUID().toString())
+                        .username("existing_user")
+                        .build()));
 
         scheduler.checkUsersWithoutProfile();
 
@@ -64,8 +67,11 @@ class DataIntegritySchedulerTest {
 
     @Test
     void checkProfilesWithoutUser_profileWithoutUser_deletesProfile() {
-        Profile profile = new Profile();
-        profile.setId(UUID.randomUUID().toString());
+        Profile profile = Profile.builder()
+                .id(UUID.randomUUID().toString())
+                .username("some_user")
+                .build();
+
         when(profileRepository.findAll()).thenReturn(List.of(profile));
         when(userRepository.findById(any())).thenReturn(Optional.empty());
 
@@ -77,8 +83,11 @@ class DataIntegritySchedulerTest {
 
     @Test
     void checkProfilesWithoutUser_profileWithUser_doesNothing() {
-        Profile profile = new Profile();
-        profile.setId(UUID.randomUUID().toString());
+        Profile profile = Profile.builder()
+                .id(UUID.randomUUID().toString())
+                .username("some_user")
+                .build();
+
         when(profileRepository.findAll()).thenReturn(List.of(profile));
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
 

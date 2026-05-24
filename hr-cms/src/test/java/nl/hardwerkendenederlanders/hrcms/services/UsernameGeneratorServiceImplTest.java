@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.Optional;
+import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.mongodb.ProfileRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Profile;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,10 @@ public class UsernameGeneratorServiceImplTest {
     @Test
     void generateUniqueUsername_firstConflict_retriesAndReturnsUsername() {
         when(profileRepository.findByUsername(any()))
-                .thenReturn(Optional.of(new Profile()))
+                .thenReturn(Optional.of(Profile.builder()
+                        .id(UUID.randomUUID().toString())
+                        .username("existing_user")
+                        .build()))
                 .thenReturn(Optional.empty());
 
         String result = usernameGeneratorService.generateUniqueUsername();

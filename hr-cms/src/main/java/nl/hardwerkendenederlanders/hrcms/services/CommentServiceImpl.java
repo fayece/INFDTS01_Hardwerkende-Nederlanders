@@ -44,7 +44,8 @@ public class CommentServiceImpl implements CommentService {
                     commentRepository.findTopLevelCommentsByArticleIdPaged(articleId, offset, limit + 1).stream()
                             .map(record -> {
                                 String username = profileRepository
-                                        .findById(record.authorName())
+                                        .findById(
+                                                record.comment().getCreatorId().toString())
                                         .map(Profile::getUsername)
                                         .orElse("deleted_user");
                                 return CommentViewDto.from(record.comment(), username, record.replyCount());
@@ -65,7 +66,7 @@ public class CommentServiceImpl implements CommentService {
             return commentRepository.findCommentsByParentId(parentId).stream()
                     .map(record -> {
                         String username = profileRepository
-                                .findById(record.authorName())
+                                .findById(record.comment().getCreatorId().toString())
                                 .map(Profile::getUsername)
                                 .orElse("deleted_user");
                         return CommentViewDto.from(record.comment(), username, record.replyCount());
