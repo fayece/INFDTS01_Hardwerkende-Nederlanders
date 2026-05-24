@@ -20,7 +20,7 @@ public class RedisCacheManagerConfiguration {
                 .activateDefaultTyping(
                         BasicPolymorphicTypeValidator.builder()
                                 .allowIfSubType(Object.class)
-                                .allowIfBaseType("nl.hardwerkendenederlanders.hrcms")
+                                .allowIfBaseType("nl.hardwerkendenederlanders.hrcms.models")
                                 .build(),
                         DefaultTyping.NON_FINAL)
                 .build();
@@ -29,7 +29,7 @@ public class RedisCacheManagerConfiguration {
 
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(RedisCacheConfiguration.defaultCacheConfig()
-                        .entryTtl(Duration.ofMinutes(1))
+                        .entryTtl(Duration.ofMinutes(10))
                         .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer)))
                 .transactionAware()
                 .build();
