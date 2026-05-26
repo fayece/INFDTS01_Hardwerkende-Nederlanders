@@ -333,13 +333,10 @@ public class UsernameGeneratorServiceImpl implements UsernameGeneratorService {
 
         int number = random.nextInt(100000);
 
-        String username = adjective + animal + number;
-
-        return username;
+        return adjective + animal + number;
     }
 
     public String generateUniqueUsername() {
-
         while (true) {
             String generatedName = generateUsername();
             Optional<Profile> usernameExists = profileRepository.findByUsername(generatedName);

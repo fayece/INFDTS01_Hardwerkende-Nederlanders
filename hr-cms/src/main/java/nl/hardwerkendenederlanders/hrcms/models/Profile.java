@@ -3,7 +3,6 @@ package nl.hardwerkendenederlanders.hrcms.models;
 import com.mongodb.lang.NonNull;
 import com.mongodb.lang.Nullable;
 import jakarta.validation.constraints.NotBlank;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
 import lombok.Data;
@@ -28,10 +27,10 @@ public class Profile {
     @Nullable
     private String bio;
 
-    private List<String> interests = new ArrayList<>();
-    private List<String> pronouns = new ArrayList<>();
-    private List<CustomField> customFields = new ArrayList<>();
-    private List<Social> socials = new ArrayList<>();
+    private List<String> interests;
+    private List<String> pronouns;
+    private List<CustomField> customFields;
+    private List<Social> socials;
 
     @Data
     public static class Social {

@@ -2,6 +2,7 @@ package nl.hardwerkendenederlanders.hrcms.services;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleAuthorRepository;
@@ -74,13 +75,28 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public List<ArticleFullDetailsDto> findAllPaged(int pageSize, int page) {
-        return articleRepository.findAllPaged(pageSize, page);
+        List<ArticleFullDetailsDto> articles = articleRepository.findAllPaged(pageSize, page);
+        for (ArticleFullDetailsDto article : articles) {
+            Optional<Profile> profile =
+                    profileRepository.findById(article.getFirstAuthor().getUsername());
+            String username = profile.get().getUsername();
+            article.setFirstAuthor(new AuthorDto(username));
+        }
+
+        return articles;
     }
 
     @Override
     @Cacheable(value = "publishedArticlesFull", sync = true)
     public List<ArticleFullDetailsDto> findNewPublished(int pageSize, int page) {
-        return articleRepository.findNewArticlesPublishedPaged(pageSize, page);
+        List<ArticleFullDetailsDto> articles = articleRepository.findNewArticlesPublishedPaged(pageSize, page);
+        for (ArticleFullDetailsDto article : articles) {
+            Optional<Profile> profile =
+                    profileRepository.findById(article.getFirstAuthor().getUsername());
+            String username = profile.get().getUsername();
+            article.setFirstAuthor(new AuthorDto(username));
+        }
+        return articles;
     }
 
     @Override
