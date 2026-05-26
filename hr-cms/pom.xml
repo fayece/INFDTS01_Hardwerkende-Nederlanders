@@ -162,7 +162,6 @@
             <groupId>io.gatling.highcharts</groupId>
             <artifactId>gatling-charts-highcharts</artifactId>
             <version>3.15.0</version>
-            <scope>test</scope>
         </dependency>
 
 

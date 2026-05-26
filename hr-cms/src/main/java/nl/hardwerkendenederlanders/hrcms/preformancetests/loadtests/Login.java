@@ -3,22 +3,14 @@ package nl.hardwerkendenederlanders.hrcms.preformancetests.loadtests;
 import java.time.Duration;
 import java.util.*;
 
-import io.gatling.javaapi.core.*;
-import io.gatling.javaapi.http.*;
-import io.gatling.javaapi.jdbc.*;
-import nl.hardwerkendenederlanders.hrcms.HrCmsApplication;
-import nl.hardwerkendenederlanders.hrcms.models.Role;
-import nl.hardwerkendenederlanders.hrcms.services.UserServiceImpl;
-import nl.hardwerkendenederlanders.hrcms.services.interfaces.RoleService;
-import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserService;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import io.gatling.javaapi.core.ScenarioBuilder;
+import io.gatling.javaapi.core.Simulation;
+import io.gatling.javaapi.http.HttpProtocolBuilder;
 
 import static io.gatling.javaapi.core.CoreDsl.*;
-import static io.gatling.javaapi.http.HttpDsl.*;
-import static io.gatling.javaapi.jdbc.JdbcDsl.*;
+import static io.gatling.javaapi.http.HttpDsl.http;
+import static io.gatling.javaapi.http.HttpDsl.status;
+
 
 public class Login extends Simulation {
 
@@ -75,28 +67,6 @@ public class Login extends Simulation {
   );
 
 
-  @Override
-  public void before() {
-    var app = SpringApplication.run(
-            HrCmsApplication.class,
-            new  String[] {"--server.port=" + serverPort});
-    var roleService = app.getBean(RoleService.class);
-    List<Role> userId = roleService.findAll();
-    System.out.println("Id of user Role is:");
-    System.out.println(userId.get(2).getId());
-    System.out.println(userId.get(2).getRoleName());
-    var userService = app.getBean(UserService.class);
-    userService.insertUser("int", "", "int", "int@int.int", "int", userId.get(2).getId());
-    var users = userService.getUsers(0, "", false);
-    var encoder = new BCryptPasswordEncoder();
-
-    System.out.println(users);
-    var user1 = users.get(0);
-    System.out.println(user1.getEmail());
-    System.out.println(user1.getPasswordHash());
-    System.out.println(encoder.matches("int", user1.getPasswordHash()));
-  }
-
   private ScenarioBuilder scn = scenario("Login")
     .exec(
       http("request_0")
@@ -109,7 +79,7 @@ public class Login extends Simulation {
         .formParam("email", "int@int.int")
         .formParam("password", "int")
         .check(status().is(302)),
-      pause(1000),
+      pause(1),
       http("request_3")
         .get("/")
         .headers(headers_2)
