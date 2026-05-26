@@ -6,8 +6,15 @@ import java.util.*;
 import io.gatling.javaapi.core.*;
 import io.gatling.javaapi.http.*;
 import io.gatling.javaapi.jdbc.*;
+import nl.hardwerkendenederlanders.hrcms.HrCmsApplication;
+import nl.hardwerkendenederlanders.hrcms.models.Role;
+import nl.hardwerkendenederlanders.hrcms.services.UserServiceImpl;
+import nl.hardwerkendenederlanders.hrcms.services.interfaces.RoleService;
+import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.*;
@@ -15,12 +22,12 @@ import static io.gatling.javaapi.jdbc.JdbcDsl.*;
 
 public class Login extends Simulation {
 
-  private String serverPort = System.getProperty("server_port");
+  private String serverPort = "8080";
 
   private HttpProtocolBuilder httpProtocol = http
     .baseUrl("http://localhost:" + serverPort)
     .disableFollowRedirect()
-    .inferHtmlResources(AllowList(), DenyList(".*\\.js", ".*\\.css", ".*\\.gif", ".*\\.jpeg", ".*\\.jpg", ".*\\.ico", ".*\\.woff", ".*\\.woff2", ".*\\.(t|o)tf", ".*\\.png", ".*\\.svg", ".*detectportal\\.firefox\\.com.*"))
+    .inferHtmlResources(AllowList(), DenyList(".*\\.gif", ".*\\.jpeg", ".*\\.jpg", ".*\\.ico", ".*\\.woff", ".*\\.woff2", ".*\\.(t|o)tf", ".*\\.png", ".*\\.svg", ".*detectportal\\.firefox\\.com.*"))
     .acceptHeader("text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8")
     .acceptEncodingHeader("gzip, deflate, br")
     .acceptLanguageHeader("nl;q=0.7")
@@ -68,6 +75,28 @@ public class Login extends Simulation {
   );
 
 
+  @Override
+  public void before() {
+    var app = SpringApplication.run(
+            HrCmsApplication.class,
+            new  String[] {"--server.port=" + serverPort});
+    var roleService = app.getBean(RoleService.class);
+    List<Role> userId = roleService.findAll();
+    System.out.println("Id of user Role is:");
+    System.out.println(userId.get(2).getId());
+    System.out.println(userId.get(2).getRoleName());
+    var userService = app.getBean(UserService.class);
+    userService.insertUser("int", "", "int", "int@int.int", "int", userId.get(2).getId());
+    var users = userService.getUsers(0, "", false);
+    var encoder = new BCryptPasswordEncoder();
+
+    System.out.println(users);
+    var user1 = users.get(0);
+    System.out.println(user1.getEmail());
+    System.out.println(user1.getPasswordHash());
+    System.out.println(encoder.matches("int", user1.getPasswordHash()));
+  }
+
   private ScenarioBuilder scn = scenario("Login")
     .exec(
       http("request_0")
@@ -80,7 +109,7 @@ public class Login extends Simulation {
         .formParam("email", "int@int.int")
         .formParam("password", "int")
         .check(status().is(302)),
-      pause(1),
+      pause(1000),
       http("request_3")
         .get("/")
         .headers(headers_2)
