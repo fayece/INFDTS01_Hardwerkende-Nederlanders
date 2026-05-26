@@ -79,8 +79,12 @@ public class ArticleServiceImpl implements ArticleService {
         for (ArticleFullDetailsDto article : articles) {
             Optional<Profile> profile =
                     profileRepository.findById(article.getFirstAuthor().getUsername());
-            String username = profile.get().getUsername();
-            article.setFirstAuthor(new AuthorDto(username));
+            if (profile.isEmpty()) {
+                article.setFirstAuthor(new AuthorDto("deleted_user"));
+            } else {
+                String username = profile.get().getUsername();
+                article.setFirstAuthor(new AuthorDto(username));
+            }
         }
 
         return articles;
@@ -93,8 +97,12 @@ public class ArticleServiceImpl implements ArticleService {
         for (ArticleFullDetailsDto article : articles) {
             Optional<Profile> profile =
                     profileRepository.findById(article.getFirstAuthor().getUsername());
-            String username = profile.get().getUsername();
-            article.setFirstAuthor(new AuthorDto(username));
+            if (profile.isEmpty()) {
+                article.setFirstAuthor(new AuthorDto("deleted_user"));
+            } else {
+                String username = profile.get().getUsername();
+                article.setFirstAuthor(new AuthorDto(username));
+            }
         }
         return articles;
     }
