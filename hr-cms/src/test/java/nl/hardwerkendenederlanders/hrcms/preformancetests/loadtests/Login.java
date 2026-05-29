@@ -14,7 +14,7 @@ import static io.gatling.javaapi.http.HttpDsl.status;
 
 public class Login extends Simulation {
 
-  private String serverPort = "8080";
+  private String serverPort = "6031";
 
   private HttpProtocolBuilder httpProtocol = http
     .baseUrl("http://localhost:" + serverPort)
@@ -76,8 +76,8 @@ public class Login extends Simulation {
       http("request_1")
         .post("/login")
         .headers(headers_1)
-        .formParam("email", "int@int.int")
-        .formParam("password", "int")
+        .formParam("email", "1@theorg.nl")
+        .formParam("password", "secret")
         .check(status().is(302)),
       pause(1),
       http("request_3")

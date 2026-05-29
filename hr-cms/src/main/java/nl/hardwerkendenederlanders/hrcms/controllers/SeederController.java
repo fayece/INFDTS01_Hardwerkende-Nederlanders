@@ -1,7 +1,7 @@
 package nl.hardwerkendenederlanders.hrcms.controllers;
 
 import lombok.AllArgsConstructor;
-import nl.hardwerkendenederlanders.hrcms.preformancetests.seeding.databaseSeeder;
+import nl.hardwerkendenederlanders.hrcms.seeding.databaseSeeder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,7 +13,7 @@ public class SeederController {
 
      @PostMapping("seed-database")
     public void seedDatabase(){
-        seeder.seed();
+        seeder.seed2();
     }
 
     @DeleteMapping("wipe")
