@@ -6,9 +6,9 @@ public class utils {
 
     private static Random rnd = new Random();
 
-    public static int randint(int upperBound){
+    public static int randint(int upperBound) {
         return rnd.nextInt(upperBound);
     }
 
-    public final static int performanceTestServerPort = 6031;
+    public static final int performanceTestServerPort = 6031;
 }
