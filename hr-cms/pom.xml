@@ -233,6 +233,7 @@
                         <exclude>**/HrCmsApplication.class</exclude>
                         <exclude>**/TestHrCmsApplication.class</exclude>
                         <exclude>**/TestcontainersConfiguration.class</exclude>
+                        <exclude>**/databaseSeeder.class</exclude>
                     </excludes>
                     <rules>
                         <rule>

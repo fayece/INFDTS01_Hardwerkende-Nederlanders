@@ -3,7 +3,6 @@ package nl.hardwerkendenederlanders.hrcms.seeding;
 import java.util.*;
 import lombok.AllArgsConstructor;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.*;
-import nl.hardwerkendenederlanders.hrcms.models.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
