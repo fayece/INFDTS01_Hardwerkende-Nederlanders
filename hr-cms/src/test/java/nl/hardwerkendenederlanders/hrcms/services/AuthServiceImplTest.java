@@ -31,7 +31,7 @@ class AuthServiceImplTest {
         Profile profile =
                 Profile.builder().id(userId.toString()).username("johndoe123").build();
 
-        User user = new User(userId, "John", null, "Doe", hash, null, null, true, OffsetDateTime.now());
+        User user = new User(userId, "John", null, "Doe", hash, null, true, OffsetDateTime.now());
 
         when(profileRepository.findByUsername("johndoe123")).thenReturn(Optional.of(profile));
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
@@ -60,7 +60,7 @@ class AuthServiceImplTest {
         Profile profile =
                 Profile.builder().id(userId.toString()).username("johndoe123").build();
 
-        User user = new User(userId, "John", null, "Doe", hash, null, null, true, OffsetDateTime.now());
+        User user = new User(userId, "John", null, "Doe", hash, null, true, OffsetDateTime.now());
 
         when(profileRepository.findByUsername("johndoe123")).thenReturn(Optional.of(profile));
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));

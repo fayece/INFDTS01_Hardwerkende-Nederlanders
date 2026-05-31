@@ -82,6 +82,7 @@ public class UserController {
     @RequiresPermission("admin:manage_users")
     @GetMapping("/create-user")
     public String createUserPage(Model model) {
+        model.addAttribute("user", User.builder().build());
         model.addAttribute("roles", roleService.findAll());
         return "pages/create-user";
     }
@@ -105,16 +106,12 @@ public class UserController {
     @RequiresPermission("admin:manage_users")
     @PostMapping("/new")
     public String createNewUser(
-            @RequestParam String firstName,
-            @RequestParam(required = false) String prefix,
-            @RequestParam String lastName,
-            @RequestParam String password,
-            @RequestParam UUID roleId,
+            @RequestParam User userModel,
             Model model) {
 
-        userService.insertUser(firstName, prefix, lastName, password, roleId);
+        userService.insertUser(userModel);
         model.addAttribute("inserted", true);
-        String username = userService.insertUser(firstName, prefix, lastName, password, roleId);
+        String username = userService.insertUser(userModel);
         model.addAttribute("successMessage", "User \"" + username + "\" created successfully!");
 
         model.addAttribute("roles", roleService.findAll());
@@ -128,9 +125,8 @@ public class UserController {
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String prefix,
             @RequestParam(required = false) String lastName,
-            @RequestParam(required = false) UUID roleId,
-            @RequestParam(required = false) UUID organisationId) {
-        userService.updateUser(id, firstName, prefix, lastName, roleId, organisationId);
+            @RequestParam(required = false) UUID roleId) {
+        userService.updateUser(id, firstName, prefix, lastName, roleId);
         return "redirect:/manage-users"; // or a successpage -> manage-users
     }
 
@@ -174,7 +170,6 @@ public class UserController {
                 .lastName(user.getLastName())
                 .roleId(user.getRoleId())
                 .roleName(user.getRoleId() != null ? roleNames.get(user.getRoleId()) : null)
-                .organizationId(user.getOrganizationId())
                 .active(user.isActive())
                 .createdAt(user.getCreatedAt())
                 .build();

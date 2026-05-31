@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void insertUser(@NonNull User user) {
+    public void createUser(@NonNull User user) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String hash = encoder.encode(user.getPasswordHash());
         user.setPasswordHash(hash);
@@ -64,12 +64,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public String insertUser(String firstName, String prefix, String lastName, String password, UUID roleId) {
-        User toInsert = new User(
-                UUID.randomUUID(), firstName, prefix, lastName, password, roleId, null, true, OffsetDateTime.now());
+    public String insertUser(@NonNull User user) {
+        User toInsert = user;
 
         validateUserAttributes(toInsert);
-        insertUser(toInsert);
+        createUser(toInsert);
 
         // Profile username creation
         String username = usernameGeneratorService.generateUniqueUsername();
@@ -106,7 +105,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void updateUser(
-            UUID id, String firstName, String prefix, String lastName, UUID roleId, UUID organisationId) {
+            UUID id, String firstName, String prefix, String lastName, UUID roleId) {
         User currentUser = findById(id);
         if (firstName != null) {
             currentUser.setFirstName(firstName);
@@ -119,9 +118,6 @@ public class UserServiceImpl implements UserService {
         }
         if (roleId != null) {
             currentUser.setRoleId(roleId);
-        }
-        if (organisationId != null) {
-            currentUser.setOrganizationId(organisationId);
         }
 
         validateUserAttributes(currentUser);

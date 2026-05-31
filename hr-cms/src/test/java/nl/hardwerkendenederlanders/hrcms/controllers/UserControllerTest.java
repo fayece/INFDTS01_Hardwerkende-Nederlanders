@@ -200,16 +200,25 @@ class UserControllerTest {
         Model model = new ConcurrentModel();
         UUID roleId = UUID.randomUUID();
         List<Role> roles = List.of(mock(Role.class));
-        when(roleService.findAll()).thenReturn(roles);
-        when(userService.insertUser("Kim", "", "Possible", "secret", roleId)).thenReturn("kim.possible");
 
-        String result = userController.createNewUser("Kim", "", "Possible", "secret", roleId, model);
+        User user = User.builder()
+                .firstName("Kim")
+                .prefix("")
+                .lastName("Possible")
+                .passwordHash("secret")
+                .roleId(roleId)
+                .build();
+
+        when(roleService.findAll()).thenReturn(roles);
+        when(userService.insertUser(any(User.class))).thenReturn("kim.possible");
+
+        String result = userController.createNewUser(user, model);
 
         assertEquals("pages/create-user", result);
         assertEquals(true, model.getAttribute("inserted"));
         assertEquals(roles, model.getAttribute("roles"));
 
-        verify(userService, times(2)).insertUser("Kim", "", "Possible", "secret", roleId);
+        verify(userService, times(1)).insertUser(any(User.class));
         verify(roleService).findAll();
     }
 
@@ -217,12 +226,11 @@ class UserControllerTest {
     void updateUser_success() {
         UUID id = UUID.randomUUID();
         UUID roleId = UUID.randomUUID();
-        UUID orgId = UUID.randomUUID();
 
-        String result = userController.updateUser(id, "New", "de", "Name", roleId, orgId);
+        String result = userController.updateUser(id, "New", "de", "Name", roleId);
 
         assertEquals("redirect:/manage-users", result);
-        verify(userService).updateUser(id, "New", "de", "Name", roleId, orgId);
+        verify(userService).updateUser(id, "New", "de", "Name", roleId);
     }
 
     @Test

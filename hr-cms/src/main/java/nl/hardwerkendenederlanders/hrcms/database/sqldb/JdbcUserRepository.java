@@ -23,7 +23,6 @@ public class JdbcUserRepository implements UserRepository {
             rs.getString("last_name"),
             rs.getString("password_hash"),
             rs.getString("role_id") != null ? UUID.fromString(rs.getString("role_id")) : null,
-            rs.getString("organization_id") != null ? UUID.fromString(rs.getString("organization_id")) : null,
             rs.getBoolean("active"),
             rs.getObject("created_at", OffsetDateTime.class));
 
@@ -35,7 +34,6 @@ public class JdbcUserRepository implements UserRepository {
                 .addValue("lastName", user.getLastName())
                 .addValue("passwordHash", user.getPasswordHash())
                 .addValue("roleId", user.getRoleId())
-                .addValue("organizationId", user.getOrganizationId())
                 .addValue("active", user.isActive())
                 .addValue("createdAt", user.getCreatedAt());
     }
@@ -44,9 +42,9 @@ public class JdbcUserRepository implements UserRepository {
     public void insert(User user) {
         String sql = """
                 INSERT INTO %s (
-                id, first_name, prefix, last_name, password_hash, role_id, organization_id, active, created_at)
+                id, first_name, prefix, last_name, password_hash, role_id, active, created_at)
                 VALUES (
-                :id, :firstName, :prefix, :lastName, :passwordHash, :roleId, :organizationId, :active, :createdAt)
+                :id, :firstName, :prefix, :lastName, :passwordHash, :roleId, :active, :createdAt)
                 """.formatted(TABLE);
         jdbc.update(sql, paramsFromUser(user));
     }
@@ -162,7 +160,6 @@ public class JdbcUserRepository implements UserRepository {
                 prefix = :prefix,
                 last_name = :lastName,
                 role_id = :roleId,
-                organization_id = :organizationId,
                 active = :active
                 WHERE id = :id
                 """.formatted(TABLE);
@@ -171,7 +168,6 @@ public class JdbcUserRepository implements UserRepository {
                 .addValue("prefix", user.getPrefix())
                 .addValue("lastName", user.getLastName())
                 .addValue("roleId", user.getRoleId())
-                .addValue("organizationId", user.getOrganizationId())
                 .addValue("active", user.isActive())
                 .addValue("id", user.getId());
 
