@@ -33,10 +33,6 @@ public class User implements FullName {
     private UUID roleId;
 
     @Setter
-    @Nullable
-    private UUID organizationId;
-
-    @Setter
     @Builder.Default
     private boolean active = true;
 
