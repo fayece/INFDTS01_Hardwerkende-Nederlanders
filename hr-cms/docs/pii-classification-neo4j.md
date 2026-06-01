@@ -1,24 +1,27 @@
-# PII Field Classification - Neo4j
+# PII Classificaties voor Neo4j
 
-This document identifies all properties and relationships stored in Neo4j, classified by PII level, and documents GDPR compliance requirements.
+Dit document identificeert alle eigenschappen en relaties die in Neo4j worden opgeslagen.
+De gegevens zijn geclassificeerd op basis van PII-niveau.
+De GDPR-compliancevereisten voor elke eigenschap en relatie worden ook gedocumenteerd.
 
-## Related Documents
-- [pii-classification-postgresql.md](pii-classification-postgresql.md) - PostgreSQL classification document for all core domain data, including users and articles.
-- [pii-classification-redis.md](pii-classification-redis.md) - Redis classification document for cached, non-authoritative data.
+## Gerelateerde Documenten
+- [PII Classificaties voor PostgreSQL](pii-classification-postgresql.md)
+- [PII Classificaties voor Redis]()
 
-## Classification Levels
+## Classificatieniveaus
 
-| Level          | Description                                                                                                                                                 |
-|----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **public**     | No PII. Safe to expose broadly.                                                                                                                             |
-| **PII**        | Could be linked to a real person.                                                                                                                           |
-| **PII_strict** | Highly sensitive. Contact channels, credentials, or data that could enable targeted abuse (scams, phising, credential attacks). Must be tightly controlled. |
+| Niveau         | Beschrijving                                                                                                                         |
+|----------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| **public**     | Geen PII. Veilig om bloot te stellen aan andere gebruikers.                                                                          |
+| **PII**        | Kan worden gekoppeld aan een echt persoon.                                                                                           |
+| **PII_strict** | Zeer gevoelig. Contactkanalen, inloggegevens of gegevens die gerichte misbruik (scams, phishing, credential attacks) mogelijk maken. |
 
-> No Neo4j properties currently reach PII_strict. The level is listed for consistency with the other classification documents.
+> Er zijn momenteel geen Neo4j-eigenschappen die als PII_strict worden geclassificeerd.
+> Het niveau staat enkel vermeld voor consistentie met de andere classificatiedocumenten.
 
 ---
 
-## Graph Structure Overview
+## Neo4j Datamodel
 
 ```
 (:Comment) -[:REPLIED_TO]-> (:Comment)
@@ -27,105 +30,103 @@ This document identifies all properties and relationships stored in Neo4j, class
 
 ---
 
-## Node: `:User`
+## Eigenschappen en Relaties
 
-A name-only copy of the PostgreSQL `users` table. Exists to support graph traversal for comment authorship without requiring an extra call to PostgreSQL. 
+### Node `:User`
+De `:User` nodes zijn kopiën van de `users` tabel in PostgreSQL.
+Deze bestaat om ervoor te zorgen dat gebruikersinformatie beschikbaar is in Neo4j voor commentaargerelateerde queries, zonder dat er een dure join tussen Neo4j en PostgreSQL nodig is.
+Enkel de volgende eigenschappen worden opgeslagen in Neo4j:
 
-| Property    | Type          | PII Level | Reason                               |
-|-------------|---------------|-----------|--------------------------------------|
-| `id`        | String (UUID) | public    | Mirrors `users.id`; surrogate key    |
-| `firstName` | String        | PII       | Name data — identifies a real person |
-| `prefix`    | String        | PII       | Part of a person's name              |
-| `lastName`  | String        | PII       | Name data — identifies a real person |
+| Eigenschap | Type          | PII Niveau | Reden                                                     |
+|------------|---------------|------------|-----------------------------------------------------------|
+| `id`       | String (UUID) | public     | Unieke identifier, geen directe PII                       |
+| `username` | String        | public     | Automatisch gegenereerde gebruikersnaam, geen directe PII |
 
-> **Sync note:** The node is kept current with fallback logic:
+> **Opmerking**
 > 
-> When a user is created or edited in PostgreSQL, the application will do a best-effort attempt to update Neo4j within the same transaction. 
-> If Neo4j is unavailable at that moment, the change will be picked up by `Neo4jUserReconciliationJob` within 5 minutes and synced then.
-> Deletion takes effect immediately via an explicit call to `deleteById()`.
+> In Spotlight is `username` een automatisch gegenereerde waarde die niet direct PII bevat, omdat het niet de echte naam of contactgegevens van de gebruiker is.
+> Gebruikers kunnen hun `username` aanpassen, maar ze worden geadviseerd om geen persoonlijke informatie in te voeren.
+> Gebruikers die hun `username` aanpassen naar iets dat wel PII bevat, doen dit dan op eigen risico, en de verantwoordelijkheid voor de PII-inhoud ligt dan bij de gebruiker zelf.
+
+### Node: `:Comment`
+De `:Comment` nodes bevatten alle informatie over een comment.
+De inhoud van een comment wordt geschreven door een gebruiker.
+Dit betekent dat gebruikers alles in hun comments kunnen zetten die ze willen, inclusief data die geregistreerd staat als PII of zelfs PII_strict, maar is niet automatisch PII of PII_strict.
+De volgende eigenschappen worden standaard opgeslagen in Neo4j:
+
+| Eigenschap    | Type          | PII Niveau | Reden                                                                                                               |
+|---------------|---------------|------------|---------------------------------------------------------------------------------------------------------------------|
+| `id`          | String (UUID) | public     | Unieke identifier om stabiele referenties naar comments mogelijk te maken, geen directe PII                         |
+| `commentBody` | String        | PII        | Gelinkt aan een specifiek persoon via `:AUTHORED_BY`; vrije tekst, inhoud kan PII bevatten                          |
+| `articleId`   | String (UUID) | public     | Verwijst naar een artikel, geen directe PII                                                                         |
+| `creatorId`   | String (UUID) | PII        | Linkt de comment aan een specifieke gebruiker in PostgreSQL, waardoor het kan worden gekoppeld aan een echt persoon |
+| `mediaId`     | String (UUID) | public     | Verwijst naar media, geen directe PII                                                                               |
+| `createdAt`   | DateTime      | PII        | Timestamp van een specifieke actie van een persoon.                                                                 |
+| `deletedAt`   | DateTime      | PII        | Timestamp van het verwijderen; aanwezigheid kan worden gekoppeld aan het gedrag van een specifieke persoon.         |
 
 ---
 
-## Node: `:Comment`
+## Relaties
 
-Stores all comment data. Comment content is user-authored free text.
-This means that users can write anything in their comments, including PII or even PII_strict data if misused.
-However, since the data is authored by a user and linked to them via the `:AUTHORED_BY` relationship, we need to classify it as PII to reflect that it can be linked to a real person.
-
-| Property      | Type                | PII Level | Reason                                                                           |
-|---------------|---------------------|-----------|----------------------------------------------------------------------------------|
-| `id`          | String (UUID)       | public    | Surrogate key to ensure stable references to comments                            |
-| `commentBody` | String              | PII       | Free-text content authored by and linked to a specific person via `:AUTHORED_BY` |
-| `articleId`   | String (UUID)       | public    | Reference to an article; not personal data in isolation                          |
-| `creatorId`   | String (UUID)       | PII       | Links the comment to a specific user in PostgreSQL                               |
-| `mediaId`     | String (UUID)       | public    | Reference to a media item; not personal data in isolation                        |
-| `createdAt`   | DateTime            | PII       | Timestamp of a specific person's action                                          |
-| `deletedAt`   | DateTime (nullable) | PII       | Timestamp of deletion; presence reveals a specific person deleted their comment  |
+| Relatie          | PII Niveau | Reden                                                                                                     |
+|------------------|------------|-----------------------------------------------------------------------------------------------------------|
+| `[:REPLIED_TO]`  | public     | Structurele geneste relatie tussen comments, geen directe PII                                             |
+| `[:AUTHORED_BY]` | PII        | Verbindt een comment aan een specifieke gebruiker, waardoor het kan worden gekoppeld aan een echt persoon |
 
 ---
 
-## Relationships
+## Samenvatting
 
-| Relationship     | PII Level | Reason                                                                                                     |
-|------------------|-----------|------------------------------------------------------------------------------------------------------------|
-| `[:REPLIED_TO]`  | public    | Structural threading between comments; no personal properties                                              |
-| `[:AUTHORED_BY]` | PII       | Links a comment (with user-authored content) to a `:User` node; the relationship itself encodes authorship |
-
----
-
-## Summary
-
-| PII Level  | Node / Relationship | Properties                                           |
-|------------|---------------------|------------------------------------------------------|
-| **PII**    | `:User`             | `firstName`, `prefix`, `lastName`                    |
-| **PII**    | `:Comment`          | `commentBody`, `creatorId`, `createdAt`, `deletedAt` |
-| **PII**    | `[:AUTHORED_BY]`    | (relationship itself — encodes authorship)           |
-| **public** | `:User`             | `id`                                                 |
-| **public** | `:Comment`          | `id`, `articleId`, `mediaId`                         |
-| **public** | `[:REPLIED_TO]`     | (relationship itself)                                |
-
-Nodes with personal data: `:User` (name projection) and `:Comment` (user-authored content and authorship links).
+| PII Niveau | Nodes en Relaties | Eigenschappen                                                                               |
+|------------|-------------------|---------------------------------------------------------------------------------------------|
+| PII        | `:Comment`        | `commentBody`, `creatorId`, `createdAt`, `deletedAt`                                        |
+| PII        | `[:AUTHORED_BY]`  | Relatie tussen `:Comment` en `:User` die een comment verbindt aan een specifieke gebruiker. |
+| public     | `:User`           | `id`, `username`                                                                            |
+| public     | `:Comment`        | `id`, `articleId`, `mediaId`                                                                |
+| public     | `[:REPLIED_TO]`   | Geneste relatie tussen comments, geen directe PII                                           |
 
 ---
 
-## GDPR Compliance Reference
+## GDPR Compliance Vereisten
 
-### Lawful Basis (Art. 6)
+### Rechtmatigheid (Art. 6)
 
-| Data Category        | Properties                                       | Lawful Basis            | Notes                                               |
-|----------------------|--------------------------------------------------|-------------------------|-----------------------------------------------------|
-| Comment content      | `commentBody`, `createdAt`, `deletedAt`          | Contract (Art. 6(1)(b)) | Posted as part of using the service                 |
-| Comment authorship   | `creatorId`, `[:AUTHORED_BY]`                    | Contract (Art. 6(1)(b)) | Necessary to attribute comments to their author     |
-| User name projection | `:User` node (`firstName`, `prefix`, `lastName`) | Contract (Art. 6(1)(b)) | Necessary to display author name alongside comments |
+| Data Categorie       | Velden                                  | Rechtmatige Basis       | Toelichting                                                                                        |
+|----------------------|-----------------------------------------|-------------------------|----------------------------------------------------------------------------------------------------|
+| Commentinhoud        | `commentBody`. `createdAt`, `deletedAt` | Contract (Art. 6(1)(b)) | Volstrekt noodzakelijk voor het uitvoeren van het comment systeem.                                 |
+| Comment auteurschap  | `creatorId`, `[:AUTHORED_BY]`           | Contract (Art. 6(1)(b)) | Verbindt comment aan een specifieke gebruiker, noodzakelijk voor het functioneren van het systeem. |
+| Gebruikersinformatie | `id`, `username`                        | Contract (Art. 6(1)(b)) | Nodig voor het functioneren van het comment systeem, maar bevat geen directe PII.                  |
 
-### Retention Periods
+### Retentie
 
-> These are recommended periods. Formal retention periods must be adopted in a Data Retention Policy document.
+> Dit zijn initiële aanbevelingen op basis van de huidige gegevens en gebruikspatronen.
+> Deze aanbevelingen zijn nog niet definitief, verwerkt in beleid, of gecommuniceerd in een officiële capaciteit.
+> Formele retentieperiodes moeten worden vastgesteld in overleg met juridische en compliance teams, en duidelijk worden gecommuniceerd aan gebruikers.
 
-| Data Category    | Retention Period              | Notes                                                 |
-|------------------|-------------------------------|-------------------------------------------------------|
-| `:Comment` nodes | Duration of account + 30 days | PII properties must be erased on account deletion     |
-| `:User` nodes    | Duration of account           | Delete node when PostgreSQL user is deleted or erased |
+| Data Categorie   | Retentieperiode                             | Notities                                                                                                                                              |
+|------------------|---------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `:Comment` nodes | Zolang het account actief is, plus 30 dagen | PII-gegevens moeten worden verwijderd of geanonimiseerd op moment van accountverwijdering, met een bufferperiode van 30 dagen voor niet-PII gegevens. |
+| `:User` nodes    | Zolang het account actief is                | Node moet verwijderd worden wanneer de gelinkte PostgreSQL row wordt verwijderd.                                                                      |
 
-### Data Subject Rights
+### Rechten van betrokkenen
 
-| Right                   | Applies to                                                                         | Notes                                                                                                                                                                                 |
-|-------------------------|------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Access (Art. 15)        | All `:Comment` nodes authored by the user, `:User` node                            | Must include comment content in any data export                                                                                                                                       |
-| Rectification (Art. 16) | `:User` node properties (`firstName`, `prefix`, `lastName`)                        | Name data must be updated within 5 minutes via the reconciliation job. Comments can currently not be edited after posting, so no rectification process for `commentBody` is required. |
-| Erasure (Art. 17)       | `commentBody`, `creatorId`, `:User` node properties, `[:AUTHORED_BY]` relationship | See critical note below                                                                                                                                                               |
-| Restriction (Art. 18)   | All PII properties on `:Comment` and `:User`                                       | Must be able to freeze processing without deleting                                                                                                                                    |
-| Portability (Art. 20)   | `commentBody`, `createdAt` per comment                                             | Contract basis + automated processing; export in machine-readable format (e.g. JSON)                                                                                                  |
+| Recht                           | Betrekking tot                                                                | Notities                                                                                                                                                                                                                                                                    |
+|---------------------------------|-------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Toegang (Art. 15)               | `:Comment` nodes en `:User` node                                              | Alle comment inhoud moet worden verstrekt in elke aanvraag                                                                                                                                                                                                                  |
+| Rectificatie (Art. 16)          | `:User` node eigenschap (`username`)                                          | Gebruikersnaam moet binnen 5 minuten worden bijgewerkt in Neo4j via een reconciliatieproces als de dual-write aanpak faalt voor Neo4j. Momenteel is er geen mogelijkheid voor gebruikers om een comment te bewerken, dus er is geen rectificatieproces voor comment inhoud. |
+| Verwijdering (Art. 17)          | `commentBody`, `creatorId`, `:User` node eigenschap, `[:AUTHORED_BY]` relatie | Zie Issues hieronder voor details.                                                                                                                                                                                                                                          |
+| Restrictie (Art. 18)            | Alle PII gegevens op `:Comment` en `:User` nodes                              | Er moet een mechanisme zijn om gegevens niet te processen zonder deze te verwijderen.                                                                                                                                                                                       |
+| Dataoverdraagbaarheid (Art. 20) | `commentBody`. `createdAt` per `:Comment` node                                | Gegevens moeten worden geëxporteerd in een gestructureerd, machine-leesbaar formaat (zoals JSON) dat gemakkelijk kan worden overgedragen aan een andere controller, indien verzocht door de gebruiker.                                                                      |
 
 ---
 
-## Critical: Current Soft-Delete Does Not Satisfy Right to Erasure
+## Issues
+### Huidige soft-delete voldoet niet aan het recht op verwijdering
+De huidige implementatie van comment verwijdering in Neo4j is een soft-delete, waarbij de `deletedAt` timestamp wordt ingesteld en de `commentBody` in de applicatielaag wordt gemaskeerd, terwijl de originele `commentBody` aanwezig blijft in Neo4j.
+Deze aanpak voldoet niet aan het recht op verwijdering (Art. 17).
 
-The current `delete` implementation for comments is a soft delete that sets the `deletedAt` timestamp and masks the comment body at the application layer.
-However, the original `commentBody` remains stored in Neo4j, which means that the right to erasure (Art. 17) cannot currently be satisfied by this approach alone.
+Om te voldoen aan de GDPR vereisten, moet de implementatie worden aangepast op een van de volgende manieren:
+- `commentBody` volledig overschrijven met een placeholder tekst bij verwijdering, zodat de originele inhoud niet langer aanwezig is in Neo4j.
+- De `:Comment` node volledig verwijderen uit Neo4j bij verwijdering. Let hierbij op dat er een tombstone node voor in de plaats moet komen om referentiële integriteit te behouden voor bestaande relaties.
 
-To comply with GDPR requirements, the implementation must be updated to either:
-- Overwrite `commentBody` in Neo4j at deletion time with the placeholder value, or
-- Hard-delete the node and preserve the thread structure via a tombstone node with no personal properties.
-
-This must be resolved before any GDPR erasure workflow is implemented.
+Dit moet worden opgelost voordat een workflow voor gebruikersverzoeken tot verwijdering kan worden geïmplementeerd.
