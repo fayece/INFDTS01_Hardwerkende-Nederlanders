@@ -67,14 +67,7 @@ class JdbcUserRepositoryTest {
         User user = new User(
                 UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", null, true, OffsetDateTime.now());
         User user2 = new User(
-                UUID.randomUUID(),
-                "Kim2",
-                null,
-                "Possible2",
-                "hashedPassword",
-                null,
-                false,
-                OffsetDateTime.now());
+                UUID.randomUUID(), "Kim2", null, "Possible2", "hashedPassword", null, false, OffsetDateTime.now());
 
         repository.insert(user);
         repository.insert(user2);
@@ -91,14 +84,7 @@ class JdbcUserRepositoryTest {
         User user = new User(
                 UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", null, true, OffsetDateTime.now());
         User user2 = new User(
-                UUID.randomUUID(),
-                "Kim2",
-                null,
-                "Possible2",
-                "hashedPassword",
-                null,
-                false,
-                OffsetDateTime.now());
+                UUID.randomUUID(), "Kim2", null, "Possible2", "hashedPassword", null, false, OffsetDateTime.now());
 
         repository.insert(user);
         repository.insert(user2);
@@ -126,8 +112,8 @@ class JdbcUserRepositoryTest {
 
         repository.insert(user);
 
-        User updatedUser = new User(
-                user.getId(), "Kom", null, "Pissable", "hashedPassword", null, false, OffsetDateTime.now());
+        User updatedUser =
+                new User(user.getId(), "Kom", null, "Pissable", "hashedPassword", null, false, OffsetDateTime.now());
 
         repository.update(updatedUser);
 

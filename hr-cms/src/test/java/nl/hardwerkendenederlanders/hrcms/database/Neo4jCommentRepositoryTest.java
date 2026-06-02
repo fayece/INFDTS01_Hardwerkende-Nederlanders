@@ -49,8 +49,7 @@ public class Neo4jCommentRepositoryTest extends CommentRepositoryContractTest {
         clearCommentsTable();
         JdbcTestUtils.deleteFromTables(jdbcTemplate, "users");
         neo4jClient.query("MATCH (u:User) DETACH DELETE u").run();
-        neo4jUserRepository.upsert(
-                new User(AUTHOR_ID, "Test", null, "User", "hash", null, true, OffsetDateTime.now()));
+        neo4jUserRepository.upsert(new User(AUTHOR_ID, "Test", null, "User", "hash", null, true, OffsetDateTime.now()));
     }
 
     @Override

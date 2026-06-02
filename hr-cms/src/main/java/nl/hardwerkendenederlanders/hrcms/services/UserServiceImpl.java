@@ -1,6 +1,5 @@
 package nl.hardwerkendenederlanders.hrcms.services;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
@@ -104,8 +103,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updateUser(
-            UUID id, String firstName, String prefix, String lastName, UUID roleId) {
+    public void updateUser(UUID id, String firstName, String prefix, String lastName, UUID roleId) {
         User currentUser = findById(id);
         if (firstName != null) {
             currentUser.setFirstName(firstName);

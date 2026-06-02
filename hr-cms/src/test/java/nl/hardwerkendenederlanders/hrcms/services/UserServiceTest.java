@@ -3,7 +3,6 @@ package nl.hardwerkendenederlanders.hrcms.services;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -137,6 +136,7 @@ public class UserServiceTest {
 
         assertEquals(user.getId(), result.getId());
     }
+
     @Test
     void findById_failThrowsException() {
         UUID id = UUID.randomUUID();

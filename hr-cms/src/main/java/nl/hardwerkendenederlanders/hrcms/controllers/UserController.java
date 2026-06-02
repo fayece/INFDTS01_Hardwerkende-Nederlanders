@@ -107,8 +107,7 @@ public class UserController {
     @RequiresPermission("admin:manage_users")
     @PostMapping("/new")
     public String createNewUser(
-            @ModelAttribute("user") User userModel,
-            Model model, RedirectAttributes redirectAttributes) {
+            @ModelAttribute("user") User userModel, Model model, RedirectAttributes redirectAttributes) {
 
         String username = userService.insertUser(userModel);
         model.addAttribute("inserted", true);
