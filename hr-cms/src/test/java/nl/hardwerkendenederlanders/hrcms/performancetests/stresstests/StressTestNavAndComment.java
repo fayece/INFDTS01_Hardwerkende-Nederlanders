@@ -3,7 +3,7 @@ package nl.hardwerkendenederlanders.hrcms.performancetests.stresstests;
 import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.http;
 import static io.gatling.javaapi.http.HttpDsl.status;
-import static nl.hardwerkendenederlanders.hrcms.performancetests.utils.utils.performanceTestServerPort;
+import static nl.hardwerkendenederlanders.hrcms.performancetests.performancetestConfig.performanceTestServerPort;
 import static nl.hardwerkendenederlanders.hrcms.performancetests.utils.utils.randint;
 
 import io.gatling.javaapi.core.ScenarioBuilder;

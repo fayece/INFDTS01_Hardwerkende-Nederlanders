@@ -170,7 +170,7 @@ public class JdbcArticleRepository implements ArticleRepository {
                 FROM full_articles
                 WHERE article_id = :id AND publication_status = 'PUBLISHED'
                 LIMIT 1;
-                """; // full articles contains bug. multiple authors cause multiple rows, that's why a limit is needed
+                """;
         // here.
         MapSqlParameterSource mapping = new MapSqlParameterSource();
         mapping.addValue("id", id);

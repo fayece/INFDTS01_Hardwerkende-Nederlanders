@@ -13,7 +13,7 @@ public class SeederController {
 
     @PostMapping("seed-database")
     public void seedDatabase() {
-        seeder.seed2();
+        seeder.seed();
     }
 
     @DeleteMapping("wipe")

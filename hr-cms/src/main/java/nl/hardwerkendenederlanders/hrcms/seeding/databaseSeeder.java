@@ -24,7 +24,7 @@ public class databaseSeeder {
                         "$1-$2-$3-$4-$5"));
     }
 
-    public void seed2() {
+    public void seed() {
 
         System.out.println("Running Seeder");
 

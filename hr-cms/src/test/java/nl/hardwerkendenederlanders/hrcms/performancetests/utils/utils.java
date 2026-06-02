@@ -9,6 +9,4 @@ public class utils {
     public static int randint(int upperBound) {
         return rnd.nextInt(upperBound);
     }
-
-    public static final int performanceTestServerPort = 6031;
 }

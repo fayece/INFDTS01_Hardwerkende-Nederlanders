@@ -2,7 +2,7 @@ package nl.hardwerkendenederlanders.hrcms.performancetests.loadtests;
 
 import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.*;
-import static nl.hardwerkendenederlanders.hrcms.performancetests.utils.utils.performanceTestServerPort;
+import static nl.hardwerkendenederlanders.hrcms.performancetests.performancetestConfig.performanceTestServerPort;
 import static nl.hardwerkendenederlanders.hrcms.performancetests.utils.utils.randint;
 
 import io.gatling.javaapi.core.*;
