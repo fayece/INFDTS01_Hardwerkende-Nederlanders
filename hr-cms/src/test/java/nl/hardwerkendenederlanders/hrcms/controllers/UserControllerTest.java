@@ -216,7 +216,8 @@ class UserControllerTest {
         String result = userController.createNewUser(user, model, redirectAttributes);
 
         assertEquals("redirect:/manage-users/create-user", result);
-        assertEquals("User \"kim.possible\" created successfully!",
+        assertEquals(
+                "User \"kim.possible\" created successfully!",
                 redirectAttributes.getFlashAttributes().get("successMessage"));
 
         verify(userService, times(1)).insertUser(any(User.class));
