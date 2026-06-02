@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
         validateUserAttributes(toInsert);
         createUser(toInsert);
 
-        // Profile username creation
+        // Creating profile username
         String username = usernameGeneratorService.generateUniqueUsername();
         Profile profile = Profile.builder()
                 .id(toInsert.getId().toString())
