@@ -63,10 +63,7 @@ public class JdbcArticleRepository implements ArticleRepository {
                 .subjectName(rs.getString("subject_name"))
                 .viewCount(rs.getInt("view_count"))
                 .commentCount(rs.getInt("comment_count"))
-                .firstAuthor(new AuthorDto(
-                        rs.getString("first_author_first_name"),
-                        rs.getString("first_author_prefix"),
-                        rs.getString("first_author_last_name")))
+                .firstAuthor(new AuthorDto(rs.getString("first_author_id")))
                 .build();
     }
 

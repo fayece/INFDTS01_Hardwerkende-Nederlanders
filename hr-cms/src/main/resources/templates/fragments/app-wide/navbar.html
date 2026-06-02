@@ -2,8 +2,11 @@
     <h1><i>Spotlight!</i></h1>
     <div class="navbar--button-container">
         <a th:href="@{/}" class="navbar--button">Home</a>
-        <a th:href="@{/profile}" class="navbar--button">Profile</a>
-        <a th:href="@{/article/editor/overview}" class="navbar--button">Editor</a>
+        <a th:href="@{/my-profile}" class="navbar--button">Profile</a>
+        <a th:if="${session.userId != null and @permissionServiceImpl.hasPermission(session.userId, 'article:create')}"
+           th:href="@{/article/editor/overview}" class="navbar--button">Editor</a>
+        <a th:if="${session.userId != null and @permissionServiceImpl.hasPermission(session.userId, 'admin:manage_users')}"
+           th:href="@{/manage-users}" class="navbar--button">Manage users</a>
     </div>
 </nav>
 

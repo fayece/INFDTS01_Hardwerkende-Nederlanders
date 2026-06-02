@@ -27,9 +27,6 @@ public class User implements FullName {
     private String lastName;
 
     @Setter
-    private String email;
-
-    @Setter
     private String passwordHash;
 
     @Setter
@@ -51,7 +48,6 @@ public class User implements FullName {
             String firstName,
             @Nullable String prefix,
             String lastName,
-            String email,
             String passwordHash,
             UUID roleId,
             @Nullable UUID organizationId,
@@ -60,7 +56,6 @@ public class User implements FullName {
         this.firstName = firstName;
         this.prefix = prefix;
         this.lastName = lastName;
-        this.email = email;
         this.passwordHash = passwordHash;
         this.roleId = roleId;
         this.organizationId = organizationId;
@@ -73,7 +68,6 @@ public class User implements FullName {
             String firstName,
             @Nullable String prefix,
             String lastName,
-            String email,
             String passwordHash,
             UUID roleId,
             @Nullable UUID organizationId,
@@ -83,7 +77,6 @@ public class User implements FullName {
         this.firstName = firstName;
         this.prefix = prefix;
         this.lastName = lastName;
-        this.email = email;
         this.passwordHash = passwordHash;
         this.roleId = roleId;
         this.organizationId = organizationId;

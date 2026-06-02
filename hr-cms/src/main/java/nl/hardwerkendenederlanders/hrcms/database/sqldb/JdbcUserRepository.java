@@ -21,7 +21,6 @@ public class JdbcUserRepository implements UserRepository {
             rs.getString("first_name"),
             rs.getString("prefix"),
             rs.getString("last_name"),
-            rs.getString("email"),
             rs.getString("password_hash"),
             rs.getString("role_id") != null ? UUID.fromString(rs.getString("role_id")) : null,
             rs.getString("organization_id") != null ? UUID.fromString(rs.getString("organization_id")) : null,
@@ -34,7 +33,6 @@ public class JdbcUserRepository implements UserRepository {
                 .addValue("firstName", user.getFirstName())
                 .addValue("prefix", user.getPrefix())
                 .addValue("lastName", user.getLastName())
-                .addValue("email", user.getEmail())
                 .addValue("passwordHash", user.getPasswordHash())
                 .addValue("roleId", user.getRoleId())
                 .addValue("organizationId", user.getOrganizationId())
@@ -46,9 +44,9 @@ public class JdbcUserRepository implements UserRepository {
     public void insert(User user) {
         String sql = """
                 INSERT INTO %s (
-                id, first_name, prefix, last_name, email, password_hash, role_id, organization_id, active, created_at)
+                id, first_name, prefix, last_name, password_hash, role_id, organization_id, active, created_at)
                 VALUES (
-                :id, :firstName, :prefix, :lastName, :email, :passwordHash, :roleId, :organizationId, :active, :createdAt)
+                :id, :firstName, :prefix, :lastName, :passwordHash, :roleId, :organizationId, :active, :createdAt)
                 """.formatted(TABLE);
         jdbc.update(sql, paramsFromUser(user));
     }
@@ -66,26 +64,12 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
-        String sqlQuery = """
-                SELECT * FROM %s
-                WHERE email = :email
-                """.formatted(TABLE);
-
-        MapSqlParameterSource params = new MapSqlParameterSource().addValue("email", email);
-
-        List<User> users = jdbc.query(sqlQuery, params, rowMapper);
-        return users.stream().findFirst();
-    }
-
-    @Override
-    public List<User> findByNameOrEmailPaginated(String name, int page, int amount) {
+    public List<User> findByNamePaginated(String name, int page, int amount) {
         String sqlQuery = """
                 SELECT *
                 FROM %s
                 WHERE first_name ILIKE :name
                 OR last_name ILIKE :name
-                OR email ILIKE :name
                 OR (first_name || ' ' || last_name) ILIKE :name
                 ORDER BY last_name
                 LIMIT :limit
@@ -101,13 +85,12 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public Integer countByNameOrEmailPaginated(String name) {
+    public Integer countByNamePaginated(String name) {
         String sqlQuery = """
                 SELECT COUNT(*)
                 FROM %s
                 WHERE first_name ILIKE :name
                 OR last_name ILIKE :name
-                OR email ILIKE :name
                 OR (first_name || ' ' || last_name) ILIKE :name
                 """.formatted(TABLE);
 
@@ -178,7 +161,6 @@ public class JdbcUserRepository implements UserRepository {
                 SET first_name = :firstName,
                 prefix = :prefix,
                 last_name = :lastName,
-                email = :emailAddress,
                 role_id = :roleId,
                 organization_id = :organizationId,
                 active = :active
@@ -188,7 +170,6 @@ public class JdbcUserRepository implements UserRepository {
                 .addValue("firstName", user.getFirstName())
                 .addValue("prefix", user.getPrefix())
                 .addValue("lastName", user.getLastName())
-                .addValue("emailAddress", user.getEmail())
                 .addValue("roleId", user.getRoleId())
                 .addValue("organizationId", user.getOrganizationId())
                 .addValue("active", user.isActive())
