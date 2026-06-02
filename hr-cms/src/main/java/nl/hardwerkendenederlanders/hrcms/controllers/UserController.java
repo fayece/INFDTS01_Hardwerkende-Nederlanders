@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @Validated
@@ -82,7 +83,7 @@ public class UserController {
     @RequiresPermission("admin:manage_users")
     @GetMapping("/create-user")
     public String createUserPage(Model model) {
-        model.addAttribute("user", User.builder().build());
+        model.addAttribute("user", new User());
         model.addAttribute("roles", roleService.findAll());
         return "pages/create-user";
     }
@@ -106,16 +107,15 @@ public class UserController {
     @RequiresPermission("admin:manage_users")
     @PostMapping("/new")
     public String createNewUser(
-            @RequestParam User userModel,
-            Model model) {
+            @ModelAttribute("user") User userModel,
+            Model model, RedirectAttributes redirectAttributes) {
 
-        userService.insertUser(userModel);
-        model.addAttribute("inserted", true);
         String username = userService.insertUser(userModel);
-        model.addAttribute("successMessage", "User \"" + username + "\" created successfully!");
+        model.addAttribute("inserted", true);
+        redirectAttributes.addFlashAttribute("successMessage", "User \"" + username + "\" created successfully!");
 
         model.addAttribute("roles", roleService.findAll());
-        return "pages/create-user";
+        return "redirect:/manage-users/create-user";
     }
 
     @RequiresPermission("admin:manage_users")

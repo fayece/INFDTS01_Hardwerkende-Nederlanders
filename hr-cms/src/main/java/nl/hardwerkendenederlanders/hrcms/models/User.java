@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import nl.hardwerkendenederlanders.hrcms.models.commonalities.FullName;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 @SuperBuilder
 @Getter
+@NoArgsConstructor
 public class User implements FullName {
 
     @Builder.Default
