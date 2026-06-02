@@ -37,16 +37,18 @@ De `:User` nodes zijn kopiën van de `users` tabel in PostgreSQL.
 Deze bestaat om ervoor te zorgen dat gebruikersinformatie beschikbaar is in Neo4j voor commentaargerelateerde queries, zonder dat er een dure join tussen Neo4j en PostgreSQL nodig is.
 Enkel de volgende eigenschappen worden opgeslagen in Neo4j:
 
-| Eigenschap | Type          | PII Niveau | Reden                                                     |
-|------------|---------------|------------|-----------------------------------------------------------|
-| `id`       | String (UUID) | public     | Unieke identifier, geen directe PII                       |
-| `username` | String        | public     | Automatisch gegenereerde gebruikersnaam, geen directe PII |
+| Eigenschap  | Type          | PII Niveau | Reden                                                |
+|-------------|---------------|------------|------------------------------------------------------|
+| `id`        | String (UUID) | public     | Unieke identifier, geen directe PII                  |
+| `firstName` | String        | PII        | Gelinkt aan een specifiek persoon via `:AUTHORED_BY` |
+| `prefix`    | String        | PII        | Gelinkt aan een specifiek persoon via `:AUTHORED_BY` |
+| `lastName`  | String        | PII        | Gelinkt aan een specifiek persoon via `:AUTHORED_BY` |
 
 > **Opmerking**
-> 
-> In Spotlight is `username` een automatisch gegenereerde waarde die niet direct PII bevat, omdat het niet de echte naam of contactgegevens van de gebruiker is.
-> Gebruikers kunnen hun `username` aanpassen, maar ze worden geadviseerd om geen persoonlijke informatie in te voeren.
-> Gebruikers die hun `username` aanpassen naar iets dat wel PII bevat, doen dit dan op eigen risico, en de verantwoordelijkheid voor de PII-inhoud ligt dan bij de gebruiker zelf.
+> De database slaat de volledige naam van de gebruiker op in Neo4j.
+> In de frontend wordt de username laten zien in plaats van de volledige naam, om privacy te beschermen.
+> Wegens het feit dat usernames later geïmplementeerd zijn dan de Neo4j database, staat de username niet in Neo4j.
+> Gezien de tijdlijn van implementatie en de huidige gegevens, zal de username op dit moment niet worden opgeslagen in Neo4j, maar enkel in MongoDB.
 
 ### Node: `:Comment`
 De `:Comment` nodes bevatten alle informatie over een comment.
@@ -81,7 +83,7 @@ De volgende eigenschappen worden standaard opgeslagen in Neo4j:
 |------------|-------------------|---------------------------------------------------------------------------------------------|
 | PII        | `:Comment`        | `commentBody`, `creatorId`, `createdAt`, `deletedAt`                                        |
 | PII        | `[:AUTHORED_BY]`  | Relatie tussen `:Comment` en `:User` die een comment verbindt aan een specifieke gebruiker. |
-| public     | `:User`           | `id`, `username`                                                                            |
+| public     | `:User`           | `id`, `firstName`, `prefix`, `lastName`                                                     |
 | public     | `:Comment`        | `id`, `articleId`, `mediaId`                                                                |
 | public     | `[:REPLIED_TO]`   | Geneste relatie tussen comments, geen directe PII                                           |
 
@@ -95,7 +97,7 @@ De volgende eigenschappen worden standaard opgeslagen in Neo4j:
 |----------------------|-----------------------------------------|-------------------------|----------------------------------------------------------------------------------------------------|
 | Commentinhoud        | `commentBody`. `createdAt`, `deletedAt` | Contract (Art. 6(1)(b)) | Volstrekt noodzakelijk voor het uitvoeren van het comment systeem.                                 |
 | Comment auteurschap  | `creatorId`, `[:AUTHORED_BY]`           | Contract (Art. 6(1)(b)) | Verbindt comment aan een specifieke gebruiker, noodzakelijk voor het functioneren van het systeem. |
-| Gebruikersinformatie | `id`, `username`                        | Contract (Art. 6(1)(b)) | Nodig voor het functioneren van het comment systeem, maar bevat geen directe PII.                  |
+| Gebruikersinformatie | `id`, `firstName`, `prefix`, `lastName` | Contract (Art. 6(1)(b)) | Nodig voor het functioneren van het comment systeem, maar bevat geen directe PII.                  |
 
 ### Retentie
 
@@ -110,13 +112,13 @@ De volgende eigenschappen worden standaard opgeslagen in Neo4j:
 
 ### Rechten van betrokkenen
 
-| Recht                           | Betrekking tot                                                                | Notities                                                                                                                                                                                                                                                                    |
-|---------------------------------|-------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Toegang (Art. 15)               | `:Comment` nodes en `:User` node                                              | Alle comment inhoud moet worden verstrekt in elke aanvraag                                                                                                                                                                                                                  |
-| Rectificatie (Art. 16)          | `:User` node eigenschap (`username`)                                          | Gebruikersnaam moet binnen 5 minuten worden bijgewerkt in Neo4j via een reconciliatieproces als de dual-write aanpak faalt voor Neo4j. Momenteel is er geen mogelijkheid voor gebruikers om een comment te bewerken, dus er is geen rectificatieproces voor comment inhoud. |
-| Verwijdering (Art. 17)          | `commentBody`, `creatorId`, `:User` node eigenschap, `[:AUTHORED_BY]` relatie | Zie Issues hieronder voor details.                                                                                                                                                                                                                                          |
-| Restrictie (Art. 18)            | Alle PII gegevens op `:Comment` en `:User` nodes                              | Er moet een mechanisme zijn om gegevens niet te processen zonder deze te verwijderen.                                                                                                                                                                                       |
-| Dataoverdraagbaarheid (Art. 20) | `commentBody`. `createdAt` per `:Comment` node                                | Gegevens moeten worden geëxporteerd in een gestructureerd, machine-leesbaar formaat (zoals JSON) dat gemakkelijk kan worden overgedragen aan een andere controller, indien verzocht door de gebruiker.                                                                      |
+| Recht                           | Betrekking tot                                                                | Notities                                                                                                                                                                                               |
+|---------------------------------|-------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Toegang (Art. 15)               | `:Comment` nodes en `:User` node                                              | Alle comment inhoud moet worden verstrekt in elke aanvraag                                                                                                                                             |
+| Rectificatie (Art. 16)          | `:User` node eigenschappen (`firstName`, `prefix`, `lastName`                 | Naam informatie moet binnen 5 minuten worden geüpdate via een reconciliation job. Comment content kan zelf niet worden aangepast, dus daar is geen rectificatieproces voor nodig.                      |
+| Verwijdering (Art. 17)          | `commentBody`, `creatorId`, `:User` node eigenschap, `[:AUTHORED_BY]` relatie | Zie Issues hieronder voor details.                                                                                                                                                                     |
+| Restrictie (Art. 18)            | Alle PII gegevens op `:Comment` en `:User` nodes                              | Er moet een mechanisme zijn om gegevens niet te processen zonder deze te verwijderen.                                                                                                                  |
+| Dataoverdraagbaarheid (Art. 20) | `commentBody`. `createdAt` per `:Comment` node                                | Gegevens moeten worden geëxporteerd in een gestructureerd, machine-leesbaar formaat (zoals JSON) dat gemakkelijk kan worden overgedragen aan een andere controller, indien verzocht door de gebruiker. |
 
 ---
 

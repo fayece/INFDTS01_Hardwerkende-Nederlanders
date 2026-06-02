@@ -22,7 +22,6 @@ De GDPR-compliancevereisten voor elke eigenschap en relatie worden ook gedocumen
 
 ```mermaid
 erDiagram
-    organizations ||--o{ users : "belongs to"
     roles ||--o{ users : "assigned to"
     roles ||--o{ role_permissions : "has"
     permissions ||--o{ role_permissions : "granted via"
@@ -32,10 +31,6 @@ erDiagram
     users ||--o{ article_viewers : "views"
     articles }o--|| subjects : "categorized under"
 
-    organizations {
-        uuid id PK
-        varchar org_name
-    }
     roles {
         uuid id PK
         varchar role_name
@@ -59,7 +54,6 @@ erDiagram
         varchar last_name
         varchar password_hash
         uuid role_id FK
-        uuid organization_id FK
         timestamptz created_at
         boolean active
     }
@@ -111,18 +105,8 @@ erDiagram
 | `last_name`       | VARCHAR     | PII        | Identificeert direct een persoon                                                                                                                                                                                                   |
 | `password_hash`   | VARCHAR     | PII_strict | Authenticatiegegevens; bestand tegen offline aanvallen door de salting en kosten van ontsleuteling, maar exposure zorgt nog steeds voor crack-aanvallen op zwakke wachtwoorden en zou signaleren welk hash algoritme in gebruik is |
 | `role_id`         | UUID        | PII        | Verwijst naar een attribuut van een persoon                                                                                                                                                                                        |
-| `organization_id` | UUID        | PII        | Verwijst naar een attribuut van een persoon                                                                                                                                                                                        |
 | `created_at`      | TIMESTAMPTZ | PII        | Timestamp van een specifieke actie van een persoon                                                                                                                                                                                 |
 | `active`          | BOOLEAN     | PII        | Status van een persoon binnen het systeem                                                                                                                                                                                          |
-
----
-
-### `organizations`
-
-| Kolom      | Type    | PII Niveau | Reden                                                           |
-|------------|---------|------------|-----------------------------------------------------------------|
-| `id`       | UUID    | public     | Unieke identifier zonder directe link naar een persoon          |
-| `org_name` | VARCHAR | public     | Naam van een organisatie, niet direct gekoppeld aan een persoon |
 
 ---
 
@@ -213,12 +197,12 @@ erDiagram
 
 ## Samenvatting
 
-| PII Niveau     | Tabel                 | Velden                                                                                    |
-|----------------|-----------------------|-------------------------------------------------------------------------------------------|
-| **PII_strict** | `users`               | `email`, `password_hash`                                                                  |
-| **PII**        | `users`               | `first_name`, `prefix`, `last_name`, `role_id`, `organization_id`, `created_at`, `active` |
-| **PII**        | `article_viewers`     | `viewer_id`                                                                               |
-| **public**     | Alle overige tabellen | Alle overige velden                                                                       |
+| PII Niveau     | Tabel                 | Velden                                                                 |
+|----------------|-----------------------|------------------------------------------------------------------------|
+| **PII_strict** | `users`               | `password_hash`                                                        |
+| **PII**        | `users`               | `first_name`, `prefix`, `last_name`, `role_id`, `created_at`, `active` |
+| **PII**        | `article_viewers`     | `viewer_id`                                                            |
+| **public**     | Alle overige tabellen | Alle overige velden                                                    |
 
 Tabellen met persoonlijke data:
 - `users` (identiteitsgegevens, credentislals en accountattributen)
@@ -231,12 +215,12 @@ Elke andere tabel bevat enkel editoriale, relationele of operationele metadata z
 ## GDPR Compliance Vereisten
 
 ### Rechtmatigheid (Art. 6)
-| Data Categorie       | Velden                                               | Rechtmatige Basis              | Toelichting                                                                                  |
-|----------------------|------------------------------------------------------|--------------------------------|----------------------------------------------------------------------------------------------|
-| Account identiteit   | `first_name`, `prefix`, `last_name`                  | Contract (Art. 6(1)(b))        | Noodzakelijk voor accountbeheer                                                              |
-| Account credentialen | `password_hash`                                      | Contract (Art. 6(1)(b))        | Noodzakelijk voor het uitvoeren van een contract met de gebruiker (authenticatie)            |
-| Account metadata     | `role_id`, `organization_id`, `active`, `created_at` | Contract (Art. 6(1)(b))        | Noodzakelijk voor accountbeheer                                                              |
-| Gedragsgegevens      | `article_viewers.viewer_id`                          | Legitiem belang (Art. 6(1)(f)) | Analyse; kan mogelijk worden geanonimiseerd of gepseudonimiseerd om compliance te verbeteren |
+| Data Categorie       | Velden                              | Rechtmatige Basis              | Toelichting                                                                                  |
+|----------------------|-------------------------------------|--------------------------------|----------------------------------------------------------------------------------------------|
+| Account identiteit   | `first_name`, `prefix`, `last_name` | Contract (Art. 6(1)(b))        | Noodzakelijk voor accountbeheer                                                              |
+| Account credentialen | `password_hash`                     | Contract (Art. 6(1)(b))        | Noodzakelijk voor het uitvoeren van een contract met de gebruiker (authenticatie)            |
+| Account metadata     | `role_id`, `active`, `created_at`   | Contract (Art. 6(1)(b))        | Noodzakelijk voor accountbeheer                                                              |
+| Gedragsgegevens      | `article_viewers.viewer_id`         | Legitiem belang (Art. 6(1)(f)) | Analyse; kan mogelijk worden geanonimiseerd of gepseudonimiseerd om compliance te verbeteren |
 
 ### Retentie
 

@@ -108,7 +108,7 @@ Er is geen handmatige retentie- of verwijderingsmechanisme nodig buiten de garan
 
 ## Issues
 ### Verwijdering triggert niet een directe eviction van cache entries
-Wanneer een gebruiker verwijderd wordt, worden de cache entries die de gegevens van die gebruiker bevatten niet onmiddellijk geevicted.
+Wanneer een gebruiker verwijderd wordt, worden de cache entries die de gegevens van die gebruiker bevatten niet onmiddellijk evicted.
 Dit betekent het volgende:
 - `publishedArticlesFull` en `fullArticle` entries kunnen nog steeds de `username` van de verwijderde gebruiker bevatten totdat ze automatisch vervallen.
   Al is de `username` als public geclassificeerd, is het nog steeds een goed idee om deze zo snel mogelijk te verwijderen.
