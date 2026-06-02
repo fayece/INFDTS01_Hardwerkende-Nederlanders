@@ -164,8 +164,7 @@ public class JdbcArticleRepository implements ArticleRepository {
     }
 
     public @Nullable ArticleFullDetailsDto findArticlePublished(UUID id) {
-        String query =
-                """
+        String query = """
                 SELECT *
                 FROM full_articles
                 WHERE article_id = :id AND publication_status = 'PUBLISHED'
