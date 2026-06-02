@@ -1,5 +1,6 @@
 package nl.hardwerkendenederlanders.hrcms.controllers;
 
+import nl.hardwerkendenederlanders.hrcms.configuration.RequiresPermission;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.ArticleService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +15,7 @@ public class ReaderHomeController {
         this.articleService = articleService;
     }
 
+    @RequiresPermission("article:read")
     @GetMapping("/")
     public String getHomePage(Model model, @RequestParam(defaultValue = "1") int page) {
         model.addAttribute("articles", articleService.findNewPublished(20, page));

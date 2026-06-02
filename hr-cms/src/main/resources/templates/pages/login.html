@@ -1,31 +1,36 @@
 ﻿<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Login</title>
-    <link rel="stylesheet"
-          th:each="cssRef : ${@cssDiscoveryService.getAllCssPaths()}"
-          th:href="${cssRef}">
-</head>
-<body>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <title>Login</title>
+        <link rel="stylesheet"
+              th:each="cssRef : ${@cssDiscoveryService.getAllCssPaths()}"
+              th:href="${cssRef}">
+    </head>
 
-<h1>Login</h1>
-<p th:if="${error}" style="color:red;">
-    Invalid email or password
-</p>
+    <body>
+        <div></div>
+        <main class="standard-page-layout">
+            <h1>Login</h1>
+            <p th:if="${error}" style="color:red;">
+                Invalid email or password
+            </p>
 
-<form th:action="@{/login}" method="post">
-    <div>
-        <label>Email:</label>
-        <input type="text" name="email"/>
-    </div>
+            <form th:action="@{/login}" method="post">
+                <div>
+                    <label>Email:
+                        <input type="text" name="email"/>
+                    </label>
+                </div>
 
-    <div>
-        <label>Password:</label>
-        <input type="password" name="password"/>
-    </div>
+                <div>
+                    <label>Password:
+                        <input type="password" name="password"/>
+                    </label>
+                </div>
 
-    <button type="submit">Login</button>
-</form>
-
-</body>
+                <button type="submit">Login</button>
+            </form>
+        </main>
+        <footer th:replace="~{fragments/app-wide/footer :: footer}"></footer>
+    </body>
 </html>

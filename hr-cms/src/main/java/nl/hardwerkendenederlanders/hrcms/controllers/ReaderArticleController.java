@@ -2,6 +2,7 @@ package nl.hardwerkendenederlanders.hrcms.controllers;
 
 import jakarta.servlet.http.HttpSession;
 import java.util.UUID;
+import nl.hardwerkendenederlanders.hrcms.configuration.RequiresPermission;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentUnavailableException;
 import nl.hardwerkendenederlanders.hrcms.models.ArticleViewer;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleFullDetailsDto;
@@ -32,14 +33,15 @@ public class ReaderArticleController {
             CommentServiceImpl commentService,
             ArticleAuthorsService authorsService,
             UserSessionService userSessionService,
-            ArticleViewersService articleViewersSerivce) {
+            ArticleViewersService articleViewersService) {
         this.articleService = articleService;
         this.commentService = commentService;
         this.authorsService = authorsService;
         this.userSessionService = userSessionService;
-        this.articleViewersService = articleViewersSerivce;
+        this.articleViewersService = articleViewersService;
     }
 
+    @RequiresPermission("article:read")
     @GetMapping("/{articleId}")
     public String getArticle(@PathVariable UUID articleId, Model model, HttpSession httpSession) {
         var user = userSessionService.getLoggedInUser(httpSession);
@@ -57,11 +59,11 @@ public class ReaderArticleController {
 
         try {
             PagedComments result = commentService.getTopLevelComments(articleId, 0, 10);
-            model.addAttribute("comments", result.comments());
-            model.addAttribute("hasMore", result.hasMore());
+            model.addAttribute("comments", result.getComments());
+            model.addAttribute("hasMore", result.isHasMore());
             model.addAttribute("nextPage", 2);
             model.addAttribute("articleId", articleId);
-            model.addAttribute("offset", result.comments().size());
+            model.addAttribute("offset", result.getComments().size());
 
         } catch (ComponentUnavailableException e) {
             model.addAttribute("failedComponent", "comments");

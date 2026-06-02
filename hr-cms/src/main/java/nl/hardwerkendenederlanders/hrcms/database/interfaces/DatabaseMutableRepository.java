@@ -1,4 +1,4 @@
-package nl.hardwerkendenederlanders.hrcms.database;
+package nl.hardwerkendenederlanders.hrcms.database.interfaces;
 
 public interface DatabaseMutableRepository<T> extends DatabaseRepository<T> {
 

@@ -5,7 +5,7 @@ import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import nl.hardwerkendenederlanders.hrcms.database.MediaRepository;
+import nl.hardwerkendenederlanders.hrcms.database.interfaces.MediaRepository;
 import nl.hardwerkendenederlanders.hrcms.exceptions.MediaUploadException;
 import nl.hardwerkendenederlanders.hrcms.models.MediaType;
 import org.junit.jupiter.api.BeforeEach;

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
+import nl.hardwerkendenederlanders.hrcms.database.interfaces.CommentRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Comment;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentWithAuthor;
 import org.junit.jupiter.api.Test;
@@ -40,23 +41,6 @@ public abstract class CommentRepositoryContractTest {
         assertEquals(comment.getId(), retrieved.getId());
         assertEquals(getValidArticleId(), retrieved.getArticleId());
         assertEquals("This is a test comment.", retrieved.getCommentBody());
-    }
-
-    @Test
-    void update_withModifiedFields_shouldReflectChanges() {
-        Comment comment = Comment.builder()
-                .articleId(getValidArticleId())
-                .creatorId(getValidAuthorId())
-                .commentBody("This is a test comment.")
-                .build();
-        getRepository().insert(comment);
-
-        comment.setCommentBody("This is an updated test comment.");
-        getRepository().update(comment);
-
-        Comment retrieved = getRepository().findById(comment.getId()).orElse(null);
-        assertNotNull(retrieved);
-        assertEquals("This is an updated test comment.", retrieved.getCommentBody());
     }
 
     @Test

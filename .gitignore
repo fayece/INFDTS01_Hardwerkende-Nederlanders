@@ -32,7 +32,6 @@ replay_pid*
 .idea
 /node_modules
 .DS_Store
-/hr-cms/qodana-results
 .env.local
 /hr-cms/uploads
 /uploads

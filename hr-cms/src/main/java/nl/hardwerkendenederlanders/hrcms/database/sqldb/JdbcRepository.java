@@ -3,7 +3,7 @@ package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import nl.hardwerkendenederlanders.hrcms.database.DatabaseRepository;
+import nl.hardwerkendenederlanders.hrcms.database.interfaces.DatabaseRepository;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
