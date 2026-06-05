@@ -1,13 +1,11 @@
 package nl.hardwerkendenederlanders.hrcms.seeding;
 
-import java.time.OffsetDateTime;
 import java.util.*;
 import lombok.AllArgsConstructor;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.*;
 import nl.hardwerkendenederlanders.hrcms.database.mongodb.ProfileRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Profile;
 import org.neo4j.driver.*;
-import org.springframework.data.neo4j.core.Neo4jClient;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -220,7 +218,7 @@ public class databaseSeeder {
             "fanbase ",
             "live performance ");
 
-    public StringBuilder textGenerator(int length, String prefix){
+    public StringBuilder textGenerator(int length, String prefix) {
         StringBuilder text = new StringBuilder(prefix);
 
         for (int j = 0; j < length; j++) {
@@ -369,9 +367,7 @@ public class databaseSeeder {
                 "Baukje",
                 "Jitske");
 
-
         int firstNameSize = firstNames.size();
-
 
         // ============================================================
         // USERS
@@ -419,7 +415,10 @@ public class databaseSeeder {
 
                     users.add(userId);
 
-                    profiles.add(Profile.builder().id(userId.toString()).username("user" + i).build());
+                    profiles.add(Profile.builder()
+                            .id(userId.toString())
+                            .username("user" + i)
+                            .build());
 
                     neoUser.put("id", userId.toString());
                     neoUser.put("firstName", firstName);
@@ -437,7 +436,8 @@ public class databaseSeeder {
 
                 Map<String, Object> params = new HashMap<>();
                 params.put("props", neoUsers);
-                tx.run("UNWIND $props AS map CREATE (n:PERSONS) SET n=map", params).consume();
+                tx.run("UNWIND $props AS map CREATE (n:PERSONS) SET n=map", params)
+                        .consume();
                 tx.commit();
             }
         }
@@ -483,8 +483,10 @@ public class databaseSeeder {
 
                 contentManagers.add(managerId);
 
-                profiles.add(Profile.builder().id(managerId.toString()).username("cm" + i).build());
-
+                profiles.add(Profile.builder()
+                        .id(managerId.toString())
+                        .username("cm" + i)
+                        .build());
             }
             profileRepository.insert(profiles);
 
@@ -613,7 +615,6 @@ public class databaseSeeder {
         }
 
         System.out.println("Article Views Seeded");
-
     }
 
     public void wipe() {
@@ -627,7 +628,7 @@ public class databaseSeeder {
             COMMIT;
             """);
         System.out.println("PostgreSQL wipe complete");
-        try (var tx = neo4j.session().beginTransaction()){
+        try (var tx = neo4j.session().beginTransaction()) {
             tx.run("MATCH (n) DETACH DELETE n");
             tx.commit();
         }
