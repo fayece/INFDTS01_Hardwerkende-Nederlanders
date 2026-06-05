@@ -1,8 +1,13 @@
 package nl.hardwerkendenederlanders.hrcms.seeding;
 
+import java.time.OffsetDateTime;
 import java.util.*;
 import lombok.AllArgsConstructor;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.*;
+import nl.hardwerkendenederlanders.hrcms.database.mongodb.ProfileRepository;
+import nl.hardwerkendenederlanders.hrcms.models.Profile;
+import org.neo4j.driver.*;
+import org.springframework.data.neo4j.core.Neo4jClient;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,7 +17,9 @@ import org.springframework.stereotype.Service;
 public class databaseSeeder {
 
     private final JdbcTemplate db;
+    private final Driver neo4j;
     private final RoleRepository roleRepository;
+    private final ProfileRepository profileRepository;
 
     private final Random rand = new Random();
 
@@ -22,6 +29,204 @@ public class databaseSeeder {
                 .replaceFirst(
                         "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{8})",
                         "$1-$2-$3-$4-$5"));
+    }
+
+    private final List<String> words = Arrays.asList(
+            "the ",
+            "but ",
+            "so ",
+            "very good idea ",
+            "new ",
+            "created ",
+            "he ",
+            "she ",
+            "they ",
+            "viewers ",
+            "audience ",
+            "exploded ",
+            "amazing ",
+            "find ",
+            "I ",
+            "bad idea ",
+            "hopeless ",
+            ".",
+
+            // Common English words
+            "a ",
+            "an ",
+            "and ",
+            "or ",
+            "if ",
+            "then ",
+            "because ",
+            "when ",
+            "where ",
+            "what ",
+            "why ",
+            "who ",
+            "how ",
+            "this ",
+            "that ",
+            "these ",
+            "those ",
+            "is ",
+            "was ",
+            "are ",
+            "were ",
+            "be ",
+            "been ",
+            "have ",
+            "has ",
+            "had ",
+            "do ",
+            "does ",
+            "did ",
+            "can ",
+            "could ",
+            "will ",
+            "would ",
+            "should ",
+            "to ",
+            "from ",
+            "with ",
+            "without ",
+            "for ",
+            "about ",
+            "into ",
+            "over ",
+            "under ",
+            "before ",
+            "after ",
+            "people ",
+            "friends ",
+            "family ",
+            "story ",
+            "world ",
+            "music ",
+            "sound ",
+            "voice ",
+            "night ",
+            "day ",
+            "life ",
+            "dream ",
+            "love ",
+            "heart ",
+            "mind ",
+            "feeling ",
+            "beautiful ",
+            "perfect ",
+            "crazy ",
+            "wild ",
+            "happy ",
+            "sad ",
+            "strong ",
+            "alone ",
+            "everything ",
+            "nothing ",
+            "something ",
+            "anything ",
+            "always ",
+            "never ",
+            "sometimes ",
+            "again ",
+            "today ",
+            "tomorrow ",
+            "yesterday ",
+            "big ",
+            "small ",
+            "fast ",
+            "slow ",
+            "good ",
+            "great ",
+            "best ",
+            "worst ",
+
+            // Pop music themed
+            "song ",
+            "songs ",
+            "album ",
+            "albums ",
+            "track ",
+            "tracks ",
+            "single ",
+            "hit ",
+            "chart ",
+            "billboard ",
+            "radio ",
+            "stream ",
+            "streaming ",
+            "viral ",
+            "trending ",
+            "concert ",
+            "tour ",
+            "festival ",
+            "show ",
+            "stage ",
+            "performance ",
+            "dance ",
+            "beat ",
+            "rhythm ",
+            "melody ",
+            "chorus ",
+            "verse ",
+            "hook ",
+            "bridge ",
+            "drop ",
+            "lyrics ",
+            "singer ",
+            "artist ",
+            "band ",
+            "producer ",
+            "studio ",
+            "record ",
+            "microphone ",
+            "guitar ",
+            "piano ",
+            "drums ",
+            "fans ",
+            "crowd ",
+            "spotlight ",
+            "celebrity ",
+            "famous ",
+            "superstar ",
+            "party ",
+            "club ",
+            "disco ",
+            "romance ",
+            "breakup ",
+            "emotion ",
+            "summer hit ",
+            "love song ",
+            "dance floor ",
+            "top charts ",
+            "music video ",
+            "world tour ",
+            "encore ",
+            "headline ",
+            "backstage ",
+            "acoustic ",
+            "remix ",
+            "collab ",
+            "synth ",
+            "bass ",
+            "vocals ",
+            "autotune ",
+            "playlist ",
+            "anthem ",
+            "pop star ",
+            "gold record ",
+            "platinum ",
+            "number one ",
+            "fanbase ",
+            "live performance ");
+
+    public StringBuilder textGenerator(int length, String prefix){
+        StringBuilder text = new StringBuilder(prefix);
+
+        for (int j = 0; j < length; j++) {
+            text.append(words.get(rand.nextInt(words.size())));
+        }
+        return text;
     }
 
     public void seed() {
@@ -164,196 +369,9 @@ public class databaseSeeder {
                 "Baukje",
                 "Jitske");
 
-        var words = Arrays.asList(
-                "the ",
-                "but ",
-                "so ",
-                "very good idea ",
-                "new ",
-                "created ",
-                "he ",
-                "she ",
-                "they ",
-                "viewers ",
-                "audience ",
-                "exploded ",
-                "amazing ",
-                "find ",
-                "I ",
-                "bad idea ",
-                "hopeless ",
-                ".",
-
-                // Common English words
-                "a ",
-                "an ",
-                "and ",
-                "or ",
-                "if ",
-                "then ",
-                "because ",
-                "when ",
-                "where ",
-                "what ",
-                "why ",
-                "who ",
-                "how ",
-                "this ",
-                "that ",
-                "these ",
-                "those ",
-                "is ",
-                "was ",
-                "are ",
-                "were ",
-                "be ",
-                "been ",
-                "have ",
-                "has ",
-                "had ",
-                "do ",
-                "does ",
-                "did ",
-                "can ",
-                "could ",
-                "will ",
-                "would ",
-                "should ",
-                "to ",
-                "from ",
-                "with ",
-                "without ",
-                "for ",
-                "about ",
-                "into ",
-                "over ",
-                "under ",
-                "before ",
-                "after ",
-                "people ",
-                "friends ",
-                "family ",
-                "story ",
-                "world ",
-                "music ",
-                "sound ",
-                "voice ",
-                "night ",
-                "day ",
-                "life ",
-                "dream ",
-                "love ",
-                "heart ",
-                "mind ",
-                "feeling ",
-                "beautiful ",
-                "perfect ",
-                "crazy ",
-                "wild ",
-                "happy ",
-                "sad ",
-                "strong ",
-                "alone ",
-                "everything ",
-                "nothing ",
-                "something ",
-                "anything ",
-                "always ",
-                "never ",
-                "sometimes ",
-                "again ",
-                "today ",
-                "tomorrow ",
-                "yesterday ",
-                "big ",
-                "small ",
-                "fast ",
-                "slow ",
-                "good ",
-                "great ",
-                "best ",
-                "worst ",
-
-                // Pop music themed
-                "song ",
-                "songs ",
-                "album ",
-                "albums ",
-                "track ",
-                "tracks ",
-                "single ",
-                "hit ",
-                "chart ",
-                "billboard ",
-                "radio ",
-                "stream ",
-                "streaming ",
-                "viral ",
-                "trending ",
-                "concert ",
-                "tour ",
-                "festival ",
-                "show ",
-                "stage ",
-                "performance ",
-                "dance ",
-                "beat ",
-                "rhythm ",
-                "melody ",
-                "chorus ",
-                "verse ",
-                "hook ",
-                "bridge ",
-                "drop ",
-                "lyrics ",
-                "singer ",
-                "artist ",
-                "band ",
-                "producer ",
-                "studio ",
-                "record ",
-                "microphone ",
-                "guitar ",
-                "piano ",
-                "drums ",
-                "fans ",
-                "crowd ",
-                "spotlight ",
-                "celebrity ",
-                "famous ",
-                "superstar ",
-                "party ",
-                "club ",
-                "disco ",
-                "romance ",
-                "breakup ",
-                "emotion ",
-                "summer hit ",
-                "love song ",
-                "dance floor ",
-                "top charts ",
-                "music video ",
-                "world tour ",
-                "encore ",
-                "headline ",
-                "backstage ",
-                "acoustic ",
-                "remix ",
-                "collab ",
-                "synth ",
-                "bass ",
-                "vocals ",
-                "autotune ",
-                "playlist ",
-                "anthem ",
-                "pop star ",
-                "gold record ",
-                "platinum ",
-                "number one ",
-                "fanbase ",
-                "live performance ");
 
         int firstNameSize = firstNames.size();
+
 
         // ============================================================
         // USERS
@@ -365,40 +383,63 @@ public class databaseSeeder {
 
             int batchEnd = Math.min(batchStart + BATCH_SIZE, totalUsers);
 
+            // SQL
             StringBuilder query = new StringBuilder("INSERT INTO users "
-                    + "(id, first_name, prefix, last_name, email, password_hash, role_id, active) VALUES ");
+                    + "(id, first_name, prefix, last_name, password_hash, role_id, active) VALUES ");
 
-            for (int i = batchStart; i < batchEnd; i++) {
+            // Mongo
+            ArrayList<Profile> profiles = new ArrayList<Profile>();
 
-                String firstName = firstNames.get(rand.nextInt(firstNameSize));
-                String lastName = firstNames.get(rand.nextInt(firstNameSize)) + "son";
+            // Neo
+            List<Map<String, Object>> neoUsers = new ArrayList<>();
 
-                int user_num = i + batchStart * BATCH_SIZE;
-                UUID userId = createNumericUUID(user_num);
+            try (var tx = neo4j.session().beginTransaction()) {
+                for (int i = batchStart; i < batchEnd; i++) {
 
-                query.append("('")
-                        .append(userId)
-                        .append("', '")
-                        .append(firstName)
-                        .append("', ")
-                        .append("null, '")
-                        .append(lastName)
-                        .append("', '")
-                        .append(userId)
-                        .append("@theorg.nl', '")
-                        .append(password)
-                        .append("', '")
-                        .append(userRole.getId())
-                        .append("', ")
-                        .append("true),");
+                    String firstName = firstNames.get(rand.nextInt(firstNameSize));
+                    String lastName = firstNames.get(rand.nextInt(firstNameSize)) + "son";
 
-                users.add(userId);
+                    int user_num = i + batchStart * BATCH_SIZE;
+                    UUID userId = createNumericUUID(user_num);
+                    HashMap<String, Object> neoUser = new HashMap<String, Object>();
+
+                    query.append("('")
+                            .append(userId)
+                            .append("', '")
+                            .append(firstName)
+                            .append("', ")
+                            .append("null, '")
+                            .append(lastName)
+                            .append("', '")
+                            .append(password)
+                            .append("', '")
+                            .append(userRole.getId())
+                            .append("', ")
+                            .append("true),");
+
+                    users.add(userId);
+
+                    profiles.add(Profile.builder().id(userId.toString()).username("user" + i).build());
+
+                    neoUser.put("id", userId.toString());
+                    neoUser.put("firstName", firstName);
+                    neoUser.put("prefix", null);
+                    neoUser.put("lastName", lastName);
+                    neoUsers.add(neoUser);
+                }
+
+                query.setLength(query.length() - 1);
+                query.append(";");
+
+                db.update(query.toString());
+
+                profileRepository.insert(profiles);
+
+                Map<String, Object> params = new HashMap<>();
+                params.put("props", neoUsers);
+                tx.run("UNWIND $props AS map CREATE (n:PERSONS) SET n=map", params).consume();
+                tx.commit();
             }
-
-            query.setLength(query.length() - 1);
-            query.append(";");
-
-            db.update(query.toString());
         }
 
         System.out.println("Users Seeded");
@@ -409,12 +450,14 @@ public class databaseSeeder {
 
         System.out.println("Seeding content managers");
 
-        for (int batchStart = 0; batchStart < totalManagers; batchStart += BATCH_SIZE) {
+        for (int batchStart = totalUsers; batchStart + 1 < totalManagers + totalUsers + 1; batchStart += BATCH_SIZE) {
 
-            int batchEnd = Math.min(batchStart + BATCH_SIZE, totalManagers);
+            int batchEnd = Math.min(batchStart + BATCH_SIZE, totalManagers + totalUsers + 1);
 
             StringBuilder query = new StringBuilder("INSERT INTO users "
-                    + "(id, first_name, prefix, last_name, email, password_hash, role_id, active) VALUES ");
+                    + "(id, first_name, prefix, last_name, password_hash, role_id, active) VALUES ");
+
+            ArrayList<Profile> profiles = new ArrayList<Profile>();
 
             for (int i = batchStart; i < batchEnd; i++) {
 
@@ -432,8 +475,6 @@ public class databaseSeeder {
                         .append("null, '")
                         .append(lastName)
                         .append("', '")
-                        .append(manager_num)
-                        .append("@theorg.nl', '")
                         .append(password)
                         .append("', '")
                         .append(contentManagerRole.getId())
@@ -441,7 +482,11 @@ public class databaseSeeder {
                         .append("true),");
 
                 contentManagers.add(managerId);
+
+                profiles.add(Profile.builder().id(managerId.toString()).username("cm" + i).build());
+
             }
+            profileRepository.insert(profiles);
 
             query.setLength(query.length() - 1);
             query.append(";");
@@ -465,17 +510,9 @@ public class databaseSeeder {
                     "INSERT INTO articles " + "(id, title, text_content, publication_status) VALUES ");
 
             for (int i = batchStart; i < batchEnd; i++) {
+                StringBuilder articleContent = textGenerator(100, "So I think we should ");
 
-                StringBuilder articleTitle = new StringBuilder("Good Read: ");
-                StringBuilder articleContent = new StringBuilder("So I think we should ");
-
-                for (int j = 0; j < 7; j++) {
-                    articleTitle.append(words.get(rand.nextInt(words.size())));
-                }
-
-                for (int j = 0; j < 100; j++) {
-                    articleContent.append(words.get(rand.nextInt(words.size())));
-                }
+                StringBuilder articleTitle = textGenerator(7, "Good Read:");
 
                 UUID articleId = createNumericUUID(i + batchStart * BATCH_SIZE);
 
@@ -576,9 +613,11 @@ public class databaseSeeder {
         }
 
         System.out.println("Article Views Seeded");
+
     }
 
     public void wipe() {
+        System.out.println("Wiping database");
         db.update("""
             BEGIN;
             DELETE FROM article_viewers;
@@ -587,5 +626,13 @@ public class databaseSeeder {
             DELETE FROM users;
             COMMIT;
             """);
+        System.out.println("PostgreSQL wipe complete");
+        try (var tx = neo4j.session().beginTransaction()){
+            tx.run("MATCH (n) DETACH DELETE n");
+            tx.commit();
+        }
+        System.out.println("Neo4j wipe complete");
+        profileRepository.deleteAll();
+        System.out.println("Mongo wipe complete, Database is clean");
     }
 }
