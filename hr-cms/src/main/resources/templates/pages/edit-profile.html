@@ -1,0 +1,66 @@
+﻿<head>
+    <title>Profile Page</title>
+    <link rel="stylesheet" th:href="${cssRef}" th:each="cssRef: ${@cssDiscoveryService.getAllCssPaths()}">
+</head>
+<body>
+<div th:insert="~{fragments/app-wide/navbar :: navbar}" class="navbar"></div>
+    <form th:action="@{/my-profile/update}" th:object="${profileDTO}" method="post">
+        <div>
+            <label class="profile-edit-label">A username is required</label>
+            <input type="text" th:field="*{username}" required>
+        </div>
+
+        <div>
+            <label class="profile-edit-label">Add pronouns if you like</label>
+            <input type="text" th:field="*{pronouns[0]}" placeholder="Pronoun 1">
+            <input type="text" th:field="*{pronouns[1]}" placeholder="Pronoun 2">
+            <input type="text" th:field="*{pronouns[2]}" placeholder="Pronoun 3">
+            <input type="text" th:field="*{pronouns[3]}" placeholder="Pronoun 4">
+        </div>
+        <div>
+            <label class="profile-edit-label">Write a bio if you like</label>
+            <input type="text" th:field="*{bio}">
+        </div>
+        <div>
+            <label class="profile-edit-label">Set your interests</label>
+            <input type="text" th:field="*{interests[0]}" placeholder="interest">
+            <input type="text" th:field="*{interests[1]}" placeholder="interest">
+            <input type="text" th:field="*{interests[2]}" placeholder="interest">
+            <input type="text" th:field="*{interests[3]}" placeholder="interest">
+            <input type="text" th:field="*{interests[4]}" placeholder="interest">
+            <input type="text" th:field="*{interests[5]}" placeholder="interest">
+        </div>
+        <div>
+            <label class="profile-edit-label">Set your custom fields</label>
+            <input type="text" th:field="*{customFields[0].label}" placeholder="Label">
+            <input type="text" th:field="*{customFields[0].value}" placeholder="Value">
+
+            <input type="text" th:field="*{customFields[1].label}" placeholder="Label">
+            <input type="text" th:field="*{customFields[1].value}" placeholder="Value">
+
+            <input type="text" th:field="*{customFields[2].label}" placeholder="Label">
+            <input type="text" th:field="*{customFields[2].value}" placeholder="Value">
+
+            <input type="text" th:field="*{customFields[3].label}" placeholder="Label">
+            <input type="text" th:field="*{customFields[3].value}" placeholder="Value">
+        </div>
+        <div>
+            <label class="profile-edit-label">Set your socials</label>
+            <input type="text" th:field="*{socials[0].type}" placeholder="Label">
+            <input type="text" th:field="*{socials[0].username}" placeholder="Value">
+
+            <input type="text" th:field="*{socials[1].type}" placeholder="Label">
+            <input type="text" th:field="*{socials[1].username}" placeholder="Value">
+
+            <input type="text" th:field="*{socials[2].type}" placeholder="Label">
+            <input type="text" th:field="*{socials[2].username}" placeholder="Value">
+
+            <input type="text" th:field="*{socials[3].type}" placeholder="Label">
+            <input type="text" th:field="*{socials[3].username}" placeholder="Value">
+        </div>
+
+        <a class="profile-edit-cancel" th:href="@{/my-profile}">Cancel</a>
+        <button type="submit">Save profile</button>
+    </form>
+<footer th:replace="~{fragments/app-wide/footer :: footer}"></footer>
+</body>

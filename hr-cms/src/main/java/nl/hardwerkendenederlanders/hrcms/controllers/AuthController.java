@@ -22,10 +22,11 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(HttpSession session, String email, String password) {
+    public String login(HttpSession session, String username, String password) {
         try {
-            User user = authService.login(email, password);
+            User user = authService.login(username, password);
             userSessionService.login(session, user);
+
             return "redirect:/";
         } catch (RuntimeException e) {
             return "redirect:/login?error=true";

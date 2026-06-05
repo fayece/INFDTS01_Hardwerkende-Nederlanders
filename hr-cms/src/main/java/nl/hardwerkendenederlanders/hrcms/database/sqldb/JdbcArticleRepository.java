@@ -63,10 +63,7 @@ public class JdbcArticleRepository implements ArticleRepository {
                 .subjectName(rs.getString("subject_name"))
                 .viewCount(rs.getInt("view_count"))
                 .commentCount(rs.getInt("comment_count"))
-                .firstAuthor(new AuthorDto(
-                        rs.getString("first_author_first_name"),
-                        rs.getString("first_author_prefix"),
-                        rs.getString("first_author_last_name")))
+                .firstAuthor(new AuthorDto(rs.getString("first_author_id")))
                 .build();
     }
 
@@ -167,8 +164,10 @@ public class JdbcArticleRepository implements ArticleRepository {
         String query = """
                 SELECT *
                 FROM full_articles
-                WHERE article_id = :id AND publication_status = 'PUBLISHED';
+                WHERE article_id = :id AND publication_status = 'PUBLISHED'
+                LIMIT 1;
                 """;
+        // here.
         MapSqlParameterSource mapping = new MapSqlParameterSource();
         mapping.addValue("id", id);
         try {

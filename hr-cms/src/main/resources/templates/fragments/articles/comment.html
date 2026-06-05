@@ -1,5 +1,5 @@
 <div th:fragment="comment" class="comment" xmlns="http://www.w3.org/1999/html">
-    <span class="author-name" th:text="${comment.authorName ?: 'Unknown User'}"></span>
+    <a class="author-name" th:href="@{/profile/{username}(username=${comment.authorName})}" th:text="${comment.authorName ?: 'Unknown User'}"></a>
     <div class="comment-body" th:data-markdown="${comment.commentBody}"></div>
 
     <div class="comment-footer">

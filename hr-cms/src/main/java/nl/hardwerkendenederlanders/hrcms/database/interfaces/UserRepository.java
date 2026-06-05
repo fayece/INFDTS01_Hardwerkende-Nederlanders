@@ -10,15 +10,13 @@ public interface UserRepository {
 
     Optional<User> findById(UUID id);
 
-    Optional<User> findByEmail(String email);
-
     List<User> findAllUsers();
 
     List<User> findAllPaginated(Integer page, Integer amount);
 
     void updateActivityById(UUID id, boolean setActive);
 
-    List<User> findByNameOrEmailPaginated(String name, int page, int amount);
+    List<User> findByNamePaginated(String name, int page, int amount);
 
     List<User> findUserOnActivityPaginated(boolean isActive, int page, int amount);
 
@@ -28,5 +26,5 @@ public interface UserRepository {
 
     Integer countAll();
 
-    Integer countByNameOrEmailPaginated(String name);
+    Integer countByNamePaginated(String name);
 }

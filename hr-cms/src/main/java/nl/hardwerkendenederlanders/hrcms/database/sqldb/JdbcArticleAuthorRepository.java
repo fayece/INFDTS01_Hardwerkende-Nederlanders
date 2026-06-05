@@ -33,7 +33,7 @@ public class JdbcArticleAuthorRepository implements ArticleAuthorRepository {
      * @return The RowMapper
      */
     private RowMapper<AuthorDto> authorNameMapper() {
-        return (rs, _) -> new AuthorDto(rs.getString("first_name"), rs.getString("prefix"), rs.getString("last_name"));
+        return (rs, _) -> new AuthorDto(rs.getString("author_id"));
     }
 
     /**

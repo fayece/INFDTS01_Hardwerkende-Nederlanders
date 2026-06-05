@@ -50,11 +50,6 @@ public class DualWriteUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
-        return jdbcUserRepository.findByEmail(email);
-    }
-
-    @Override
     public List<User> findAllUsers() {
         return jdbcUserRepository.findAllUsers();
     }
@@ -65,8 +60,8 @@ public class DualWriteUserRepository implements UserRepository {
     }
 
     @Override
-    public List<User> findByNameOrEmailPaginated(String name, int page, int amount) {
-        return jdbcUserRepository.findByNameOrEmailPaginated(name, page, amount);
+    public List<User> findByNamePaginated(String name, int page, int amount) {
+        return jdbcUserRepository.findByNamePaginated(name, page, amount);
     }
 
     @Override
@@ -85,8 +80,8 @@ public class DualWriteUserRepository implements UserRepository {
     }
 
     @Override
-    public Integer countByNameOrEmailPaginated(String name) {
-        return jdbcUserRepository.countByNameOrEmailPaginated(name);
+    public Integer countByNamePaginated(String name) {
+        return jdbcUserRepository.countByNamePaginated(name);
     }
 
     private void trySync(Runnable neo4jOp) {

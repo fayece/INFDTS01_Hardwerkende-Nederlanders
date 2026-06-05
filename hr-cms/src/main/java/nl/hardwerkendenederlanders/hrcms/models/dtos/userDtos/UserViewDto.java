@@ -15,6 +15,9 @@ public class UserViewDto {
     private UUID id;
 
     @Setter
+    String userName;
+
+    @Setter
     private String firstName;
 
     @Setter
@@ -23,9 +26,6 @@ public class UserViewDto {
 
     @Setter
     private String lastName;
-
-    @Setter
-    private String email;
 
     @Setter
     private UUID roleId;

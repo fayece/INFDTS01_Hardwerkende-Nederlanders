@@ -14,6 +14,7 @@
                 <h4>You can create as many new users as you'd like and leave by pressing the return button</h4>
 
                 <div th:if="${errorMessage}" th:text="${errorMessage}" class="error-container"></div>
+                <div th:if="${successMessage}" th:text="${successMessage}" class="success-container"></div>
 
                 <div class="create-user-form-container">
                     <form class="create-user-form" th:action="@{/manage-users/new}" method="post">
@@ -27,10 +28,6 @@
 
                         <label><b>Last name:</b>
                             <input type="text" name="lastName" required>
-                        </label>
-
-                        <label><b>Email</b>
-                            <input type="text" name="email" required>
                         </label>
 
                         <label><b>Password</b>

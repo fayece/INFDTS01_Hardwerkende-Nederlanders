@@ -68,7 +68,6 @@ public class JdbcPermissionRepositoryTest {
         user = User.builder()
                 .firstName("Test")
                 .lastName("User")
-                .email("test@user.com")
                 .passwordHash("hash123-005-12X")
                 .roleId(role.getId())
                 .build();
