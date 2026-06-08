@@ -35,8 +35,9 @@ public class ArticleServiceImpl implements ArticleService {
     @Caching(
             evict = {
                 @CacheEvict(value = "publishedArticlesFull", allEntries = true),
-                @CacheEvict(value = "fullArticle", key = "#article.id")
+                @CacheEvict(value = "fullArticle", key = "#article.id", beforeInvocation = true)
             })
+    @Override
     @Transactional
     public void ensureArticleExists(Article article, UUID authorId) {
         article = Article.fillOutNullFields(article);
