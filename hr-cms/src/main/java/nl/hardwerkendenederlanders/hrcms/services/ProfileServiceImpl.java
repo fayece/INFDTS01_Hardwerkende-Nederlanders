@@ -106,19 +106,23 @@ public class ProfileServiceImpl implements ProfileService {
         dto.setUsername(profile.getUsername());
         dto.setBio(profile.getBio() != null ? profile.getBio() : "");
 
-        List<String> interests = new ArrayList<>(profile.getInterests());
+        List<String> interests =
+                profile.getInterests() != null ? new ArrayList<>(profile.getInterests()) : new ArrayList<>();
         while (interests.size() < 6) interests.add("");
         dto.setInterests(interests);
 
-        List<String> pronouns = new ArrayList<>(profile.getPronouns());
+        List<String> pronouns =
+                profile.getPronouns() != null ? new ArrayList<>(profile.getPronouns()) : new ArrayList<>();
         while (pronouns.size() < 4) pronouns.add("");
         dto.setPronouns(pronouns);
 
-        List<Profile.CustomField> fields = new ArrayList<>(profile.getCustomFields());
+        List<Profile.CustomField> fields =
+                profile.getCustomFields() != null ? new ArrayList<>(profile.getCustomFields()) : new ArrayList<>();
         while (fields.size() < 4) fields.add(new Profile.CustomField());
         dto.setCustomFields(fields);
 
-        List<Profile.Social> socials = new ArrayList<>(profile.getSocials());
+        List<Profile.Social> socials =
+                profile.getSocials() != null ? new ArrayList<>(profile.getSocials()) : new ArrayList<>();
         while (socials.size() < 4) socials.add(new Profile.Social());
         dto.setSocials(socials);
 
