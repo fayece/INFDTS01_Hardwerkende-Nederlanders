@@ -61,11 +61,11 @@ services:
     container_name: hard-work-redis
     env_file: ".env"
     environment:
-      REDIS_ARGS: "--requirepass ${REDIS_PASSWORD} --port 6379"
+      REDIS_ARGS: "--requirepass ${REDIS_PASSWORD} --port ${REDIS_PORT} "
     healthcheck:
-      test: [ "CMD-SHELL", "redis-cli -p 6379 -a $$REDIS_PASSWORD ping" ]
+      test: [ "CMD-SHELL", "redis-cli -p ${REDIS_PORT} -a $$REDIS_PASSWORD ping" ]
     ports:
-      - "6379:6379"
+      - ${REDIS_PORT}:${REDIS_PORT}
 
     mem_limit: 100mb
     cpus: 1
