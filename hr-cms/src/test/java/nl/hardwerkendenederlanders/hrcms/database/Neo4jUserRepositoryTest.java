@@ -38,7 +38,6 @@ class Neo4jUserRepositoryTest {
                 .lastName("User")
                 .passwordHash("hash")
                 .roleId(null)
-                .organizationId(null)
                 .active(true)
                 .createdAt(OffsetDateTime.now())
                 .build();
