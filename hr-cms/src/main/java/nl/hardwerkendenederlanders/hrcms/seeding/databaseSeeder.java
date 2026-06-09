@@ -363,7 +363,10 @@ public class databaseSeeder {
                     .append("'),");
 
             generatedIds.add(userId);
-            profiles.add(Profile.builder().id(userId.toString()).username(usernamePrefix + i).build());
+            profiles.add(Profile.builder()
+                    .id(userId.toString())
+                    .username(usernamePrefix + i)
+                    .build());
         }
 
         usersQuery.setLength(usersQuery.length() - 1);

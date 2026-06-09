@@ -37,8 +37,8 @@ public class JdbcPermissionRepository implements PermissionRepository {
             SELECT COUNT(*) > 0
             FROM permissions p
             JOIN role_permissions rp ON p.id = rp.permission_id
-            JOIN users u ON rp.role_id = u.role_id
-            WHERE u.id = :userId AND p.permission_key = :permissionKey;
+            JOIN pii.users_pii up ON rp.role_id = up.role_id
+            WHERE up.user_id = :userId AND p.permission_key = :permissionKey;
             """;
 
         return Boolean.TRUE.equals(
