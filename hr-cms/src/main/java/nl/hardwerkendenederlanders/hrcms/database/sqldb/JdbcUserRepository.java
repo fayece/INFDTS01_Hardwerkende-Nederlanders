@@ -9,14 +9,37 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @AllArgsConstructor
 public class JdbcUserRepository implements UserRepository {
     private final NamedParameterJdbcTemplate jdbc;
-    private static final String TABLE = "users";
+
+    private static final String BASE_SELECT = """
+            SELECT u.id, p.first_name, p.prefix, p.last_name, p.role_id, p.active, p.created_at
+            FROM users u
+            JOIN pii.users_pii p ON u.id = p.user_id
+            """;
+
+    private static final String AUTH_SELECT = """
+            SELECT u.id, p.first_name, p.prefix, p.last_name, ps.password_hash, p.role_id, p.active, p.created_at
+            FROM users u
+            JOIN pii.users_pii p ON u.id = p.user_id
+            JOIN pii_strict.users_pii_strict ps ON u.id = ps.user_id
+            """;
 
     private final RowMapper<User> rowMapper = (rs, rowNum) -> new User(
+            UUID.fromString(rs.getString("id")),
+            rs.getString("first_name"),
+            rs.getString("prefix"),
+            rs.getString("last_name"),
+            null,
+            rs.getString("role_id") != null ? UUID.fromString(rs.getString("role_id")) : null,
+            rs.getBoolean("active"),
+            rs.getObject("created_at", OffsetDateTime.class));
+
+    private final RowMapper<User> authRowMapper = (rs, rowNum) -> new User(
             UUID.fromString(rs.getString("id")),
             rs.getString("first_name"),
             rs.getString("prefix"),
@@ -39,40 +62,37 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
+    @Transactional
     public void insert(User user) {
-        String sql = """
-                INSERT INTO %s (
-                id, first_name, prefix, last_name, password_hash, role_id, active, created_at)
-                VALUES (
-                :id, :firstName, :prefix, :lastName, :passwordHash, :roleId, :active, :createdAt)
-                """.formatted(TABLE);
-        jdbc.update(sql, paramsFromUser(user));
+        jdbc.update("INSERT INTO users (id) VALUES (:id)", paramsFromUser(user));
+
+        jdbc.update("""
+                INSERT INTO pii.users_pii (user_id, first_name, prefix, last_name, role_id, created_at, active)
+                VALUES (:id, :firstName, :prefix, :lastName, :roleId, :createdAt, :active)
+                """, paramsFromUser(user));
+
+        jdbc.update(
+                "INSERT INTO pii_strict.users_pii_strict (user_id, password_hash) VALUES (:id, :passwordHash)",
+                paramsFromUser(user));
     }
 
     @Override
     public Optional<User> findById(UUID id) {
-        String sqlQuery = """
-                SELECT * FROM %s
-                WHERE id = :id
-                """.formatted(TABLE);
-
-        MapSqlParameterSource params = new MapSqlParameterSource().addValue("id", id);
-        List<User> users = jdbc.query(sqlQuery, params, rowMapper);
-        return users.stream().findFirst();
+        String sql = AUTH_SELECT + "WHERE u.id = :id";
+        return jdbc.query(sql, new MapSqlParameterSource("id", id), authRowMapper).stream()
+                .findFirst();
     }
 
     @Override
     public List<User> findByNamePaginated(String name, int page, int amount) {
-        String sqlQuery = """
-                SELECT *
-                FROM %s
-                WHERE first_name ILIKE :name
-                OR last_name ILIKE :name
-                OR (first_name || ' ' || last_name) ILIKE :name
-                ORDER BY last_name
+        String sqlQuery = BASE_SELECT + """
+                WHERE p.first_name ILIKE :name
+                OR p.last_name ILIKE :name
+                OR (p.first_name || ' ' || p.last_name) ILIKE :name
+                ORDER BY p.last_name
                 LIMIT :limit
                 OFFSET :offset
-                """.formatted(TABLE);
+                """;
 
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("name", "%" + name + "%")
@@ -86,11 +106,12 @@ public class JdbcUserRepository implements UserRepository {
     public Integer countByNamePaginated(String name) {
         String sqlQuery = """
                 SELECT COUNT(*)
-                FROM %s
-                WHERE first_name ILIKE :name
-                OR last_name ILIKE :name
-                OR (first_name || ' ' || last_name) ILIKE :name
-                """.formatted(TABLE);
+                FROM users u
+                JOIN pii.users_pii p ON u.id = p.user_id
+                WHERE p.first_name ILIKE :name
+                OR p.last_name ILIKE :name
+                OR (p.first_name || ' ' || p.last_name) ILIKE :name
+                """;
 
         MapSqlParameterSource params = new MapSqlParameterSource().addValue("name", "%" + name + "%");
 
@@ -99,14 +120,12 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public List<User> findUserOnActivityPaginated(boolean isActive, int page, int amount) {
-        String sqlQuery = """
-                SELECT *
-                FROM %s
-                WHERE active = :isActive
-                ORDER BY last_name
+        String sqlQuery = BASE_SELECT + """
+                WHERE p.active = :isActive
+                ORDER BY p.last_name
                 LIMIT :limit
                 OFFSET :offset
-                """.formatted(TABLE);
+                """;
 
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("isActive", isActive)
@@ -118,19 +137,16 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public List<User> findAllUsers() {
-        String sqlQuery = "SELECT * FROM %s".formatted(TABLE);
-        return jdbc.query(sqlQuery, rowMapper);
+        return jdbc.query(BASE_SELECT, rowMapper);
     }
 
     @Override
     public List<User> findAllPaginated(Integer page, Integer amount) {
-        String sqlQuery = """
-                SELECT *
-                FROM %s
-                ORDER BY last_name
+        String sqlQuery = BASE_SELECT + """
+                ORDER BY p.last_name
                 LIMIT :limit
                 OFFSET :offset
-                """.formatted(TABLE);
+                """;
 
         MapSqlParameterSource params =
                 new MapSqlParameterSource().addValue("limit", amount).addValue("offset", page * amount);
@@ -140,11 +156,12 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public void updateActivityById(UUID id, boolean setActive) {
+
         String sqlQuery = """
-                UPDATE %s
+                UPDATE pii.users_pii
                 SET active = :setActive
-                WHERE id = :id
-                """.formatted(TABLE);
+                WHERE user_id = :id
+                """;
 
         MapSqlParameterSource params =
                 new MapSqlParameterSource().addValue("id", id).addValue("setActive", setActive);
@@ -155,14 +172,14 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     public void update(User user) {
         String sqlQuery = """
-                UPDATE %s
+                UPDATE pii.users_pii
                 SET first_name = :firstName,
                 prefix = :prefix,
                 last_name = :lastName,
                 role_id = :roleId,
                 active = :active
-                WHERE id = :id
-                """.formatted(TABLE);
+                WHERE user_id = :id
+                """;
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("firstName", user.getFirstName())
                 .addValue("prefix", user.getPrefix())
@@ -175,36 +192,33 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
+    @Transactional
     public void deleteById(UUID id) {
-        String sqlQuery = """
-                DELETE FROM %s
-                WHERE id = :id
-                """.formatted(TABLE);
+        jdbc.update("DELETE FROM pii_strict.users_pii_strict WHERE user_id = :id", new MapSqlParameterSource("id", id));
 
-        MapSqlParameterSource params = new MapSqlParameterSource().addValue("id", id);
+        jdbc.update("DELETE FROM pii.users_pii WHERE user_id = :id", new MapSqlParameterSource("id", id));
 
-        jdbc.update(sqlQuery, params);
+        jdbc.update("DELETE FROM users WHERE id = :id", new MapSqlParameterSource("id", id));
     }
 
     @Override
     public Integer countByActive(boolean active) {
         String sqlQuery = """
                 SELECT COUNT(*)
-                FROM %s
-                WHERE active = :active
-                """.formatted(TABLE);
+                FROM users u
+                JOIN pii.users_pii p ON u.id = p.user_id
+                WHERE p.active = :active
+                """;
 
-        MapSqlParameterSource params = new MapSqlParameterSource("active", active);
-
-        return jdbc.queryForObject(sqlQuery, params, Integer.class);
+        return jdbc.queryForObject(sqlQuery, new MapSqlParameterSource("active", active), Integer.class);
     }
 
     @Override
     public Integer countAll() {
         String sqlQuery = """
                 SELECT COUNT(*)
-                FROM %s
-                """.formatted(TABLE);
+                FROM users
+                """;
 
         return jdbc.queryForObject(sqlQuery, new MapSqlParameterSource(), Integer.class);
     }
