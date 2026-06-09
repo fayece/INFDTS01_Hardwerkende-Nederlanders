@@ -71,6 +71,14 @@ ALTER TABLE users
     DROP COLUMN created_at,
     DROP COLUMN active;
 
+-- Recreate the trigram index for full name search
+DROP INDEX IF EXISTS idx_users_fullname_trgm;
+
+CREATE INDEX idx_users_pii_fullname_trgm
+    ON pii.users_pii USING gin ((first_name || ' ' || last_name) gin_trgm_ops);
+
+-- Revoke all permissions on the new schemas and tables from PUBLIC.
+-- This is in preparation for making specific database roles for accessing data.
 REVOKE ALL ON SCHEMA pii FROM PUBLIC;
 REVOKE ALL ON SCHEMA pii_strict FROM PUBLIC;
 REVOKE ALL ON ALL TABLES IN SCHEMA pii FROM PUBLIC;
