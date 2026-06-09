@@ -13,7 +13,7 @@ De GDPR-compliancevereisten voor elke eigenschap en relatie worden ook gedocumen
 | Niveau         | Beschrijving                                                                                                                         |
 |----------------|--------------------------------------------------------------------------------------------------------------------------------------|
 | **public**     | Geen PII. Veilig om bloot te stellen aan andere gebruikers.                                                                          |
-| **PII**        | Kan worden gekoppeld aan een echt persoon.                                                                                           |
+| **PII**        | Kan direct of indirect gebruikt worden om een persoon te identificeren en beschrijven                                                |
 | **PII_strict** | Zeer gevoelig. Contactkanalen, inloggegevens of gegevens die gerichte misbruik (scams, phishing, credential attacks) mogelijk maken. |
 
 > Er zijn momenteel geen Neo4j-eigenschappen die als PII_strict worden geclassificeerd.

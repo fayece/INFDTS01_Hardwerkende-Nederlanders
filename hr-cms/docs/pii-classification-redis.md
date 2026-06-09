@@ -1,10 +1,10 @@
 # PII Classificaties voor Redis
 
-Dit document identificeert alle eigenschappen en relaties die in Redis worden gecached.
+Dit document identificeert alle eigenschappen en relaties die in Redis worden beheerd.
 De gegevens zijn geclassificeerd op basis van PII-niveau.
 De GDPR-compliancevereisten voor elke cache namespace worden ook gedocumenteerd.
 
-Redis werkt enkel als cache. Alle data is tijdelijk, met een globale Time To Live (TTL) van 10 minuten. Na deze periode vervallen de cache entries automatisch.
+Redis werkt momenteel enkel als cache. De data is tijdelijk, met een globale Time To Live (TTL) van 10 minuten. Na deze periode vervallen de cache entries automatisch.
 Redis bevat geen autoritatieve data, wat betekent dat alle gegevens afgeleid zijn van andere databases.
 
 ## Gerelateerde Documenten
@@ -16,7 +16,7 @@ Redis bevat geen autoritatieve data, wat betekent dat alle gegevens afgeleid zij
 | Niveau         | Beschrijving                                                                                                                         |
 |----------------|--------------------------------------------------------------------------------------------------------------------------------------|
 | **public**     | Geen PII. Veilig om bloot te stellen aan andere gebruikers.                                                                          |
-| **PII**        | Kan worden gekoppeld aan een echt persoon.                                                                                           |
+| **PII**        | Kan direct of indirect gebruikt worden om een persoon te identificeren en beschrijven                                                |
 | **PII_strict** | Zeer gevoelig. Contactkanalen, inloggegevens of gegevens die gerichte misbruik (scams, phishing, credential attacks) mogelijk maken. |
 
 > Er zijn momenteel geen Redis cache entries die als PII_strict worden geclassificeerd.
