@@ -3,7 +3,6 @@ package nl.hardwerkendenederlanders.hrcms.services;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -105,17 +104,31 @@ public class UserServiceTest {
 
     @Test
     void insertUser_success() {
-        User user = new User(
-                UUID.randomUUID(), "John", null, "Doe", "hashedPassword", null, null, true, OffsetDateTime.now());
+        UUID roleId = UUID.randomUUID();
+        User user = User.builder()
+                .firstName("Kim")
+                .prefix(null)
+                .lastName("Possible")
+                .passwordHash("secret")
+                .roleId(roleId)
+                .build();
 
-        userService.insertUser(user);
-        verify(userRepository).insert(user);
+        when(usernameGeneratorService.generateUniqueUsername()).thenReturn("swift_frog42");
+
+        String username = userService.insertUser(user);
+
+        verify(userRepository).insert(any(User.class));
+        verify(profileRepository).save(any(Profile.class));
+        assertEquals("swift_frog42", username);
     }
 
     @Test
     void findById_successReturnsUser() {
-        User user = new User(
-                UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", null, null, true, OffsetDateTime.now());
+        User user = User.builder()
+                .firstName("Kim")
+                .lastName("Possible")
+                .passwordHash("hashedPassword")
+                .build();
 
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
@@ -135,19 +148,17 @@ public class UserServiceTest {
 
     @Test
     void findAllUsers_successReturnsList() {
-        User user = new User(
-                UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", null, null, true, OffsetDateTime.now());
+        User user = User.builder()
+                .firstName("Kim")
+                .lastName("Possible")
+                .passwordHash("hashedPassword")
+                .build();
 
-        User user2 = new User(
-                UUID.randomUUID(),
-                "Kimkim",
-                null,
-                "Possiblepossible",
-                "hashedPassword",
-                null,
-                null,
-                true,
-                OffsetDateTime.now());
+        User user2 = User.builder()
+                .firstName("Kimkim")
+                .lastName("Possiblepossible")
+                .passwordHash("hashedPassword")
+                .build();
 
         List<User> users = Arrays.asList(user, user2);
 
@@ -161,8 +172,11 @@ public class UserServiceTest {
 
     @Test
     void updateUser_successUpdatesUser() {
-        User user = new User(
-                UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", null, null, true, OffsetDateTime.now());
+        User user = User.builder()
+                .firstName("Kim")
+                .lastName("Possible")
+                .passwordHash("hashedPassword")
+                .build();
 
         userService.updateUser(user);
         verify(userRepository).update(user);
@@ -188,19 +202,17 @@ public class UserServiceTest {
 
     @Test
     void findUsersPaginated_successReturnsUsers() {
-        User user = new User(
-                UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", null, null, true, OffsetDateTime.now());
+        User user = User.builder()
+                .firstName("Kim")
+                .lastName("Possible")
+                .passwordHash("hashedPassword")
+                .build();
 
-        User user2 = new User(
-                UUID.randomUUID(),
-                "Kimkim",
-                null,
-                "Possiblepossible",
-                "hashedPassword",
-                null,
-                null,
-                true,
-                OffsetDateTime.now());
+        User user2 = User.builder()
+                .firstName("Kimkim")
+                .lastName("Possiblepossible")
+                .passwordHash("hashedPassword")
+                .build();
 
         List<User> users = Arrays.asList(user, user2);
 
@@ -217,19 +229,17 @@ public class UserServiceTest {
 
     @Test
     void searchByNamePaginated_successReturnsMatchingUsers() {
-        User user = new User(
-                UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", null, null, true, OffsetDateTime.now());
+        User user = User.builder()
+                .firstName("Kim")
+                .lastName("Possible")
+                .passwordHash("hashedPassword")
+                .build();
 
-        User user2 = new User(
-                UUID.randomUUID(),
-                "kim",
-                null,
-                "Possiblepossible",
-                "hashedPassword",
-                null,
-                null,
-                true,
-                OffsetDateTime.now());
+        User user2 = User.builder()
+                .firstName("kim")
+                .lastName("Possiblepossible")
+                .passwordHash("hashedPassword")
+                .build();
 
         List<User> users = Arrays.asList(user, user2);
 
@@ -245,19 +255,17 @@ public class UserServiceTest {
 
     @Test
     void findUserOnActivityPaginated_successReturnsActiveUsers() {
-        User user = new User(
-                UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", null, null, true, OffsetDateTime.now());
+        User user = User.builder()
+                .firstName("Kim")
+                .lastName("Possible")
+                .passwordHash("hashedPassword")
+                .build();
 
-        User user2 = new User(
-                UUID.randomUUID(),
-                "Kimkim",
-                null,
-                "Possiblepossible",
-                "hashedPassword",
-                null,
-                null,
-                true,
-                OffsetDateTime.now());
+        User user2 = User.builder()
+                .firstName("Kimkim")
+                .lastName("Possiblepossible")
+                .passwordHash("hashedPassword")
+                .build();
 
         List<User> users = Arrays.asList(user, user2);
 
@@ -284,8 +292,11 @@ public class UserServiceTest {
 
     @Test
     void validateUserAttributes_invalidFirstName_throws() {
-        User user = new User(
-                UUID.randomUUID(), "K", null, "Possible", "hashedPassword", null, null, true, OffsetDateTime.now());
+        User user = User.builder()
+                .firstName("K")
+                .lastName("Possible")
+                .passwordHash("hashedPassword")
+                .build();
 
         UserServiceImpl service = new UserServiceImpl(userRepository, profileRepository, usernameGeneratorService);
 
@@ -296,22 +307,15 @@ public class UserServiceTest {
     }
 
     @Test
-    void insertUser_withParams_success() {
-        UUID roleId = UUID.randomUUID();
-        when(usernameGeneratorService.generateUniqueUsername()).thenReturn("swift_frog42");
+    void insertUser_invalidFirstName_throws() {
+        User user = User.builder()
+                .firstName("K")
+                .lastName("Possible")
+                .passwordHash("secret")
+                .roleId(UUID.randomUUID())
+                .build();
 
-        String username = userService.insertUser("Kim", null, "Possible", "secret", roleId);
-
-        verify(userRepository).insert(any(User.class));
-        verify(profileRepository).save(any(Profile.class));
-        assertEquals("swift_frog42", username);
-    }
-
-    @Test
-    void insertUser_withParams_invalidFirstName_throws() {
-        UUID roleId = UUID.randomUUID();
-        assertThrows(
-                IllegalArgumentException.class, () -> userService.insertUser("K", null, "Possible", "secret", roleId));
+        assertThrows(IllegalArgumentException.class, () -> userService.insertUser(user));
 
         verify(userRepository, never()).insert(any());
     }

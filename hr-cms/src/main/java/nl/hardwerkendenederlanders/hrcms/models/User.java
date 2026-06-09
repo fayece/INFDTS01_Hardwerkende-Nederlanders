@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import nl.hardwerkendenederlanders.hrcms.models.commonalities.FullName;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 @SuperBuilder
 @Getter
+@NoArgsConstructor
 public class User implements FullName {
 
     @Builder.Default
@@ -33,10 +35,6 @@ public class User implements FullName {
     private UUID roleId;
 
     @Setter
-    @Nullable
-    private UUID organizationId;
-
-    @Setter
     @Builder.Default
     private boolean active = true;
 
@@ -50,7 +48,6 @@ public class User implements FullName {
             String lastName,
             String passwordHash,
             UUID roleId,
-            @Nullable UUID organizationId,
             boolean active,
             OffsetDateTime createdAt) {
         this.firstName = firstName;
@@ -58,7 +55,6 @@ public class User implements FullName {
         this.lastName = lastName;
         this.passwordHash = passwordHash;
         this.roleId = roleId;
-        this.organizationId = organizationId;
         this.active = active;
         this.createdAt = createdAt;
     }
@@ -70,7 +66,6 @@ public class User implements FullName {
             String lastName,
             String passwordHash,
             UUID roleId,
-            @Nullable UUID organizationId,
             boolean active,
             OffsetDateTime createdAt) {
         this.id = id;
@@ -79,7 +74,6 @@ public class User implements FullName {
         this.lastName = lastName;
         this.passwordHash = passwordHash;
         this.roleId = roleId;
-        this.organizationId = organizationId;
         this.active = active;
         this.createdAt = createdAt;
     }

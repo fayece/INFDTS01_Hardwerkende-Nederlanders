@@ -49,8 +49,7 @@ public class Neo4jCommentRepositoryTest extends CommentRepositoryContractTest {
         clearCommentsTable();
         JdbcTestUtils.deleteFromTables(jdbcTemplate, "users");
         neo4jClient.query("MATCH (u:User) DETACH DELETE u").run();
-        neo4jUserRepository.upsert(
-                new User(AUTHOR_ID, "Test", null, "User", "hash", null, null, true, OffsetDateTime.now()));
+        neo4jUserRepository.upsert(new User(AUTHOR_ID, "Test", null, "User", "hash", null, true, OffsetDateTime.now()));
     }
 
     @Override
@@ -97,7 +96,7 @@ public class Neo4jCommentRepositoryTest extends CommentRepositoryContractTest {
     @Test
     void insert_whenUserNodeMissing_syncsFromSqlAndResolvesAuthorName() {
         UUID userId = UUID.randomUUID();
-        jdbcUserRepository.insert(new User(userId, "No", null, "User", "hash", null, null, true, OffsetDateTime.now()));
+        jdbcUserRepository.insert(new User(userId, "No", null, "User", "hash", null, true, OffsetDateTime.now()));
 
         Comment comment = Comment.builder()
                 .articleId(ARTICLE_ID)

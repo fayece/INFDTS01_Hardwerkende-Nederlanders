@@ -19,6 +19,8 @@ import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
 import org.junit.jupiter.api.Test;
 import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 class UserControllerTest {
 
@@ -197,32 +199,39 @@ class UserControllerTest {
 
     @Test
     void createNewUser_success() {
+        RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
         Model model = new ConcurrentModel();
         UUID roleId = UUID.randomUUID();
-        List<Role> roles = List.of(mock(Role.class));
-        when(roleService.findAll()).thenReturn(roles);
-        when(userService.insertUser("Kim", "", "Possible", "secret", roleId)).thenReturn("kim.possible");
 
-        String result = userController.createNewUser("Kim", "", "Possible", "secret", roleId, model);
+        User user = User.builder()
+                .firstName("Kim")
+                .prefix("")
+                .lastName("Possible")
+                .passwordHash("secret")
+                .roleId(roleId)
+                .build();
 
-        assertEquals("pages/create-user", result);
-        assertEquals(true, model.getAttribute("inserted"));
-        assertEquals(roles, model.getAttribute("roles"));
+        when(userService.insertUser(any(User.class))).thenReturn("kim.possible");
 
-        verify(userService, times(2)).insertUser("Kim", "", "Possible", "secret", roleId);
-        verify(roleService).findAll();
+        String result = userController.createNewUser(user, model, redirectAttributes);
+
+        assertEquals("redirect:/manage-users/create-user", result);
+        assertEquals(
+                "User \"kim.possible\" created successfully!",
+                redirectAttributes.getFlashAttributes().get("successMessage"));
+
+        verify(userService, times(1)).insertUser(any(User.class));
     }
 
     @Test
     void updateUser_success() {
         UUID id = UUID.randomUUID();
         UUID roleId = UUID.randomUUID();
-        UUID orgId = UUID.randomUUID();
 
-        String result = userController.updateUser(id, "New", "de", "Name", roleId, orgId);
+        String result = userController.updateUser(id, "New", "de", "Name", roleId);
 
         assertEquals("redirect:/manage-users", result);
-        verify(userService).updateUser(id, "New", "de", "Name", roleId, orgId);
+        verify(userService).updateUser(id, "New", "de", "Name", roleId);
     }
 
     @Test

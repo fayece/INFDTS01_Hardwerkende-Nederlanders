@@ -1,6 +1,5 @@
 package nl.hardwerkendenederlanders.hrcms.services;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
@@ -54,7 +53,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void insertUser(@NonNull User user) {
+    public void createUser(@NonNull User user) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String hash = encoder.encode(user.getPasswordHash());
         user.setPasswordHash(hash);
@@ -64,12 +63,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public String insertUser(String firstName, String prefix, String lastName, String password, UUID roleId) {
-        User toInsert = new User(
-                UUID.randomUUID(), firstName, prefix, lastName, password, roleId, null, true, OffsetDateTime.now());
+    public String insertUser(@NonNull User user) {
+        User toInsert = user;
 
         validateUserAttributes(toInsert);
-        insertUser(toInsert);
+        createUser(toInsert);
 
         // Creating profile username
         String username = usernameGeneratorService.generateUniqueUsername();
@@ -105,8 +103,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updateUser(
-            UUID id, String firstName, String prefix, String lastName, UUID roleId, UUID organisationId) {
+    public void updateUser(UUID id, String firstName, String prefix, String lastName, UUID roleId) {
         User currentUser = findById(id);
         if (firstName != null) {
             currentUser.setFirstName(firstName);
@@ -119,9 +116,6 @@ public class UserServiceImpl implements UserService {
         }
         if (roleId != null) {
             currentUser.setRoleId(roleId);
-        }
-        if (organisationId != null) {
-            currentUser.setOrganizationId(organisationId);
         }
 
         validateUserAttributes(currentUser);

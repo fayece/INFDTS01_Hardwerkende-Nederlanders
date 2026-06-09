@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @Validated
@@ -82,6 +83,7 @@ public class UserController {
     @RequiresPermission("admin:manage_users")
     @GetMapping("/create-user")
     public String createUserPage(Model model) {
+        model.addAttribute("user", new User());
         model.addAttribute("roles", roleService.findAll());
         return "pages/create-user";
     }
@@ -105,20 +107,14 @@ public class UserController {
     @RequiresPermission("admin:manage_users")
     @PostMapping("/new")
     public String createNewUser(
-            @RequestParam String firstName,
-            @RequestParam(required = false) String prefix,
-            @RequestParam String lastName,
-            @RequestParam String password,
-            @RequestParam UUID roleId,
-            Model model) {
+            @ModelAttribute("user") User userModel, Model model, RedirectAttributes redirectAttributes) {
 
-        userService.insertUser(firstName, prefix, lastName, password, roleId);
+        String username = userService.insertUser(userModel);
         model.addAttribute("inserted", true);
-        String username = userService.insertUser(firstName, prefix, lastName, password, roleId);
-        model.addAttribute("successMessage", "User \"" + username + "\" created successfully!");
+        redirectAttributes.addFlashAttribute("successMessage", "User \"" + username + "\" created successfully!");
 
         model.addAttribute("roles", roleService.findAll());
-        return "pages/create-user";
+        return "redirect:/manage-users/create-user";
     }
 
     @RequiresPermission("admin:manage_users")
@@ -128,9 +124,8 @@ public class UserController {
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String prefix,
             @RequestParam(required = false) String lastName,
-            @RequestParam(required = false) UUID roleId,
-            @RequestParam(required = false) UUID organisationId) {
-        userService.updateUser(id, firstName, prefix, lastName, roleId, organisationId);
+            @RequestParam(required = false) UUID roleId) {
+        userService.updateUser(id, firstName, prefix, lastName, roleId);
         return "redirect:/manage-users"; // or a successpage -> manage-users
     }
 
@@ -174,7 +169,6 @@ public class UserController {
                 .lastName(user.getLastName())
                 .roleId(user.getRoleId())
                 .roleName(user.getRoleId() != null ? roleNames.get(user.getRoleId()) : null)
-                .organizationId(user.getOrganizationId())
                 .active(user.isActive())
                 .createdAt(user.getCreatedAt())
                 .build();
