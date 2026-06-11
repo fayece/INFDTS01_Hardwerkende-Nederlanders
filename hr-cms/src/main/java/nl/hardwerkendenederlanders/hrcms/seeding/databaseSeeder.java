@@ -18,6 +18,12 @@ public class databaseSeeder {
     private final ProfileRepository profileRepository;
 
     private static final int BATCH_SIZE = 10_000;
+    private static final int TOTAL_USERS = 100_000;
+    private static final int TOTAL_MANAGERS = 50_000;
+    private static final int TOTAL_ARTICLES = 200_000;
+    // every article always has a random author. Field specifies extra authors
+    private static final int EXTRA_ARTICLE_AUTHORS = 100_000;
+    private static final int TOTAL_VIEWS = 1_000_000;
 
     private final Random rand = new Random();
 
@@ -394,12 +400,6 @@ public class databaseSeeder {
 
         System.out.println("Running Seeder");
 
-        int totalUsers = 100_000;
-        int totalManagers = 50_000;
-        int totalArticles = 200_000;
-        int extraArticleAuthors = 100_000; // every article always has a random author. Field specifies extra authors
-        int totalViews = 1_000_000;
-
         var allRoles = roleRepository.findAll();
 
         List<UUID> users = new ArrayList<>();
@@ -425,8 +425,8 @@ public class databaseSeeder {
 
         System.out.println("Seeding users");
 
-        for (int batchStart = 1; batchStart < totalUsers; batchStart += BATCH_SIZE) {
-            int batchEnd = Math.min(batchStart + BATCH_SIZE, totalUsers);
+        for (int batchStart = 1; batchStart < TOTAL_USERS; batchStart += BATCH_SIZE) {
+            int batchEnd = Math.min(batchStart + BATCH_SIZE, TOTAL_USERS);
             users.addAll(insertUserBatch(batchStart, batchEnd, userRole.getId(), password, "user"));
         }
 
@@ -438,8 +438,10 @@ public class databaseSeeder {
 
         System.out.println("Seeding content managers");
 
-        for (int batchStart = totalUsers; batchStart + 1 < totalManagers + totalUsers + 1; batchStart += BATCH_SIZE) {
-            int batchEnd = Math.min(batchStart + BATCH_SIZE, totalManagers + totalUsers + 1);
+        for (int batchStart = TOTAL_USERS;
+                batchStart + 1 < TOTAL_MANAGERS + TOTAL_USERS + 1;
+                batchStart += BATCH_SIZE) {
+            int batchEnd = Math.min(batchStart + BATCH_SIZE, TOTAL_MANAGERS + TOTAL_USERS + 1);
             contentManagers.addAll(insertUserBatch(batchStart, batchEnd, contentManagerRole.getId(), password, "cm"));
         }
 
@@ -451,9 +453,9 @@ public class databaseSeeder {
 
         System.out.println("Seeding articles");
 
-        for (int batchStart = 0; batchStart < totalArticles; batchStart += BATCH_SIZE) {
+        for (int batchStart = 0; batchStart < TOTAL_ARTICLES; batchStart += BATCH_SIZE) {
 
-            int batchEnd = Math.min(batchStart + BATCH_SIZE, totalArticles);
+            int batchEnd = Math.min(batchStart + BATCH_SIZE, TOTAL_ARTICLES);
 
             StringBuilder query = new StringBuilder(
                     "INSERT INTO articles " + "(id, title, text_content, publication_status) VALUES ");
@@ -510,9 +512,9 @@ public class databaseSeeder {
             db.update(query.toString());
         }
 
-        for (int batchStart = 0; batchStart < extraArticleAuthors; batchStart += BATCH_SIZE) {
+        for (int batchStart = 0; batchStart < EXTRA_ARTICLE_AUTHORS; batchStart += BATCH_SIZE) {
 
-            int batchEnd = Math.min(batchStart + BATCH_SIZE, extraArticleAuthors);
+            int batchEnd = Math.min(batchStart + BATCH_SIZE, EXTRA_ARTICLE_AUTHORS);
 
             StringBuilder query = new StringBuilder("INSERT INTO article_authors (article_id, author_id) VALUES ");
 
@@ -539,9 +541,9 @@ public class databaseSeeder {
 
         System.out.println("Seeding article viewers");
 
-        for (int batchStart = 0; batchStart < totalViews; batchStart += BATCH_SIZE) {
+        for (int batchStart = 0; batchStart < TOTAL_VIEWS; batchStart += BATCH_SIZE) {
 
-            int batchEnd = Math.min(batchStart + BATCH_SIZE, totalViews);
+            int batchEnd = Math.min(batchStart + BATCH_SIZE, TOTAL_VIEWS);
 
             StringBuilder query = new StringBuilder("INSERT INTO article_viewers (article_id, viewer_id) VALUES ");
 
