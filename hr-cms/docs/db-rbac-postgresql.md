@@ -81,7 +81,7 @@ Tabellen met `*` zijn nog niet geïmplementeerd, maar zijn opgenomen in de tabel
 | `cms_role_unauthenticated`     | `----` | `----` | `----`      | `----`           | `----`   | `----`          | `----`          | `----`      | `----`   | `-I--`         |
 | `cms_role_user`                | `S---` | `s---` | `s---`      | `s---`           | `S---`   | `S---`          | `Si--`          | `SI--`      | `S---`   | `-I--`         |
 | `cms_role_content_manager`     | `S---` | `s---` | `s---`      | `s---`           | `SIUD`   | `SIUD`          | `Si--`          | `SI--`      | `SIU-`   | `-I--`         |
-| `cms_role_administrator`       | `SI--` | `SIUD` | `SIUD`      | `SIUD`           | `SIUD`   | `SIUD`          | `Si--`          | `SI--`      | `SIU-`   | `-I--`         |
+| `cms_role_administrator`       | `SI--` | `S---` | `s---`      | `s---`           | `SIUD`   | `SIUD`          | `Si--`          | `SI--`      | `SIU-`   | `-I--`         |
 | `cms_role_moderator`           | `----` | `----` | `----`      | `----`           | `----`   | `----`          | `----`          | `----`      | `----`   | `S--D`         |
 | `cms_flyway` / `cms_superuser` | `SIUD` | `SIUD` | `SIUD`      | `SIUD`           | `SIUD`   | `SIUD`          | `SIUD`          | `SIUD`      | `SIUD`   | `SIUD`         |
 | `cms_backup`                   | `S---` | `S---` | `S---`      | `S---`           | `S---`   | `S---`          | `S---`          | `S---`      | `S---`   | `S---`         |
@@ -93,13 +93,15 @@ Tabellen met `*` zijn nog niet geïmplementeerd, maar zijn opgenomen in de tabel
 | `cms_role_unauthenticated`     | `----`    | `----`              | `----`       | `----`              | `-I--`             |
 | `cms_role_user`                | `s-u-`    | `S---`              | `S---`       | `si--`              | `-I--`             |
 | `cms_role_content_manager`     | `S-u-`    | `SIU-`              | `SIU-`       | `Si--`              | `-I--`             |
-| `cms_role_administrator`       | `SIUD`    | `SIU-`              | `SIU-`       | `Si--`              | `-I--`             |
+| `cms_role_administrator`       | `SIU-`    | `SIU-`              | `SIU-`       | `Si--`              | `-I--`             |
 | `cms_role_moderator`           | `----`    | `----`              | `----`       | `----`              | `S--D`             |
 | `cms_flyway` / `cms_superuser` | `SIUD`    | `SIUD`              | `SIUD`       | `SIUD`              | `SIUD`             |
 | `cms_backup`                   | `S---`    | `S---`              | `S---`       | `S---`              | `S---`             |
 
 > `cms_role_content_manager` en `cms_role_administrator` hebben geen `D` op `pii.article_authors` en `pii.articles`:
 > rijen worden verwijderd via `ON DELETE CASCADE` vanuit respectievelijk `public.article_authors` en `public.articles`, geen directe `DELETE` toegang nodig.
+>
+> `cms_role_administrator` heeft om dezelfde reden geen `D` op `pii.users_pii`: rijen worden verwijderd via `ON DELETE CASCADE` vanuit `users`.
 >
 > `cms_role_moderator` heeft geen `I` of `U` op `pii.integrity_logs`: alleen `INSERT` via de applicatielaag, geen directe database `INSERT` of `UPDATE` toegang.
 > Dit is enkel om de audit trail te kunnen bekijken en op te schonen.
@@ -156,3 +158,5 @@ Dit werkt, maar betekent dat iedereen met een database-verbinding die `cms_role_
 Een betere alternatief is een PostgreSQL native functie (bijv. `verify_login(username, password)`) die zelf met verhoogde rechten deze tabellen leest, de wachtwoord-vergelijking intern uitvoert, en alleen `user_id`/`role_id`/`active` teruggeeft bij een geslaagde login.
 `password_hash` verlaat de database dan ook nooit.
 Of dit alternatief goed past hangt af van of het huidige hashing-algoritme (BCrypt, zie `AuthServiceImpl`) ondersteund kan worden binnen zo'n functie (bijvoorbeeld via `pgcrypto`).
+
+Voor nu is de naïeve oplossing geïmplementeerd om de login-flow werkend te krijgen, maar dit is een belangrijk aandachtspunt voor een toekomstige iteratie.
