@@ -23,7 +23,7 @@ public class Neo4jUserRepository {
                 .run();
     }
 
-    @Transactional
+    @Transactional("neo4jTransactionManager")
     public void upsert(User user) {
         Map<String, Object> params = new HashMap<>();
         params.put("id", user.getId().toString());
@@ -52,7 +52,7 @@ public class Neo4jUserRepository {
                 .orElse(false);
     }
 
-    @Transactional
+    @Transactional("neo4jTransactionManager")
     public void deleteById(UUID id) {
         neo4jClient
                 .query(

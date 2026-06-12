@@ -57,7 +57,7 @@ public class Neo4jCommentRepository implements CommentRepository {
                             : record.get("lastName").asString());
 
     @Override
-    @Transactional
+    @Transactional("neo4jTransactionManager")
     public void insert(Comment comment) {
         neo4jClient
                 .query("CREATE (c:Comment $props)")
@@ -99,7 +99,7 @@ public class Neo4jCommentRepository implements CommentRepository {
     }
 
     @Override
-    @Transactional
+    @Transactional("neo4jTransactionManager")
     public CommentWithAuthor insertReturning(Comment comment) {
         insert(comment);
         return findByIdWithAuthor(comment.getId()).orElseThrow();
