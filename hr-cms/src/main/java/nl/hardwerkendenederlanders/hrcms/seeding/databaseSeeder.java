@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.*;
 import nl.hardwerkendenederlanders.hrcms.database.mongodb.ProfileRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Profile;
-import org.neo4j.driver.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,9 +14,16 @@ import org.springframework.stereotype.Service;
 public class databaseSeeder {
 
     private final JdbcTemplate db;
-    private final Driver neo4j;
     private final RoleRepository roleRepository;
     private final ProfileRepository profileRepository;
+
+    private static final int BATCH_SIZE = 10_000;
+    private static final int TOTAL_USERS = 100_000;
+    private static final int TOTAL_MANAGERS = 50_000;
+    private static final int TOTAL_ARTICLES = 200_000;
+    // every article always has a random author. Field specifies extra authors
+    private static final int EXTRA_ARTICLE_AUTHORS = 100_000;
+    private static final int TOTAL_VIEWS = 1_000_000;
 
     private final Random rand = new Random();
 
@@ -218,6 +224,169 @@ public class databaseSeeder {
             "fanbase ",
             "live performance ");
 
+    private final List<String> firstNames = Arrays.asList(
+            "Berend",
+            "Henk",
+            "Frits",
+            "Albert",
+            "Joost",
+            "Ben",
+            "Sjaak",
+            "Willem",
+            "Roderik",
+            "Stein",
+            "Johan",
+            "Annabell",
+            "Emma",
+            "Guusje",
+            "Annemarie",
+            "Maria",
+            "Jan",
+            "Piet",
+            "Kees",
+            "Dirk",
+            "Arie",
+            "Bram",
+            "Cornelis",
+            "Klaas",
+            "Harm",
+            "Gerrit",
+            "Teun",
+            "Leendert",
+            "Hendrik",
+            "Bastiaan",
+            "Martinus",
+            "Pieter",
+            "Rutger",
+            "Douwe",
+            "Wouter",
+            "Barend",
+            "Huib",
+            "Tjerk",
+            "Siebe",
+            "Koos",
+            "Aart",
+            "Floris",
+            "Niek",
+            "Maarten",
+            "Joris",
+            "Thijs",
+            "Adriaan",
+            "Boudewijn",
+            "Evert",
+            "Rik",
+            "Tobias",
+            "Roelof",
+            "Sybren",
+            "Wiebe",
+            "Gerben",
+            "Arend",
+            "Jacobus",
+            "Nicolaas",
+            "Lambert",
+            "Wim",
+            "Theo",
+            "Karel",
+            "Anton",
+            "Frans",
+            "Geertruida",
+            "Grietje",
+            "Jannetje",
+            "Trijntje",
+            "Aaltje",
+            "Neeltje",
+            "Antje",
+            "Maaike",
+            "Marijke",
+            "Liesbeth",
+            "Femke",
+            "Renske",
+            "Sanne",
+            "Tessa",
+            "Hilde",
+            "Bregje",
+            "Willemijn",
+            "Aleida",
+            "Cornelia",
+            "Johanna",
+            "Catharina",
+            "Petronella",
+            "Henriette",
+            "Elsje",
+            "Doortje",
+            "Miep",
+            "Jet",
+            "Fenna",
+            "Nienke",
+            "Anouk",
+            "Lotte",
+            "Hanneke",
+            "Joke",
+            "Anniek",
+            "Suzanna",
+            "Rika",
+            "Wilhelmina",
+            "Alida",
+            "Bep",
+            "Tiny",
+            "Tineke",
+            "Saskia",
+            "Baukje",
+            "Jitske");
+
+    private List<UUID> insertUserBatch(
+            int batchStart, int batchEnd, UUID roleId, String password, String usernamePrefix) {
+
+        StringBuilder usersQuery = new StringBuilder("INSERT INTO users (id) VALUES ");
+        StringBuilder piiQuery = new StringBuilder(
+                "INSERT INTO pii.users_pii (user_id, first_name, prefix, last_name, role_id, active) VALUES ");
+        StringBuilder piiStrictQuery =
+                new StringBuilder("INSERT INTO pii_strict.users_pii_strict (user_id, password_hash) VALUES ");
+
+        List<UUID> generatedIds = new ArrayList<>();
+        List<Profile> profiles = new ArrayList<>();
+
+        for (int i = batchStart; i < batchEnd; i++) {
+            String firstName = firstNames.get(rand.nextInt(firstNames.size()));
+            String lastName = firstNames.get(rand.nextInt(firstNames.size())) + "son";
+            UUID userId = createNumericUUID(i + batchStart * BATCH_SIZE);
+
+            usersQuery.append("('").append(userId).append("'),");
+            piiQuery.append("('")
+                    .append(userId)
+                    .append("', '")
+                    .append(firstName)
+                    .append("', null, '")
+                    .append(lastName)
+                    .append("', '")
+                    .append(roleId)
+                    .append("', true),");
+            piiStrictQuery
+                    .append("('")
+                    .append(userId)
+                    .append("', '")
+                    .append(password)
+                    .append("'),");
+
+            generatedIds.add(userId);
+            profiles.add(Profile.builder()
+                    .id(userId.toString())
+                    .username(usernamePrefix + i)
+                    .build());
+        }
+
+        usersQuery.setLength(usersQuery.length() - 1);
+        piiQuery.setLength(piiQuery.length() - 1);
+        piiStrictQuery.setLength(piiStrictQuery.length() - 1);
+
+        db.update(usersQuery.toString());
+        db.update(piiQuery.toString());
+        db.update(piiStrictQuery.toString());
+        profileRepository.insert(profiles);
+
+        return generatedIds;
+    }
+
     public StringBuilder textGenerator(int length, String prefix) {
         StringBuilder text = new StringBuilder(prefix);
 
@@ -230,13 +399,6 @@ public class databaseSeeder {
     public void seed() {
 
         System.out.println("Running Seeder");
-
-        final int BATCH_SIZE = 10_000;
-        int totalUsers = 100_000;
-        int totalManagers = 50_000;
-        int totalArticles = 200_000;
-        int extraArticleAuthors = 100_000; // every article always has a random author. Field specifies extra authors
-        int totalViews = 1_000_000;
 
         var allRoles = roleRepository.findAll();
 
@@ -257,189 +419,15 @@ public class databaseSeeder {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String password = encoder.encode("secret");
 
-        var firstNames = Arrays.asList(
-                "Berend",
-                "Henk",
-                "Frits",
-                "Albert",
-                "Joost",
-                "Ben",
-                "Sjaak",
-                "Willem",
-                "Roderik",
-                "Stein",
-                "Johan",
-                "Annabell",
-                "Emma",
-                "Guusje",
-                "Annemarie",
-                "Maria",
-                "Jan",
-                "Piet",
-                "Kees",
-                "Dirk",
-                "Arie",
-                "Bram",
-                "Cornelis",
-                "Klaas",
-                "Harm",
-                "Gerrit",
-                "Teun",
-                "Leendert",
-                "Hendrik",
-                "Bastiaan",
-                "Martinus",
-                "Pieter",
-                "Rutger",
-                "Douwe",
-                "Wouter",
-                "Barend",
-                "Huib",
-                "Tjerk",
-                "Siebe",
-                "Koos",
-                "Aart",
-                "Floris",
-                "Niek",
-                "Maarten",
-                "Joris",
-                "Thijs",
-                "Adriaan",
-                "Boudewijn",
-                "Evert",
-                "Rik",
-                "Tobias",
-                "Roelof",
-                "Sybren",
-                "Wiebe",
-                "Gerben",
-                "Arend",
-                "Jacobus",
-                "Nicolaas",
-                "Lambert",
-                "Wim",
-                "Theo",
-                "Karel",
-                "Anton",
-                "Frans",
-                "Geertruida",
-                "Grietje",
-                "Jannetje",
-                "Trijntje",
-                "Aaltje",
-                "Neeltje",
-                "Antje",
-                "Maaike",
-                "Marijke",
-                "Liesbeth",
-                "Femke",
-                "Renske",
-                "Sanne",
-                "Tessa",
-                "Hilde",
-                "Bregje",
-                "Willemijn",
-                "Aleida",
-                "Cornelia",
-                "Johanna",
-                "Catharina",
-                "Petronella",
-                "Henriette",
-                "Elsje",
-                "Doortje",
-                "Miep",
-                "Jet",
-                "Fenna",
-                "Nienke",
-                "Anouk",
-                "Lotte",
-                "Hanneke",
-                "Joke",
-                "Anniek",
-                "Suzanna",
-                "Rika",
-                "Wilhelmina",
-                "Alida",
-                "Bep",
-                "Tiny",
-                "Tineke",
-                "Saskia",
-                "Baukje",
-                "Jitske");
-
-        int firstNameSize = firstNames.size();
-
         // ============================================================
         // USERS
         // ============================================================
 
         System.out.println("Seeding users");
 
-        for (int batchStart = 1; batchStart < totalUsers; batchStart += BATCH_SIZE) {
-
-            int batchEnd = Math.min(batchStart + BATCH_SIZE, totalUsers);
-
-            // SQL
-            StringBuilder query = new StringBuilder("INSERT INTO users "
-                    + "(id, first_name, prefix, last_name, password_hash, role_id, active) VALUES ");
-
-            // Mongo
-            ArrayList<Profile> profiles = new ArrayList<Profile>();
-
-            // Neo
-            List<Map<String, Object>> neoUsers = new ArrayList<>();
-
-            try (var tx = neo4j.session().beginTransaction()) {
-                for (int i = batchStart; i < batchEnd; i++) {
-
-                    String firstName = firstNames.get(rand.nextInt(firstNameSize));
-                    String lastName = firstNames.get(rand.nextInt(firstNameSize)) + "son";
-
-                    int user_num = i + batchStart * BATCH_SIZE;
-                    UUID userId = createNumericUUID(user_num);
-                    HashMap<String, Object> neoUser = new HashMap<String, Object>();
-
-                    query.append("('")
-                            .append(userId)
-                            .append("', '")
-                            .append(firstName)
-                            .append("', ")
-                            .append("null, '")
-                            .append(lastName)
-                            .append("', '")
-                            .append(password)
-                            .append("', '")
-                            .append(userRole.getId())
-                            .append("', ")
-                            .append("true),");
-
-                    users.add(userId);
-
-                    profiles.add(Profile.builder()
-                            .id(userId.toString())
-                            .username("user" + i)
-                            .build());
-
-                    neoUser.put("id", userId.toString());
-                    neoUser.put("firstName", firstName);
-                    neoUser.put("prefix", null);
-                    neoUser.put("lastName", lastName);
-                    neoUsers.add(neoUser);
-                }
-
-                query.setLength(query.length() - 1);
-                query.append(";");
-
-                db.update(query.toString());
-
-                profileRepository.insert(profiles);
-
-                Map<String, Object> params = new HashMap<>();
-                params.put("props", neoUsers);
-                tx.run("UNWIND $props AS map CREATE (n:PERSONS) SET n=map", params)
-                        .consume();
-                tx.commit();
-            }
+        for (int batchStart = 1; batchStart < TOTAL_USERS; batchStart += BATCH_SIZE) {
+            int batchEnd = Math.min(batchStart + BATCH_SIZE, TOTAL_USERS);
+            users.addAll(insertUserBatch(batchStart, batchEnd, userRole.getId(), password, "user"));
         }
 
         System.out.println("Users Seeded");
@@ -450,50 +438,11 @@ public class databaseSeeder {
 
         System.out.println("Seeding content managers");
 
-        for (int batchStart = totalUsers; batchStart + 1 < totalManagers + totalUsers + 1; batchStart += BATCH_SIZE) {
-
-            int batchEnd = Math.min(batchStart + BATCH_SIZE, totalManagers + totalUsers + 1);
-
-            StringBuilder query = new StringBuilder("INSERT INTO users "
-                    + "(id, first_name, prefix, last_name, password_hash, role_id, active) VALUES ");
-
-            ArrayList<Profile> profiles = new ArrayList<Profile>();
-
-            for (int i = batchStart; i < batchEnd; i++) {
-
-                String firstName = firstNames.get(rand.nextInt(firstNameSize));
-                String lastName = firstNames.get(rand.nextInt(firstNameSize)) + "son";
-
-                int manager_num = i + batchStart * BATCH_SIZE;
-                UUID managerId = createNumericUUID(manager_num);
-
-                query.append("('")
-                        .append(managerId)
-                        .append("', '")
-                        .append(firstName)
-                        .append("', ")
-                        .append("null, '")
-                        .append(lastName)
-                        .append("', '")
-                        .append(password)
-                        .append("', '")
-                        .append(contentManagerRole.getId())
-                        .append("', ")
-                        .append("true),");
-
-                contentManagers.add(managerId);
-
-                profiles.add(Profile.builder()
-                        .id(managerId.toString())
-                        .username("cm" + i)
-                        .build());
-            }
-            profileRepository.insert(profiles);
-
-            query.setLength(query.length() - 1);
-            query.append(";");
-
-            db.update(query.toString());
+        for (int batchStart = TOTAL_USERS;
+                batchStart + 1 < TOTAL_MANAGERS + TOTAL_USERS + 1;
+                batchStart += BATCH_SIZE) {
+            int batchEnd = Math.min(batchStart + BATCH_SIZE, TOTAL_MANAGERS + TOTAL_USERS + 1);
+            contentManagers.addAll(insertUserBatch(batchStart, batchEnd, contentManagerRole.getId(), password, "cm"));
         }
 
         System.out.println("Content Managers Seeded");
@@ -504,9 +453,9 @@ public class databaseSeeder {
 
         System.out.println("Seeding articles");
 
-        for (int batchStart = 0; batchStart < totalArticles; batchStart += BATCH_SIZE) {
+        for (int batchStart = 0; batchStart < TOTAL_ARTICLES; batchStart += BATCH_SIZE) {
 
-            int batchEnd = Math.min(batchStart + BATCH_SIZE, totalArticles);
+            int batchEnd = Math.min(batchStart + BATCH_SIZE, TOTAL_ARTICLES);
 
             StringBuilder query = new StringBuilder(
                     "INSERT INTO articles " + "(id, title, text_content, publication_status) VALUES ");
@@ -563,9 +512,9 @@ public class databaseSeeder {
             db.update(query.toString());
         }
 
-        for (int batchStart = 0; batchStart < extraArticleAuthors; batchStart += BATCH_SIZE) {
+        for (int batchStart = 0; batchStart < EXTRA_ARTICLE_AUTHORS; batchStart += BATCH_SIZE) {
 
-            int batchEnd = Math.min(batchStart + BATCH_SIZE, extraArticleAuthors);
+            int batchEnd = Math.min(batchStart + BATCH_SIZE, EXTRA_ARTICLE_AUTHORS);
 
             StringBuilder query = new StringBuilder("INSERT INTO article_authors (article_id, author_id) VALUES ");
 
@@ -592,9 +541,9 @@ public class databaseSeeder {
 
         System.out.println("Seeding article viewers");
 
-        for (int batchStart = 0; batchStart < totalViews; batchStart += BATCH_SIZE) {
+        for (int batchStart = 0; batchStart < TOTAL_VIEWS; batchStart += BATCH_SIZE) {
 
-            int batchEnd = Math.min(batchStart + BATCH_SIZE, totalViews);
+            int batchEnd = Math.min(batchStart + BATCH_SIZE, TOTAL_VIEWS);
 
             StringBuilder query = new StringBuilder("INSERT INTO article_viewers (article_id, viewer_id) VALUES ");
 
@@ -628,11 +577,6 @@ public class databaseSeeder {
             COMMIT;
             """);
         System.out.println("PostgreSQL wipe complete");
-        try (var tx = neo4j.session().beginTransaction()) {
-            tx.run("MATCH (n) DETACH DELETE n");
-            tx.commit();
-        }
-        System.out.println("Neo4j wipe complete");
         profileRepository.deleteAll();
         System.out.println("Mongo wipe complete, Database is clean");
     }
