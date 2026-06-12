@@ -34,9 +34,6 @@ public class JdbcArticleAuthorRepositoryTest {
     @Autowired
     private JdbcUserRepository userRepository;
 
-    @Autowired
-    private JdbcRoleRepository jdbcRoleRepository;
-
     private Article article;
     private User author;
 
@@ -56,7 +53,7 @@ public class JdbcArticleAuthorRepositoryTest {
 
         Role role = Role.of("Author").build();
 
-        jdbcRoleRepository.insert(role);
+        RoleTestSupport.insertRole(jdbcTemplate, role);
 
         author = User.builder()
                 .firstName("Test")

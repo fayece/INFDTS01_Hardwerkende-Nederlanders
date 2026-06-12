@@ -7,7 +7,6 @@ import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.RoleRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Role;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -27,36 +26,6 @@ public class JdbcRoleRepository implements RoleRepository {
                 .build();
     }
 
-    private MapSqlParameterSource paramsFromRole(Role role) {
-        return new MapSqlParameterSource()
-                .addValue("id", role.getId())
-                .addValue("roleName", role.getRoleName())
-                .addValue("internalName", role.getInternalName());
-    }
-
-    @Override
-    public void insert(Role entity) {
-
-        String sql = """
-            INSERT INTO roles (id, role_name)
-            VALUES (:id, :roleName);
-            """;
-
-        jdbc.update(sql, paramsFromRole(entity));
-    }
-
-    @Override
-    public void update(Role entity) {
-
-        String sql = """
-            UPDATE roles
-            SET role_name = :roleName
-            WHERE id = :id;
-            """;
-
-        jdbc.update(sql, paramsFromRole(entity));
-    }
-
     @Override
     public Optional<Role> findById(UUID id) {
 
@@ -68,17 +37,6 @@ public class JdbcRoleRepository implements RoleRepository {
 
         List<Role> results = jdbc.query(sql, Map.of("id", id), rowMapper());
         return results.isEmpty() ? Optional.empty() : Optional.of(results.getFirst());
-    }
-
-    @Override
-    public void delete(UUID id) {
-
-        String sql = """
-            DELETE FROM roles
-            WHERE id = :id;
-            """;
-
-        jdbc.update(sql, Map.of("id", id));
     }
 
     @Override

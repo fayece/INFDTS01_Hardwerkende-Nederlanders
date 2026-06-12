@@ -41,7 +41,8 @@ public class DataIntegrityScheduler {
             List<User> users = userRepository.findAllUsers();
 
             for (User user : users) {
-                Optional<Profile> profile = profileRepository.findById(user.getId().toString());
+                Optional<Profile> profile =
+                        profileRepository.findById(user.getId().toString());
                 if (profile.isEmpty()) {
                     log.warn("Data integrity problem: User {} doesn't have a profile", user.getId());
 

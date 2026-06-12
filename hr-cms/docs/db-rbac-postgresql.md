@@ -77,15 +77,15 @@ Tabellen met `*` zijn nog niet geïmplementeerd, maar zijn opgenomen in de tabel
 
 ### `public`
 
-| Rol                            | users  | roles  | permissions | role_permissions | articles | article_authors | article_viewers | media_items | subjects | integrity_logs |
-|--------------------------------|--------|--------|-------------|------------------|----------|-----------------|-----------------|-------------|----------|----------------|
-| `cms_role_unauthenticated`     | `----` | `----` | `----`      | `----`           | `----`   | `----`          | `----`          | `----`      | `----`   | `-I--`         |
-| `cms_role_user`                | `S---` | `s---` | `s---`      | `s---`           | `S---`   | `S---`          | `Si--`          | `SI--`      | `S---`   | `-I--`         |
-| `cms_role_content_manager`     | `S---` | `s---` | `s---`      | `s---`           | `SIUD`   | `SIUD`          | `Si--`          | `SI--`      | `SIU-`   | `-I--`         |
-| `cms_role_administrator`       | `SI--` | `S---` | `s---`      | `s---`           | `SIUD`   | `SIUD`          | `Si--`          | `SI--`      | `SIU-`   | `-I--`         |
-| `cms_role_moderator`           | `----` | `----` | `----`      | `----`           | `----`   | `----`          | `----`          | `----`      | `----`   | `S--D`         |
-| `cms_flyway` / `cms_superuser` | `SIUD` | `SIUD` | `SIUD`      | `SIUD`           | `SIUD`   | `SIUD`          | `SIUD`          | `SIUD`      | `SIUD`   | `SIUD`         |
-| `cms_backup`                   | `S---` | `S---` | `S---`      | `S---`           | `S---`   | `S---`          | `S---`          | `S---`      | `S---`   | `S---`         |
+| Rol                            | users  | roles  | permissions | role_permissions | articles | article_authors | article_viewers | media_items | subjects | integrity_logs | full_articles (view) | article_authors_named (view) |
+|--------------------------------|--------|--------|-------------|------------------|----------|-----------------|-----------------|-------------|----------|----------------|----------------------|------------------------------|
+| `cms_role_unauthenticated`     | `----` | `----` | `----`      | `----`           | `----`   | `----`          | `----`          | `----`      | `----`   | `-I--`         | `----`               | `----`                       |
+| `cms_role_user`                | `S---` | `s---` | `s---`      | `s---`           | `S---`   | `S---`          | `Si--`          | `SI--`      | `S---`   | `-I--`         | `S---`               | `S---`                       |
+| `cms_role_content_manager`     | `S---` | `s---` | `s---`      | `s---`           | `SIUD`   | `SIUD`          | `Si--`          | `SI--`      | `SIU-`   | `-I--`         | `S---`               | `S---`                       |
+| `cms_role_administrator`       | `SI-D` | `S---` | `s---`      | `s---`           | `SIUD`   | `SIUD`          | `Si--`          | `SI--`      | `SIU-`   | `-I--`         | `S---`               | `S---`                       |
+| `cms_role_moderator`           | `----` | `----` | `----`      | `----`           | `----`   | `----`          | `----`          | `----`      | `----`   | `S--D`         | `----`               | `----`                       |
+| `cms_flyway` / `cms_superuser` | `SIUD` | `SIUD` | `SIUD`      | `SIUD`           | `SIUD`   | `SIUD`          | `SIUD`          | `SIUD`      | `SIUD`   | `SIUD`         | `SIUD`               | `SIUD`                       |
+| `cms_backup`                   | `S---` | `S---` | `S---`      | `S---`           | `S---`   | `S---`          | `S---`          | `S---`      | `S---`   | `S---`         | `S---`               | `S---`                       |
 
 ### `pii`
 

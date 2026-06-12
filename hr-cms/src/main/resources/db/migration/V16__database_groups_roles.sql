@@ -84,6 +84,8 @@ GRANT SELECT ON public.article_authors TO cms_role_user;
 GRANT SELECT, INSERT ON public.article_viewers TO cms_role_user;
 GRANT SELECT, INSERT ON public.media_items TO cms_role_user;
 GRANT SELECT ON public.subjects TO cms_role_user;
+GRANT SELECT ON public.article_authors_named TO cms_role_user;
+GRANT SELECT ON public.full_articles TO cms_role_user;
 
 -- cms_role_content_manager
 GRANT INSERT, UPDATE, DELETE ON public.articles TO cms_role_content_manager;
@@ -91,7 +93,7 @@ GRANT INSERT, UPDATE, DELETE ON public.article_authors TO cms_role_content_manag
 GRANT INSERT, UPDATE ON public.subjects TO cms_role_content_manager;
 
 -- cms_role_administrator
-GRANT INSERT ON public.users TO cms_role_administrator;
+GRANT INSERT, DELETE ON public.users TO cms_role_administrator;
 
 -- cms_role_moderator
 GRANT SELECT, DELETE ON public.integrity_logs TO cms_role_moderator;
@@ -108,7 +110,7 @@ GRANT SELECT ON pii.users_pii TO cms_role_user;
     -- No additional permissions needed compared to cms_role_user.
 
 -- cms_role_administrator
-GRANT INSERT ON pii.users_pii TO cms_role_administrator;
+GRANT INSERT, UPDATE ON pii.users_pii TO cms_role_administrator;
 
 -- cms_backup
 GRANT SELECT ON pii.users_pii TO cms_backup;

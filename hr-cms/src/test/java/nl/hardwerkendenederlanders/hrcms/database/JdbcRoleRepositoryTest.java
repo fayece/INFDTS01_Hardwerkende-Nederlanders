@@ -38,40 +38,10 @@ public class JdbcRoleRepositoryTest {
     }
 
     @Test
-    void insertRole_withValidRole_shouldPersistAndRetrieve() {
-        Role role = Role.of("Editor").build();
-
-        jdbcRoleRepository.insert(role);
-
-        Role retrieved = jdbcRoleRepository.findById(role.getId()).orElse(null);
-
-        assertNotNull(retrieved);
-        assertEquals(role.getId(), retrieved.getId());
-        assertEquals(role.getRoleName(), retrieved.getRoleName());
-        assertEquals(role.getRoleName().toUpperCase().replace(" ", "_"), retrieved.getInternalName());
-    }
-
-    @Test
-    void updateRole_withModifiedFields_shouldReflectChanges() {
-        Role role = Role.of("Editor").build();
-
-        jdbcRoleRepository.insert(role);
-
-        role.setRoleName("Senior Editor");
-        jdbcRoleRepository.update(role);
-
-        Role retrieved = jdbcRoleRepository.findById(role.getId()).orElse(null);
-
-        assertNotNull(retrieved);
-        assertEquals(role.getId(), retrieved.getId());
-        assertEquals("Senior Editor", retrieved.getRoleName());
-    }
-
-    @Test
     void findRoleById_withExistingId_shouldReturnRole() {
         Role role = Role.of("Reviewer").build();
 
-        jdbcRoleRepository.insert(role);
+        RoleTestSupport.insertRole(jdbcTemplate, role);
 
         Role retrieved = jdbcRoleRepository.findById(role.getId()).orElse(null);
 
@@ -91,7 +61,7 @@ public class JdbcRoleRepositoryTest {
     void findInternalNameById_withExistingId_shouldReturnInternalName() {
         Role role = Role.of("Reviewer").build();
 
-        jdbcRoleRepository.insert(role);
+        RoleTestSupport.insertRole(jdbcTemplate, role);
 
         Optional<String> internalName = jdbcRoleRepository.findInternalNameById(role.getId());
 
@@ -105,21 +75,10 @@ public class JdbcRoleRepositoryTest {
     }
 
     @Test
-    void deleteRole_withExistingRole_shouldRemoveFromDatabase() {
-        Role role = Role.of("Moderator").build();
-
-        jdbcRoleRepository.insert(role);
-        jdbcRoleRepository.delete(role.getId());
-
-        Optional<Role> result = jdbcRoleRepository.findById(role.getId());
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
     void findAllRolesPaged_withValidPaginationData_shouldReturnCorrectCount() {
         for (int i = 0; i < 15; i++) {
             Role role = Role.of("Role " + i).build();
-            jdbcRoleRepository.insert(role);
+            RoleTestSupport.insertRole(jdbcTemplate, role);
         }
 
         var page1 = jdbcRoleRepository.findAllPaged(1, 10);
@@ -131,9 +90,9 @@ public class JdbcRoleRepositoryTest {
 
     @Test
     void findAll_withMultipleRoles_returnsAllOrderedByName() {
-        jdbcRoleRepository.insert(Role.of("Admin").build());
-        jdbcRoleRepository.insert(Role.of("Article mod").build());
-        jdbcRoleRepository.insert(Role.of("Dearest guest").build());
+        RoleTestSupport.insertRole(jdbcTemplate, Role.of("Admin").build());
+        RoleTestSupport.insertRole(jdbcTemplate, Role.of("Article mod").build());
+        RoleTestSupport.insertRole(jdbcTemplate, Role.of("Dearest guest").build());
 
         List<Role> result = jdbcRoleRepository.findAll();
 

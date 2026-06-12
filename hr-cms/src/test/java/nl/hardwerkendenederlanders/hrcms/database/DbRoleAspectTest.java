@@ -6,6 +6,7 @@ import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.DbRoleContext;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.DbSessionRole;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcUserRepository;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.SkipDbRoleContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.dao.DataAccessException;
 
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
+@SkipDbRoleContext
 class DbRoleAspectTest {
 
     @Autowired

@@ -156,7 +156,8 @@ class JdbcUserRepositoryTest {
     @Test
     void findRoleIdById_shouldReturnRoleId() {
         UUID roleId = roleRepository.findAll().getFirst().getId();
-        User user = new User(UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", roleId, true, OffsetDateTime.now());
+        User user = new User(
+                UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", roleId, true, OffsetDateTime.now());
 
         repository.insert(user);
 
