@@ -17,9 +17,8 @@ GRANT cms_role_content_manager TO cms_role_administrator;
 
 
 -- Login roles
-    -- Passwords are not set here. They must be configured separately.
-    -- Default passwords will be given for local development and testing environments to the development team.
-    -- In production, passwords must be set via secure means with special attention to security, and never committed to source code or configuration files.
+    -- Passwords are set in the .env file for development for convenience.
+    -- In production, these should be strong and regularly rotated, and should not be stored in the .env file, but in a secure vault or similar.
 
 CREATE ROLE cms_app WITH LOGIN NOINHERIT PASSWORD '${cms-app-password}';
 CREATE ROLE cms_flyway WITH LOGIN PASSWORD '${cms-flyway-password}';
