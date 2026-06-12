@@ -3,9 +3,12 @@ CREATE ROLE cms_role_unauthenticated NOLOGIN;
 CREATE ROLE cms_role_user NOLOGIN;
 CREATE ROLE cms_role_content_manager NOLOGIN;
 CREATE ROLE cms_role_administrator NOLOGIN;
+CREATE ROLE cms_role_seeder NOLOGIN;  -- specifically for database seeding.
 
 -- Additional role for moderators, not part of the main hierarchy, but for database access control
 CREATE ROLE cms_role_moderator NOLOGIN;
+
+
 
 -- Granting roles to each other to establish a hierarchy
 GRANT cms_role_unauthenticated TO cms_role_user;
@@ -26,6 +29,7 @@ CREATE ROLE cms_superuser WITH SUPERUSER LOGIN PASSWORD '${cms-superuser-passwor
 
 GRANT cms_role_administrator TO cms_app;
 GRANT cms_role_moderator TO cms_moderator;
+GRANT cms_role_seeder TO cms_app;
 
 -- Set default role for cms_app to the lowest privilege role, so that it can only access what it needs by default, and will switch per request as needed.
 ALTER ROLE cms_app SET ROLE = 'cms_role_unauthenticated';
@@ -51,9 +55,6 @@ ALTER TABLE public.users OWNER TO cms_flyway;
 ALTER TABLE pii.users_pii OWNER TO cms_flyway;
 ALTER TABLE pii_strict.users_pii_strict OWNER TO cms_flyway;
 
-
-ALTER VIEW public.article_authors_named OWNER TO cms_flyway;
-ALTER VIEW public.full_articles OWNER TO cms_flyway;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.flyway_schema_history TO cms_flyway;
 
@@ -84,8 +85,6 @@ GRANT SELECT ON public.article_authors TO cms_role_user;
 GRANT SELECT, INSERT ON public.article_viewers TO cms_role_user;
 GRANT SELECT, INSERT ON public.media_items TO cms_role_user;
 GRANT SELECT ON public.subjects TO cms_role_user;
-GRANT SELECT ON public.article_authors_named TO cms_role_user;
-GRANT SELECT ON public.full_articles TO cms_role_user;
 
 -- cms_role_content_manager
 GRANT INSERT, UPDATE, DELETE ON public.articles TO cms_role_content_manager;
@@ -97,6 +96,12 @@ GRANT INSERT, DELETE ON public.users TO cms_role_administrator;
 
 -- cms_role_moderator
 GRANT SELECT, DELETE ON public.integrity_logs TO cms_role_moderator;
+
+-- cms_role_seeder
+GRANT INSERT, DELETE ON public.users TO cms_role_seeder;
+GRANT INSERT, DELETE ON public.articles TO cms_role_seeder;
+GRANT INSERT, DELETE ON public.article_authors TO cms_role_seeder;
+GRANT INSERT, DELETE ON public.article_viewers TO cms_role_seeder;
 
 -- cms_backup
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO cms_backup;
@@ -112,6 +117,9 @@ GRANT SELECT ON pii.users_pii TO cms_role_user;
 -- cms_role_administrator
 GRANT INSERT, UPDATE ON pii.users_pii TO cms_role_administrator;
 
+-- cms_role_seeder
+GRANT INSERT ON pii.users_pii TO cms_role_seeder;
+
 -- cms_backup
 GRANT SELECT ON pii.users_pii TO cms_backup;
 
@@ -125,6 +133,9 @@ GRANT UPDATE ON pii_strict.users_pii_strict TO cms_role_user;
 
 -- cms_role_administrator
 GRANT INSERT ON pii_strict.users_pii_strict TO cms_role_administrator;
+
+-- cms_role_seeder
+GRANT INSERT ON pii_strict.users_pii_strict TO cms_role_seeder;
 
 -- cms_backup
 GRANT SELECT ON pii_strict.users_pii_strict TO cms_backup;

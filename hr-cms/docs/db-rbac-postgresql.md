@@ -44,12 +44,16 @@ Deze rollen zijn hiërarchisch opgebouwd, waarbij elke hogere rol de privileges 
 Deze privileges kunnen veranderen naarmate de applicatie-eisen evolueren, dus de tabellen hieronder beschrijven enkel de huidige staat van privileges per rol.
 Als maintainer van deze rollen is het belangrijk deze tabellen bij te werken zodra er wijzigingen worden aangebracht in de privileges, zowel in de database als in de applicatielaag, om ervoor te zorgen dat dit document een accurate bron van waarheid blijft.
 
+Daarnaast is er `cms_role_seeder`, ook gekoppeld aan `cms_app`, maar buiten de in-app RBAC hiërarchie.
+Deze rol wordt enkel gebruikt door de database seeder (`seed`/`wipe`) om testdata aan te maken en op te ruimen, en is net als de andere extra rollen niet gekoppeld aan een in-app RBAC rol.
+
 | Rol                        | Doel                                                                                                                                                     | Gekoppeld aan                                                       |
 |----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------|
 | `cms_role_unauthenticated` | Enkel `INSERT` op `integrity_logs` voor niet-geautenticeerde sessies.                                                                                    | Standaard sessierol voor `cms_app`                                  |
 | `cms_role_user`            | Voegt eigen profiel toegang toe aan `pii`/`pii_strict`, en engagement acties (viewen, media uploads).                                                    | In-app RBAC rol "User"                                              |
 | `cms_role_content_manager` | Voegt volledige artikel/commentaar/media/subject management toe, en leesrechten op auteur namen.                                                         | In-app RBAC rol "Content Manager"                                   |
 | `cms_role_administrator`   | Voegt accountbeheer toe (create/update/delete gebruikers, beheren rollen & permissies), inclusief `pii`/`pii_strict` schrijfrechten voor elke gebruiker. | In-app RBAC rol "Administrator"                                     |
+| `cms_role_seeder`          | Voor seeden/wipen van testdata.                                                                                                                          | Gekoppeld aan `cms_app`, maar buiten de in-app RBAC hiërarchie      |
 | `cms_role_moderator`       | Alleen toegang tot `integrity_logs`.                                                                                                                     | Alleen voor `cms_moderator` login rol, niet gebruikt door `cms_app` |
 
 > ## `Integrity logs` design
@@ -77,15 +81,16 @@ Tabellen met `*` zijn nog niet geïmplementeerd, maar zijn opgenomen in de tabel
 
 ### `public`
 
-| Rol                            | users  | roles  | permissions | role_permissions | articles | article_authors | article_viewers | media_items | subjects | integrity_logs | full_articles (view) | article_authors_named (view) |
-|--------------------------------|--------|--------|-------------|------------------|----------|-----------------|-----------------|-------------|----------|----------------|----------------------|------------------------------|
-| `cms_role_unauthenticated`     | `----` | `----` | `----`      | `----`           | `----`   | `----`          | `----`          | `----`      | `----`   | `-I--`         | `----`               | `----`                       |
-| `cms_role_user`                | `S---` | `s---` | `s---`      | `s---`           | `S---`   | `S---`          | `Si--`          | `SI--`      | `S---`   | `-I--`         | `S---`               | `S---`                       |
-| `cms_role_content_manager`     | `S---` | `s---` | `s---`      | `s---`           | `SIUD`   | `SIUD`          | `Si--`          | `SI--`      | `SIU-`   | `-I--`         | `S---`               | `S---`                       |
-| `cms_role_administrator`       | `SI-D` | `S---` | `s---`      | `s---`           | `SIUD`   | `SIUD`          | `Si--`          | `SI--`      | `SIU-`   | `-I--`         | `S---`               | `S---`                       |
-| `cms_role_moderator`           | `----` | `----` | `----`      | `----`           | `----`   | `----`          | `----`          | `----`      | `----`   | `S--D`         | `----`               | `----`                       |
-| `cms_flyway` / `cms_superuser` | `SIUD` | `SIUD` | `SIUD`      | `SIUD`           | `SIUD`   | `SIUD`          | `SIUD`          | `SIUD`      | `SIUD`   | `SIUD`         | `SIUD`               | `SIUD`                       |
-| `cms_backup`                   | `S---` | `S---` | `S---`      | `S---`           | `S---`   | `S---`          | `S---`          | `S---`      | `S---`   | `S---`         | `S---`               | `S---`                       |
+| Rol                            | users  | roles  | permissions | role_permissions | articles | article_authors | article_viewers | media_items | subjects | integrity_logs |
+|--------------------------------|--------|--------|-------------|------------------|----------|-----------------|-----------------|-------------|----------|----------------|
+| `cms_role_unauthenticated`     | `----` | `----` | `----`      | `----`           | `----`   | `----`          | `----`          | `----`      | `----`   | `-I--`         |
+| `cms_role_user`                | `S---` | `s---` | `s---`      | `s---`           | `S---`   | `S---`          | `Si--`          | `SI--`      | `S---`   | `-I--`         |
+| `cms_role_content_manager`     | `S---` | `s---` | `s---`      | `s---`           | `SIUD`   | `SIUD`          | `Si--`          | `SI--`      | `SIU-`   | `-I--`         |
+| `cms_role_administrator`       | `SI-D` | `S---` | `s---`      | `s---`           | `SIUD`   | `SIUD`          | `Si--`          | `SI--`      | `SIU-`   | `-I--`         |
+| `cms_role_seeder`              | `-I-D` | `----` | `----`      | `----`           | `-I-D`   | `-I-D`          | `-I-D`          | `----`      | `----`   | `----`         |
+| `cms_role_moderator`           | `----` | `----` | `----`      | `----`           | `----`   | `----`          | `----`          | `----`      | `----`   | `S--D`         |
+| `cms_flyway` / `cms_superuser` | `SIUD` | `SIUD` | `SIUD`      | `SIUD`           | `SIUD`   | `SIUD`          | `SIUD`          | `SIUD`      | `SIUD`   | `SIUD`         |
+| `cms_backup`                   | `S---` | `S---` | `S---`      | `S---`           | `S---`   | `S---`          | `S---`          | `S---`      | `S---`   | `S---`         |
 
 ### `pii`
 
@@ -95,6 +100,7 @@ Tabellen met `*` zijn nog niet geïmplementeerd, maar zijn opgenomen in de tabel
 | `cms_role_user`                | `s---`    | `S---`              | `S---`       | `si--`              | `-I--`             |
 | `cms_role_content_manager`     | `S---`    | `SIU-`              | `SIU-`       | `Si--`              | `-I--`             |
 | `cms_role_administrator`       | `SIU-`    | `SIU-`              | `SIU-`       | `Si--`              | `-I--`             |
+| `cms_role_seeder`              | `-I-D`    | `----`              | `----`       | `----`              | `----`             |
 | `cms_role_moderator`           | `----`    | `----`              | `----`       | `----`              | `S--D`             |
 | `cms_flyway` / `cms_superuser` | `SIUD`    | `SIUD`              | `SIUD`       | `SIUD`              | `SIUD`             |
 | `cms_backup`                   | `S---`    | `S---`              | `S---`       | `S---`              | `S---`             |
@@ -116,6 +122,7 @@ Tabellen met `*` zijn nog niet geïmplementeerd, maar zijn opgenomen in de tabel
 | `cms_role_user`                | `--u-`           |
 | `cms_role_content_manager`     | `--u-`           |
 | `cms_role_administrator`       | `-IU-`           |
+| `cms_role_seeder`              | `-I-D`           |
 | `cms_role_moderator`           | `----`           |
 | `cms_flyway` / `cms_superuser` | `SIUD`           |
 | `cms_backup`                   | `S---`           |

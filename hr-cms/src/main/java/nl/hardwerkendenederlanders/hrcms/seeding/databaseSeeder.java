@@ -8,6 +8,7 @@ import nl.hardwerkendenederlanders.hrcms.models.Profile;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -396,7 +397,10 @@ public class databaseSeeder {
         return text;
     }
 
+    @Transactional
     public void seed() {
+
+        db.execute("SET LOCAL ROLE cms_role_seeder");
 
         System.out.println("Running Seeder");
 
@@ -570,6 +574,7 @@ public class databaseSeeder {
         System.out.println("Wiping database");
         db.update("""
             BEGIN;
+            SET LOCAL ROLE cms_role_seeder;
             DELETE FROM article_viewers;
             DELETE FROM article_authors;
             DELETE FROM articles;
