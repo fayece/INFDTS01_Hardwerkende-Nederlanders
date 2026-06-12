@@ -124,6 +124,32 @@ class JdbcUserRepositoryTest {
     }
 
     @Test
+    void updatePasswordSelf_shouldChangePasswordHash() {
+        User user = new User(
+                UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", null, true, OffsetDateTime.now());
+
+        repository.insert(user);
+
+        User userWithNewPassword =
+                new User(user.getId(), "Kim", null, "Possible", "newHashedPassword", null, true, OffsetDateTime.now());
+
+        repository.updatePasswordSelf(userWithNewPassword);
+
+        Optional<User> fromDb = repository.findById(user.getId());
+        assertTrue(fromDb.isPresent());
+        assertEquals("newHashedPassword", fromDb.get().getPasswordHash());
+    }
+
+    @Test
+    void updatePasswordSelf_unknownUser_doesNothing() {
+        User unknownUser = new User(
+                UUID.randomUUID(), "Kim", null, "Possible", "newHashedPassword", null, true, OffsetDateTime.now());
+
+        assertDoesNotThrow(() -> repository.updatePasswordSelf(unknownUser));
+        assertEquals(Optional.empty(), repository.findById(unknownUser.getId()));
+    }
+
+    @Test
     void deleteById_shouldReturnOptionalEmpty() {
         User user = new User(
                 UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", null, true, OffsetDateTime.now());
