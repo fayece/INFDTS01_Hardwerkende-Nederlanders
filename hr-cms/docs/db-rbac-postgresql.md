@@ -73,6 +73,7 @@ Legenda per positie:
 - **-** = privilege op deze positie niet toegekend
 
 Tabellen met `*` zijn nog niet geïmplementeerd, maar zijn opgenomen in de tabellen voor volledigheid, op basis van de geplande PII schema splitsing. Zie [Issues](#issues).
+> **Let op**: De tabellen zijn gemaakt met de intentie om de ideale privileges aan te tonen zodra de [Issues](#issues) zijn opgelost.
 
 ### `public`
 
@@ -155,7 +156,7 @@ Iets in de login-flow moet echter de `password_hash` van de opgegeven username k
 Een naïeve oplossing is om `cms_role_unauthenticated` leesrechten te geven op deze tabellen, beperkt tot de rij die hoort bij de opgegeven username (`WHERE username = ?`).
 Dit werkt, maar betekent dat iedereen met een database-verbinding die `cms_role_unauthenticated` gebruikt, de `password_hash`, `role_id` en `active` van elke gebruiker kan opvragen door simpelweg een username te gebruiken in de query.
 
-Een betere alternatief is een PostgreSQL native functie (bijv. `verify_login(username, password)`) die zelf met verhoogde rechten deze tabellen leest, de wachtwoord-vergelijking intern uitvoert, en alleen `user_id`/`role_id`/`active` teruggeeft bij een geslaagde login.
+Een beter alternatief is een PostgreSQL native functie (bijv. `verify_login(username, password)`) die zelf met verhoogde rechten deze tabellen leest, de wachtwoord-vergelijking intern uitvoert, en alleen `user_id`/`role_id`/`active` teruggeeft bij een geslaagde login.
 `password_hash` verlaat de database dan ook nooit.
 Of dit alternatief goed past hangt af van of het huidige hashing-algoritme (BCrypt, zie `AuthServiceImpl`) ondersteund kan worden binnen zo'n functie (bijvoorbeeld via `pgcrypto`).
 
