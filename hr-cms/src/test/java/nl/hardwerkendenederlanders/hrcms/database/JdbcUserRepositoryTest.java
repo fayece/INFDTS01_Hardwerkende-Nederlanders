@@ -6,6 +6,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcRoleRepository;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcUserRepository;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +21,9 @@ class JdbcUserRepositoryTest {
 
     @Autowired
     JdbcUserRepository repository;
+
+    @Autowired
+    private JdbcRoleRepository roleRepository;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -147,6 +151,25 @@ class JdbcUserRepositoryTest {
 
         assertDoesNotThrow(() -> repository.updatePasswordSelf(unknownUser));
         assertEquals(Optional.empty(), repository.findById(unknownUser.getId()));
+    }
+
+    @Test
+    void findRoleIdById_shouldReturnRoleId() {
+        UUID roleId = roleRepository.findAll().getFirst().getId();
+        User user = new User(UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", roleId, true, OffsetDateTime.now());
+
+        repository.insert(user);
+
+        Optional<UUID> foundRoleId = repository.findRoleIdById(user.getId());
+
+        assertEquals(Optional.of(roleId), foundRoleId);
+    }
+
+    @Test
+    void findRoleIdById_unknownUser_returnsEmptyOptional() {
+        Optional<UUID> foundRoleId = repository.findRoleIdById(UUID.randomUUID());
+
+        assertEquals(Optional.empty(), foundRoleId);
     }
 
     @Test

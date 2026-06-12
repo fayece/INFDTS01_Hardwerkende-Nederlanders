@@ -88,6 +88,23 @@ public class JdbcRoleRepositoryTest {
     }
 
     @Test
+    void findInternalNameById_withExistingId_shouldReturnInternalName() {
+        Role role = Role.of("Reviewer").build();
+
+        jdbcRoleRepository.insert(role);
+
+        Optional<String> internalName = jdbcRoleRepository.findInternalNameById(role.getId());
+
+        assertEquals(Optional.of("REVIEWER"), internalName);
+    }
+
+    @Test
+    void findInternalNameById_withNonExistingId_shouldReturnEmptyOptional() {
+        Optional<String> result = jdbcRoleRepository.findInternalNameById(UUID.randomUUID());
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
     void deleteRole_withExistingRole_shouldRemoveFromDatabase() {
         Role role = Role.of("Moderator").build();
 
