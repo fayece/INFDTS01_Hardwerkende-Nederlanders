@@ -65,7 +65,7 @@ public class JdbcArticleAuthorRepository implements ArticleAuthorRepository {
     public AuthorDto[] findAuthorsForArticle(UUID articleId) {
         String sql = """
                 SELECT *
-                FROM article_authors_named
+                FROM article_authors
                 WHERE article_id = :articleId
                 """;
         MapSqlParameterSource mapping = new MapSqlParameterSource();

@@ -137,12 +137,43 @@ public class JdbcArticleRepository implements ArticleRepository {
                     "findAllPages was called with a offset of " + offset + " the minimum is 1");
 
         String query = """
-         SELECT *
-         FROM full_articles
-         WHERE publication_status = 'PUBLISHED'
-         ORDER BY created_at DESC
-         LIMIT :limit
-         OFFSET :offset;
+
+            WITH most_recent_authors AS (
+                SELECT *
+                FROM article_authors AS aan
+                WHERE aan.created_at IN
+                (SELECT min(created_at) FROM article_authors GROUP BY article_id)
+            ),
+            desired_article_ids AS (
+                 SELECT id
+                 FROM articles
+                 WHERE publication_status = 'PUBLISHED'
+                 ORDER BY created_at DESC
+                 LIMIT :limit
+                 OFFSET :offset
+            )
+
+            SELECT
+                a.id as article_id,
+                a.title,
+                a.text_content,
+                a.updated_at,
+                a.created_at,
+                a.publication_status,
+                s.subject_name,
+                count(distinct av.id) as view_count,
+                0 as comment_count,
+                mrs.author_id as first_author_id
+ 
+            FROM desired_article_ids AS dai
+                LEFT JOIN articles a ON a.id = dai.id
+                LEFT JOIN subjects s ON s.id = a.subject_id
+                LEFT JOIN article_viewers av ON a.id = av.article_id
+                LEFT JOIN most_recent_authors mrs on a.id = mrs.article_id
+
+            GROUP BY a.id, s.id, mrs.author_id, a.created_at
+
+            ORDER BY created_at DESC;
          """;
         MapSqlParameterSource mapping = new MapSqlParameterSource();
         mapping.addValue("limit", limit);
@@ -162,12 +193,34 @@ public class JdbcArticleRepository implements ArticleRepository {
 
     public @Nullable ArticleFullDetailsDto findArticlePublished(UUID id) {
         String query = """
-                SELECT *
-                FROM full_articles
-                WHERE article_id = :id AND publication_status = 'PUBLISHED'
-                LIMIT 1;
-                """;
-        // here.
+            WITH most_recent_authors AS (
+                SELECT author_id
+                FROM article_authors AS aan
+                WHERE aan.article_id = :id AND aan.created_at IN
+                (SELECT min(created_at) FROM article_authors GROUP BY article_id)
+            )
+            
+            SELECT
+                a.id as article_id,
+                a.title,
+                a.text_content,
+                a.updated_at,
+                a.created_at,
+                a.publication_status,
+                s.subject_name,
+                count(distinct av.id) as view_count,
+                0 as comment_count,
+                mrs.author_id as first_author_id
+            
+            FROM articles AS a
+                LEFT JOIN subjects s ON s.id = a.subject_id
+                LEFT JOIN article_viewers av ON a.id = av.article_id
+                CROSS JOIN most_recent_authors mrs
+            
+            WHERE a.publication_status = 'PUBLISHED' AND a.id = :id
+            
+            GROUP BY a.id, s.id, mrs.author_id;
+            """;
         MapSqlParameterSource mapping = new MapSqlParameterSource();
         mapping.addValue("id", id);
         try {
