@@ -33,14 +33,14 @@ public class PermissionInterceptor implements HandlerInterceptor {
 
         RequiresPermission annotation = handlerMethod.getMethodAnnotation(RequiresPermission.class);
 
-        if (annotation == null) {
-            trackSuccessfulUrl(session, request);
-            return true;
-        }
-
         if (session == null || !userSessionService.isLoggedIn(session)) {
             response.sendRedirect("/login");
             return false;
+        }
+
+        if (annotation == null) {
+            trackSuccessfulUrl(session, request);
+            return true;
         }
 
         UUID userId = userSessionService
