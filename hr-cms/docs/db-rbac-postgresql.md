@@ -133,9 +133,11 @@ RLS zal zo spoedig mogelijk worden geïmplementeerd in een toekomstige iteratie 
 
 Hetzelfde geldt voor de hoofdletter-privileges (bijvoorbeeld volledige `S` op `articles`): de database staat toegang tot alle rijen toe, ongeacht `publication_status`, en vertrouwt op de applicatielaag om bijvoorbeeld `DRAFT`/`ARCHIVED` artikelen te filteren voor wie ze niet mag zien.
 
-Daarnaast vertrouwt dit ontwerp op `SET ROLE`/`RESET ROLE` per request om `cms_app` van rol te laten wisselen op basis van de geauthenticeerde gebruiker.
-Vergeet de applicatielaag dit (bijvoorbeeld bij hergebruik van een pooled connection), dan kan een request de privileges van een eerdere rol overerven.
-Dit is dezelfde categorie risico als hierboven: de database kan dit niet zelf afdwingen en vertrouwt op de applicatielaag om de juiste rol/voorwaarden per request toe te passen.
+De applicatie wisselt per request van rol via een Filter die de in-app RBAC rol van de geauthenticeerde gebruiker controleert voor dat request.
+De context wordt bij elke call van een repository methode gecontroleerd door een Aspect, die `SET LOCAL ROLE` uitvoert op basis van wat de Filter heeft vastgesteld.
+`SET LOCAL ROLE` is transaction-scoped, waardoor het automatisch teruggedraaid wordt naar `cms_role_unauthenticated` aan het einde van elke request, zelfs als er een fout optreedt.
+Verder zijn dezelfde risico's van toepassing als hierboven beschreven: de database vertrouwt op de applicatielaag om de juiste rol toe te passen per request.
+Een fout in de applicatielaag (bijvoorbeeld een verkeerde rol mapping) kan nog steeds leiden tot ongeautoriseerde toegang, maar dit is beperkt tot een enkele transactie en lekt niet naar andere requests.
 
 ### `pii.article_authors`, `pii.articles`, `pii.article_viewers` en `pii.integrity_logs` zijn nog niet geïmplementeerd
 Het opsplitsen van de PII in `article_authors`, `articles`, `article_viewers` en `integrity_logs` is nog niet geïmplementeerd.

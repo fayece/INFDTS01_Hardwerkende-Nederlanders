@@ -84,6 +84,17 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<UUID> findRoleIdById(UUID id) {
+        String sql = "SELECT role_id FROM pii.users_pii WHERE user_id = :id";
+        return jdbc.query(sql, new MapSqlParameterSource("id", id), (rs, rowNum) -> {
+                    String roleId = rs.getString("role_id");
+                    return roleId != null ? UUID.fromString(roleId) : null;
+                })
+                .stream()
+                .findFirst();
+    }
+
+    @Override
     public List<User> findByNamePaginated(String name, int page, int amount) {
         String sqlQuery = BASE_SELECT + """
                 WHERE p.first_name ILIKE :name

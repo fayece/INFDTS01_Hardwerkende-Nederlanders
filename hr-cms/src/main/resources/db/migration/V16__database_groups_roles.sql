@@ -60,6 +60,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON public.flyway_schema_history TO cms_flyw
 GRANT SELECT (id) ON public.users TO cms_role_unauthenticated;
 GRANT SELECT (user_id, password_hash) ON pii_strict.users_pii_strict TO cms_role_unauthenticated;
 GRANT SELECT (user_id, role_id, active) ON pii.users_pii TO cms_role_unauthenticated;
+GRANT SELECT (id, internal_name) ON public.roles TO cms_role_unauthenticated;
 
 GRANT USAGE ON SCHEMA public TO cms_role_unauthenticated;
 GRANT USAGE ON SCHEMA pii TO cms_role_unauthenticated;

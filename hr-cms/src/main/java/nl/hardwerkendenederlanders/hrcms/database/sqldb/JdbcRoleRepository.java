@@ -82,6 +82,18 @@ public class JdbcRoleRepository implements RoleRepository {
     }
 
     @Override
+    public Optional<String> findInternalNameById(UUID id) {
+        String sql = """
+            SELECT internal_name
+            FROM roles
+            WHERE id = :id;
+            """;
+
+        return jdbc.query(sql, Map.of("id", id), (rs, _) -> rs.getString("internal_name")).stream()
+                .findFirst();
+    }
+
+    @Override
     public List<Role> findAll() {
         String sql = """
             SELECT *

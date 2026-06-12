@@ -12,6 +12,8 @@ public interface UserRepository {
 
     Optional<User> findById(UUID id);
 
+    Optional<UUID> findRoleIdById(UUID id);
+
     List<User> findAllUsers();
 
     List<User> findAllPaginated(Integer page, Integer amount);
