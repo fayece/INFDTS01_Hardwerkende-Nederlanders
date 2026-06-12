@@ -38,7 +38,24 @@ ALTER SCHEMA public OWNER TO cms_flyway;
 ALTER SCHEMA pii OWNER TO cms_flyway;
 ALTER SCHEMA pii_strict OWNER TO cms_flyway;
 
-REASSIGN OWNED BY CURRENT_USER TO cms_flyway;
+ALTER TABLE public.article_authors OWNER TO cms_flyway;
+ALTER TABLE public.article_viewers OWNER TO cms_flyway;
+ALTER TABLE public.articles OWNER TO cms_flyway;
+ALTER TABLE public.integrity_logs OWNER TO cms_flyway;
+ALTER TABLE public.media_items OWNER TO cms_flyway;
+ALTER TABLE public.permissions OWNER TO cms_flyway;
+ALTER TABLE public.role_permissions OWNER TO cms_flyway;
+ALTER TABLE public.roles OWNER TO cms_flyway;
+ALTER TABLE public.subjects OWNER TO cms_flyway;
+ALTER TABLE public.users OWNER TO cms_flyway;
+ALTER TABLE pii.users_pii OWNER TO cms_flyway;
+ALTER TABLE pii_strict.users_pii_strict OWNER TO cms_flyway;
+
+
+ALTER VIEW public.article_authors_named OWNER TO cms_flyway;
+ALTER VIEW public.full_articles OWNER TO cms_flyway;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.flyway_schema_history TO cms_flyway;
 
 GRANT SELECT (id) ON public.users TO cms_role_unauthenticated;
 GRANT SELECT (user_id, password_hash) ON pii_strict.users_pii_strict TO cms_role_unauthenticated;
