@@ -192,6 +192,21 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
+    public void updatePasswordSelf(User user) {
+        String sqlQuery = """
+            UPDATE pii_strict.users_pii_strict
+            SET password_hash = :passwordHash
+            WHERE user_id = :id
+            """;
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("passwordHash", user.getPasswordHash())
+                .addValue("id", user.getId());
+
+        jdbc.update(sqlQuery, params);
+    }
+
+    @Override
     @Transactional
     public void deleteById(UUID id) {
         jdbc.update("DELETE FROM pii_strict.users_pii_strict WHERE user_id = :id", new MapSqlParameterSource("id", id));

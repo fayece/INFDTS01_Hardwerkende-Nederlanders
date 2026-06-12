@@ -84,7 +84,7 @@ GRANT SELECT ON ALL TABLES IN SCHEMA public TO cms_backup;
 -- PII SCHEMA
 
 -- cms_role_user
-GRANT SELECT, UPDATE ON pii.users_pii TO cms_role_user;
+GRANT SELECT ON pii.users_pii TO cms_role_user;
 
 -- cms_role_content_manager
     -- No additional permissions needed compared to cms_role_user.

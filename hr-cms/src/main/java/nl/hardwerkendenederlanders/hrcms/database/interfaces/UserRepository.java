@@ -8,6 +8,8 @@ public interface UserRepository {
 
     void update(User user);
 
+    void updatePasswordSelf(User user);
+
     Optional<User> findById(UUID id);
 
     List<User> findAllUsers();

@@ -92,7 +92,7 @@ Tabellen met `*` zijn nog niet geïmplementeerd, maar zijn opgenomen in de tabel
 | Rol                            | users_pii | article_authors `*` | articles `*` | article_viewers `*` | integrity_logs `*` |
 |--------------------------------|-----------|---------------------|--------------|---------------------|--------------------|
 | `cms_role_unauthenticated`     | `----`    | `----`              | `----`       | `----`              | `-I--`             |
-| `cms_role_user`                | `s-u-`    | `S---`              | `S---`       | `si--`              | `-I--`             |
+| `cms_role_user`                | `s---`    | `S---`              | `S---`       | `si--`              | `-I--`             |
 | `cms_role_content_manager`     | `S-u-`    | `SIU-`              | `SIU-`       | `Si--`              | `-I--`             |
 | `cms_role_administrator`       | `SIU-`    | `SIU-`              | `SIU-`       | `Si--`              | `-I--`             |
 | `cms_role_moderator`           | `----`    | `----`              | `----`       | `----`              | `S--D`             |

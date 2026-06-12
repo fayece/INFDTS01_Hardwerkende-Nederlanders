@@ -34,6 +34,11 @@ public class DualWriteUserRepository implements UserRepository {
     }
 
     @Override
+    public void updatePasswordSelf(User user) {
+        jdbcUserRepository.updatePasswordSelf(user);
+    }
+
+    @Override
     public void deleteById(UUID id) {
         jdbcUserRepository.deleteById(id);
         trySync(() -> neo4jUserRepository.deleteById(id));
