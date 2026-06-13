@@ -7,6 +7,7 @@ De GDPR-compliancevereisten voor elke eigenschap en relatie worden ook gedocumen
 ## Gerelateerde documenten
 - [PII Classificaties voor Redis](pii-classification-redis.md)
 - [PII Classificaties voor Neo4j](pii-classification-neo4j.md)
+- [Database RBAC voor PostgreSQL](db-rbac-postgresql.md)
 
 ## Classificatieniveaus
 

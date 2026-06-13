@@ -6,8 +6,6 @@ Ook worden de rechten die op tabel- en schemaniveau worden toegewezen hier besch
 ## Gerelateerde documenten
 - [PII Classificatie voor PostgreSQL](pii-classification-postgresql.md)
 
-[//]: # (TODO: link in pii-classification-postgresql.md naar dit document zodra pii in dev staat)
-
 ---
 
 ## Doelstellingen
@@ -36,6 +34,48 @@ Ook worden de rechten die op tabel- en schemaniveau worden toegewezen hier besch
 | `cms_backup`    | Read-only account voor backup- en dump-jobs (zoals `pg_dump`). Kan alle schema's lezen, inclusief `pii` en `pii_strict`, maar kan nergens schrijven.                                                                                                    |
 | `cms_moderator` | Dedicated account voor systeemmoderators/operators. Wordt gebruikt om het `integrity_logs` audit trail te bekijken. Gescheiden van de in-app RBAC hiërarchie en van `cms_app`.                                                                          |
 | `cms_superuser` | Dedicated, gedocumenteerde superuser account voor DBA/emergency werk. Vervangt gebruik van de standaard PostgreSQL superuser. Moet spaarzaam worden gebruikt en worden geaudit.                                                                         |
+
+### Lokale opzet: `cms_flyway` rol
+
+Flyway heeft een eigen rol nodig die schema-eigenaar is, zodat het de database migraties kan uitvoeren en beheren zonder dat er een superuser nodig is.
+Dit zorgt helaas voor een architecturale uitdaging: hoe kunnen we deze rol opzetten en eigenaar maken van de bestaande objecten, met terugwerkende kracht vanaf `V1` voor nieuwe databases, zonder huidige developers te dwingen om hun lokale databases te resetten?
+
+Dit is opgelost op de volgende manier:
+- **Nieuwe database (verse `pgdata` volume)**: het [init-script](../src/main/resources/db/init/01-create-cms-flyway.sh) maakt `cms_superuser` en `cms_flyway` automatisch aan via het `docker-entrypoint-initdb.d` mechanisme, en maakt `cms_flyway` eigenaar van het `public` schema.
+  Dit is automatisch en vereist geen actie van developers die een nieuwe database opzetten.
+- **Bestaande database**: Gezien het init-script alleen draait bij een verse volume, hebben developers twee opties:
+  1. Reset hun lokale database (door de `pgdata` volume te verwijderen).
+  2. Gebruik het onderstaande bash script om `cms_superuser` en `cms_flyway` aan te maken, en de eigendom van de bestaande objecten over te dragen aan `cms_flyway`.
+     Dit moet gedaan worden in een bash-shell (Git Bash, WSL, bash, zsh) vanuit de root van de repository (waar `.env` staat).
+     
+     Dit moet gedaan worden voordat Flyway migraties worden uitgevoerd (door bijvoorbeeld `docker compose up`).
+     De migraties zullen dan automatisch draaien onder de `cms_flyway` rol, wat bij toekomstige migraties verwacht wordt.
+
+```bash
+source .env && docker exec -i hard-work-postgres psql -U "$DB_USERNAME" -d "$DB_NAME" <<EOSQL
+CREATE ROLE cms_superuser WITH SUPERUSER LOGIN PASSWORD '$CMS_SUPERUSER_PASSWORD';
+CREATE ROLE cms_flyway WITH LOGIN CREATEROLE PASSWORD '$CMS_FLYWAY_PASSWORD';
+GRANT CREATE ON DATABASE $DB_NAME TO cms_flyway;
+
+ALTER SCHEMA public OWNER TO cms_flyway;
+ALTER SCHEMA pii OWNER TO cms_flyway;
+ALTER SCHEMA pii_strict OWNER TO cms_flyway;
+
+ALTER TABLE public.article_authors OWNER TO cms_flyway;
+ALTER TABLE public.article_viewers OWNER TO cms_flyway;
+ALTER TABLE public.articles OWNER TO cms_flyway;
+ALTER TABLE public.flyway_schema_history OWNER TO cms_flyway;
+ALTER TABLE public.integrity_logs OWNER TO cms_flyway;
+ALTER TABLE public.media_items OWNER TO cms_flyway;
+ALTER TABLE public.permissions OWNER TO cms_flyway;
+ALTER TABLE public.role_permissions OWNER TO cms_flyway;
+ALTER TABLE public.roles OWNER TO cms_flyway;
+ALTER TABLE public.subjects OWNER TO cms_flyway;
+ALTER TABLE public.users OWNER TO cms_flyway;
+ALTER TABLE pii.users_pii OWNER TO cms_flyway;
+ALTER TABLE pii_strict.users_pii_strict OWNER TO cms_flyway;
+EOSQL
+```
 
 ## Groep Rollen
 
@@ -170,3 +210,18 @@ Een beter alternatief is een PostgreSQL native functie (bijv. `verify_login(user
 Of dit alternatief goed past hangt af van of het huidige hashing-algoritme (BCrypt, zie `AuthServiceImpl`) ondersteund kan worden binnen zo'n functie (bijvoorbeeld via `pgcrypto`).
 
 Voor nu is de naïeve oplossing geïmplementeerd om de login-flow werkend te krijgen, maar dit is een belangrijk aandachtspunt voor een toekomstige iteratie.
+
+### De originele superuser blijft een blootgesteld superuser-account in de applicatie
+De `DB_USERNAME` en `DB_PASSWORD` in `.env` behoren tot het originele superuser-account dat werd gebruikt voor de database setup en migraties.
+Deze rol is overgenomen door `cms_flyway`, een niet-superuser rol die specifiek is ontworpen voor database migraties.
+De originele superuser blijft echter bestaan en blijft ook in `.env` staan. Dit is dus nog steeds een volwaardig superuser-account.
+In productie zou dit account na de initial setup niet beschikbaar meer moeten zijn.
+De oplossing hiervoor hangt af van hoe de productie-omgeving is opgezet.
+Een mogelijke oplossing is om de database setup in een CI/CD pipeline uit te voeren met een tijdelijk superuser-account.
+Na de setup kan dit account worden uitgeschakeld of verwijderd, zodat de productie enkel met de gedocumenteerde rollen werkt.
+
+### `cms_flyway` blijft een permanente schema-eigenaar
+Hoewel `cms_flyway` niet een superuser is, heeft het wel uitgebreide privileges als schema-eigenaar.
+Omdat de omgeving bij elke release nieuwe migraties moet kunnen uitvoeren, blijven de `cms_flyway` credentials permanent aanwezig.
+Dit betekent dat als deze credentials gelekt worden, een aanvaller uitgebreide toegang tot de database kan krijgen.
+Een mogelijke oplossing is om `cms_flyway`, net als de originele superuser, tijdelijk te maken voor de setup en migraties, en deze daarna uit te schakelen.

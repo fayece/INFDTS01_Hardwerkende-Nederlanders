@@ -20,11 +20,14 @@ GRANT cms_role_content_manager TO cms_role_administrator;
     -- Passwords are set in the .env file for development for convenience.
     -- In production, these should be strong and regularly rotated, and should not be stored in the .env file, but in a secure vault or similar.
 
+-- cms_flyway and cms_superuser are created up front (Postgres init script for new databases, or a
+-- one-time manual step for existing ones, see docs/db-rbac-postgresql.md), since Flyway connects
+-- as cms_flyway from V1 onward. That same bootstrap step also transfers ownership of any objects
+-- created by earlier migrations (V1-V16) to cms_flyway, so no ALTER ... OWNER TO is needed here.
+
 CREATE ROLE cms_app WITH LOGIN NOINHERIT PASSWORD '${cms-app-password}';
-CREATE ROLE cms_flyway WITH LOGIN PASSWORD '${cms-flyway-password}';
 CREATE ROLE cms_backup WITH LOGIN PASSWORD '${cms-backup-password}';
 CREATE ROLE cms_moderator WITH LOGIN PASSWORD '${cms-moderator-password}';
-CREATE ROLE cms_superuser WITH SUPERUSER LOGIN PASSWORD '${cms-superuser-password}';
 
 GRANT cms_role_administrator TO cms_app;
 GRANT cms_role_moderator TO cms_moderator;
@@ -33,29 +36,6 @@ GRANT cms_role_seeder TO cms_app;
 -- Set default role for cms_app to the lowest privilege role, so that it can only access what it needs by default, and will switch per request as needed.
 ALTER ROLE cms_app SET ROLE = 'cms_role_unauthenticated';
 
-
-
--- Transfer ownership of existing tables, sequences, and other database objects to the appropriate roles
-
-ALTER SCHEMA public OWNER TO cms_flyway;
-ALTER SCHEMA pii OWNER TO cms_flyway;
-ALTER SCHEMA pii_strict OWNER TO cms_flyway;
-
-ALTER TABLE public.article_authors OWNER TO cms_flyway;
-ALTER TABLE public.article_viewers OWNER TO cms_flyway;
-ALTER TABLE public.articles OWNER TO cms_flyway;
-ALTER TABLE public.integrity_logs OWNER TO cms_flyway;
-ALTER TABLE public.media_items OWNER TO cms_flyway;
-ALTER TABLE public.permissions OWNER TO cms_flyway;
-ALTER TABLE public.role_permissions OWNER TO cms_flyway;
-ALTER TABLE public.roles OWNER TO cms_flyway;
-ALTER TABLE public.subjects OWNER TO cms_flyway;
-ALTER TABLE public.users OWNER TO cms_flyway;
-ALTER TABLE pii.users_pii OWNER TO cms_flyway;
-ALTER TABLE pii_strict.users_pii_strict OWNER TO cms_flyway;
-
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.flyway_schema_history TO cms_flyway;
 
 GRANT SELECT (id) ON public.users TO cms_role_unauthenticated;
 GRANT SELECT (user_id, password_hash) ON pii_strict.users_pii_strict TO cms_role_unauthenticated;
