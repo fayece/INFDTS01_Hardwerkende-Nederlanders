@@ -13,7 +13,8 @@ public class TestcontainersConfiguration {
     @Bean
     @ServiceConnection
     public PostgreSQLContainer<?> postgresContainer() {
-        return new PostgreSQLContainer<>(DockerImageName.parse("postgres:18.2-trixie"));
+        return new PostgreSQLContainer<>(DockerImageName.parse("postgres:18.2-trixie"))
+                .withInitScript("db/init/01-create-cms-superuser.sql");
     }
 
     @Bean
