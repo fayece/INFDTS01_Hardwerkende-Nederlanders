@@ -91,7 +91,7 @@ Deze rol wordt enkel gebruikt door de database seeder (`seed`/`wipe`) om testdat
 |----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------|
 | `cms_role_unauthenticated` | Enkel `INSERT` op `integrity_logs` voor niet-geautenticeerde sessies.                                                                                    | Standaard sessierol voor `cms_app`                                  |
 | `cms_role_user`            | Voegt eigen profiel toegang toe aan `pii`/`pii_strict`, en engagement acties (viewen, media uploads).                                                    | In-app RBAC rol "User"                                              |
-| `cms_role_content_manager` | Voegt volledige artikel/commentaar/media/subject management toe, en leesrechten op auteur namen.                                                         | In-app RBAC rol "Content Manager"                                   |
+| `cms_role_content_manager` | Voegt volledige artikel/commentaar/media/subject management toe.                                                                                         | In-app RBAC rol "Content Manager"                                   |
 | `cms_role_administrator`   | Voegt accountbeheer toe (create/update/delete gebruikers, beheren rollen & permissies), inclusief `pii`/`pii_strict` schrijfrechten voor elke gebruiker. | In-app RBAC rol "Administrator"                                     |
 | `cms_role_seeder`          | Voor seeden/wipen van testdata.                                                                                                                          | Gekoppeld aan `cms_app`, maar buiten de in-app RBAC hiërarchie      |
 | `cms_role_moderator`       | Alleen toegang tot `integrity_logs`.                                                                                                                     | Alleen voor `cms_moderator` login rol, niet gebruikt door `cms_app` |
@@ -138,7 +138,7 @@ Tabellen met `*` zijn nog niet geïmplementeerd, maar zijn opgenomen in de tabel
 |--------------------------------|-----------|---------------------|--------------|---------------------|--------------------|
 | `cms_role_unauthenticated`     | `----`    | `----`              | `----`       | `----`              | `-I--`             |
 | `cms_role_user`                | `s---`    | `S---`              | `S---`       | `si--`              | `-I--`             |
-| `cms_role_content_manager`     | `S---`    | `SIU-`              | `SIU-`       | `Si--`              | `-I--`             |
+| `cms_role_content_manager`     | `s---`    | `SIU-`              | `SIU-`       | `Si--`              | `-I--`             |
 | `cms_role_administrator`       | `SIU-`    | `SIU-`              | `SIU-`       | `Si--`              | `-I--`             |
 | `cms_role_seeder`              | `-I-D`    | `----`              | `----`       | `----`              | `----`             |
 | `cms_role_moderator`           | `----`    | `----`              | `----`       | `----`              | `S--D`             |
