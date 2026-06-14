@@ -6,6 +6,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcRoleRepository;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcUserRepository;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +21,9 @@ class JdbcUserRepositoryTest {
 
     @Autowired
     JdbcUserRepository repository;
+
+    @Autowired
+    private JdbcRoleRepository roleRepository;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -121,6 +125,52 @@ class JdbcUserRepositoryTest {
         assertEquals(updatedUser.getFirstName(), fromDb.get().getFirstName());
         assertEquals(updatedUser.getLastName(), fromDb.get().getLastName());
         assertFalse(fromDb.get().isActive());
+    }
+
+    @Test
+    void updatePasswordSelf_shouldChangePasswordHash() {
+        User user = new User(
+                UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", null, true, OffsetDateTime.now());
+
+        repository.insert(user);
+
+        User userWithNewPassword =
+                new User(user.getId(), "Kim", null, "Possible", "newHashedPassword", null, true, OffsetDateTime.now());
+
+        repository.updatePasswordSelf(userWithNewPassword);
+
+        Optional<User> fromDb = repository.findById(user.getId());
+        assertTrue(fromDb.isPresent());
+        assertEquals("newHashedPassword", fromDb.get().getPasswordHash());
+    }
+
+    @Test
+    void updatePasswordSelf_unknownUser_doesNothing() {
+        User unknownUser = new User(
+                UUID.randomUUID(), "Kim", null, "Possible", "newHashedPassword", null, true, OffsetDateTime.now());
+
+        assertDoesNotThrow(() -> repository.updatePasswordSelf(unknownUser));
+        assertEquals(Optional.empty(), repository.findById(unknownUser.getId()));
+    }
+
+    @Test
+    void findRoleIdById_shouldReturnRoleId() {
+        UUID roleId = roleRepository.findAll().getFirst().getId();
+        User user = new User(
+                UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", roleId, true, OffsetDateTime.now());
+
+        repository.insert(user);
+
+        Optional<UUID> foundRoleId = repository.findRoleIdById(user.getId());
+
+        assertEquals(Optional.of(roleId), foundRoleId);
+    }
+
+    @Test
+    void findRoleIdById_unknownUser_returnsEmptyOptional() {
+        Optional<UUID> foundRoleId = repository.findRoleIdById(UUID.randomUUID());
+
+        assertEquals(Optional.empty(), foundRoleId);
     }
 
     @Test

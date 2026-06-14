@@ -8,7 +8,13 @@ public interface UserRepository {
 
     void update(User user);
 
+    void updatePasswordSelf(User user);
+
     Optional<User> findById(UUID id);
+
+    Optional<String> findPasswordHashById(UUID id);
+
+    Optional<UUID> findRoleIdById(UUID id);
 
     List<User> findAllUsers();
 

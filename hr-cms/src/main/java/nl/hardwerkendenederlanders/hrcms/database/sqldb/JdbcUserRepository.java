@@ -84,6 +84,27 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<String> findPasswordHashById(UUID id) {
+        String sql = "SELECT password_hash FROM pii_strict.users_pii_strict WHERE user_id = :id";
+        return jdbc
+                .query(sql, new MapSqlParameterSource("id", id), (rs, rowNum) -> rs.getString("password_hash"))
+                .stream()
+                .findFirst();
+    }
+
+    @Override
+    public Optional<UUID> findRoleIdById(UUID id) {
+        String sql = "SELECT role_id FROM pii.users_pii WHERE user_id = :id";
+        return jdbc
+                .query(sql, new MapSqlParameterSource("id", id), (rs, rowNum) -> {
+                    String roleId = rs.getString("role_id");
+                    return roleId != null ? UUID.fromString(roleId) : null;
+                })
+                .stream()
+                .findFirst();
+    }
+
+    @Override
     public List<User> findByNamePaginated(String name, int page, int amount) {
         String sqlQuery = BASE_SELECT + """
                 WHERE p.first_name ILIKE :name
@@ -192,12 +213,22 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    @Transactional
+    public void updatePasswordSelf(User user) {
+        String sqlQuery = """
+            UPDATE pii_strict.users_pii_strict
+            SET password_hash = :passwordHash
+            WHERE user_id = :id
+            """;
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("passwordHash", user.getPasswordHash())
+                .addValue("id", user.getId());
+
+        jdbc.update(sqlQuery, params);
+    }
+
+    @Override
     public void deleteById(UUID id) {
-        jdbc.update("DELETE FROM pii_strict.users_pii_strict WHERE user_id = :id", new MapSqlParameterSource("id", id));
-
-        jdbc.update("DELETE FROM pii.users_pii WHERE user_id = :id", new MapSqlParameterSource("id", id));
-
         jdbc.update("DELETE FROM users WHERE id = :id", new MapSqlParameterSource("id", id));
     }
 

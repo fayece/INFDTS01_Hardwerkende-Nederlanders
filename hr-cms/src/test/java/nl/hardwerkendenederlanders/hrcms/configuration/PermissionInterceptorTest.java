@@ -56,6 +56,7 @@ class PermissionInterceptorTest {
     // region noAnnotation tests
     @Test
     void preHandle_noAnnotation_returnsTrue() throws Exception {
+        givenLoggedInUser();
         when(request.getRequestURI()).thenReturn("/articles");
 
         boolean result = interceptor.preHandle(request, response, handlerMethod);
@@ -65,6 +66,7 @@ class PermissionInterceptorTest {
 
     @Test
     void preHandle_noAnnotation_tracksUrl() throws Exception {
+        givenLoggedInUser();
         when(request.getRequestURI()).thenReturn("/articles");
 
         interceptor.preHandle(request, response, handlerMethod);
@@ -74,6 +76,7 @@ class PermissionInterceptorTest {
 
     @Test
     void preHandle_noAnnotation_withQueryString_tracksFullUrl() throws Exception {
+        givenLoggedInUser();
         when(request.getRequestURI()).thenReturn("/articles");
         when(request.getQueryString()).thenReturn("page=2");
 
@@ -84,11 +87,32 @@ class PermissionInterceptorTest {
 
     @Test
     void preHandle_noAnnotation_errorUri_doesNotTrackUrl() throws Exception {
+        givenLoggedInUser();
         when(request.getRequestURI()).thenReturn("/error/404");
 
         interceptor.preHandle(request, response, handlerMethod);
 
         verify(session, never()).setAttribute(eq("lastSuccessfulUrl"), any());
+    }
+
+    @Test
+    void preHandle_noAnnotation_noSession_redirectsToLogin() throws Exception {
+        when(request.getSession(false)).thenReturn(null);
+
+        boolean result = interceptor.preHandle(request, response, handlerMethod);
+
+        assertFalse(result);
+        verify(response).sendRedirect("/login");
+    }
+
+    @Test
+    void preHandle_noAnnotation_notLoggedIn_redirectsToLogin() throws Exception {
+        when(userSessionService.isLoggedIn(session)).thenReturn(false);
+
+        boolean result = interceptor.preHandle(request, response, handlerMethod);
+
+        assertFalse(result);
+        verify(response).sendRedirect("/login");
     }
     // endregion
 

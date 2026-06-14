@@ -34,6 +34,11 @@ public class DualWriteUserRepository implements UserRepository {
     }
 
     @Override
+    public void updatePasswordSelf(User user) {
+        jdbcUserRepository.updatePasswordSelf(user);
+    }
+
+    @Override
     public void deleteById(UUID id) {
         jdbcUserRepository.deleteById(id);
         trySync(() -> neo4jUserRepository.deleteById(id));
@@ -47,6 +52,16 @@ public class DualWriteUserRepository implements UserRepository {
     @Override
     public Optional<User> findById(UUID id) {
         return jdbcUserRepository.findById(id);
+    }
+
+    @Override
+    public Optional<String> findPasswordHashById(UUID id) {
+        return jdbcUserRepository.findPasswordHashById(id);
+    }
+
+    @Override
+    public Optional<UUID> findRoleIdById(UUID id) {
+        return jdbcUserRepository.findRoleIdById(id);
     }
 
     @Override

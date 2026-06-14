@@ -7,7 +7,6 @@ import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.RolePermissionRepository;
 import nl.hardwerkendenederlanders.hrcms.models.RolePermission;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -24,34 +23,6 @@ public class JdbcRolePermissionRepository implements RolePermissionRepository {
                 UUID.fromString(rs.getString("id")),
                 UUID.fromString(rs.getString("role_id")),
                 UUID.fromString(rs.getString("permission_id")));
-    }
-
-    private MapSqlParameterSource paramsFromRolePermission(RolePermission rolePermission) {
-        return new MapSqlParameterSource()
-                .addValue("id", rolePermission.getId())
-                .addValue("roleId", rolePermission.getRoleId())
-                .addValue("permissionId", rolePermission.getPermissionId());
-    }
-
-    @Override
-    public void insert(RolePermission entity) {
-        String sql = """
-            INSERT INTO role_permissions (id, role_id, permission_id)
-            VALUES (:id, :roleId, :permissionId);
-            """;
-        jdbc.update(sql, paramsFromRolePermission(entity));
-    }
-
-    @Override
-    public void update(RolePermission entity) {
-        String sql = """
-            UPDATE role_permissions
-            SET role_id = :roleId,
-                permission_id = :permissionId
-            WHERE id = :id;
-            """;
-
-        jdbc.update(sql, paramsFromRolePermission(entity));
     }
 
     @Override

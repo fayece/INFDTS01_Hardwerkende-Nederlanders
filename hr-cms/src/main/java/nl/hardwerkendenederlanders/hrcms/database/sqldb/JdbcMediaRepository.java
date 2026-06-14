@@ -52,19 +52,6 @@ public class JdbcMediaRepository implements MediaRepository {
     }
 
     @Override
-    public void update(MediaItem entity) {
-
-        String sql = """
-            UPDATE media_items
-            SET url = :url,
-                media_type = :mediaType,
-                created_at = :createdAt
-            WHERE id = :id;
-            """;
-        jdbc.update(sql, paramsFromMediaItem(entity));
-    }
-
-    @Override
     public Optional<MediaItem> findById(UUID id) {
 
         String sql = """
@@ -75,17 +62,6 @@ public class JdbcMediaRepository implements MediaRepository {
 
         List<MediaItem> results = jdbc.query(sql, Map.of("id", id), rowMapper());
         return results.isEmpty() ? Optional.empty() : Optional.of(results.getFirst());
-    }
-
-    @Override
-    public void delete(UUID id) {
-
-        String sql = """
-            DELETE FROM media_items
-            WHERE id = :id;
-            """;
-
-        jdbc.update(sql, Map.of("id", id));
     }
 
     @Override

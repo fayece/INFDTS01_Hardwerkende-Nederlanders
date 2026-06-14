@@ -7,6 +7,7 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleAuthorRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleRepository;
+import nl.hardwerkendenederlanders.hrcms.database.interfaces.CommentRepository;
 import nl.hardwerkendenederlanders.hrcms.database.mongodb.ProfileRepository;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentActionException;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
@@ -29,6 +30,7 @@ public class ArticleServiceImpl implements ArticleService {
     private final ArticleRepository articleRepository;
     private final ArticleAuthorRepository articleAuthorRepository;
     private final ProfileRepository profileRepository;
+    private final CommentRepository commentRepository;
 
     // ensures the given article is present in the database. If the ID doesn't exist a new article is made. If it does
     // the article is updated
@@ -104,6 +106,7 @@ public class ArticleServiceImpl implements ArticleService {
                 String username = profile.get().getUsername();
                 article.setFirstAuthor(new AuthorDto(username));
             }
+            article.setCommentCount(commentRepository.countByArticleId(article.getId()));
         }
         return articles;
     }
@@ -120,6 +123,7 @@ public class ArticleServiceImpl implements ArticleService {
                 .orElse("deleted_user");
 
         article.setFirstAuthor(new AuthorDto(username));
+        article.setCommentCount(commentRepository.countByArticleId(article.getId()));
         return article;
     }
 }

@@ -54,29 +54,6 @@ public class JdbcMediaRepositoryTest {
     }
 
     @Test
-    void updateMediaItem_withModifiedFields_shouldReflectChanges() {
-        MediaItem mediaItem = MediaItem.builder()
-                .url("https://example.com/image.jpg")
-                .mediaType(MediaType.IMAGE)
-                .build();
-
-        jdbcMediaRepository.insert(mediaItem);
-
-        String newUrl = "https://example.com/new-video.mp4";
-        MediaType newMediaType = MediaType.VIDEO;
-
-        mediaItem.setUrl(newUrl);
-        mediaItem.setMediaType(newMediaType);
-        jdbcMediaRepository.update(mediaItem);
-
-        MediaItem retrieved = jdbcMediaRepository.findById(mediaItem.getId()).orElse(null);
-        assertNotNull(retrieved);
-        assertEquals(mediaItem.getId(), retrieved.getId());
-        assertEquals(newUrl, retrieved.getUrl());
-        assertEquals(newMediaType, retrieved.getMediaType());
-    }
-
-    @Test
     void findMediaItemById_withExistingId_shouldReturnMediaItem() {
         MediaItem mediaItem = MediaItem.builder()
                 .url("https://example.com/image.jpg")
@@ -95,21 +72,6 @@ public class JdbcMediaRepositoryTest {
     @Test
     void findMediaItemById_withNonExistingId_sshouldReturnEmptyOptional() {
         Optional<MediaItem> result = jdbcMediaRepository.findById(UUID.randomUUID());
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void deleteMediaItem_withExistingId_shouldRemoveMediaItem() {
-        MediaItem mediaItem = MediaItem.builder()
-                .url("https://example.com/image.jpg")
-                .mediaType(MediaType.IMAGE)
-                .build();
-
-        jdbcMediaRepository.insert(mediaItem);
-
-        jdbcMediaRepository.delete(mediaItem.getId());
-
-        Optional<MediaItem> result = jdbcMediaRepository.findById(mediaItem.getId());
         assertTrue(result.isEmpty());
     }
 

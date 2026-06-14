@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
@@ -31,14 +30,12 @@ class AuthServiceImplTest {
         Profile profile =
                 Profile.builder().id(userId.toString()).username("johndoe123").build();
 
-        User user = new User(userId, "John", null, "Doe", hash, null, true, OffsetDateTime.now());
-
         when(profileRepository.findByUsername("johndoe123")).thenReturn(Optional.of(profile));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findPasswordHashById(userId)).thenReturn(Optional.of(hash));
 
         User result = authService.login("johndoe123", password);
 
-        assertEquals(user, result);
+        assertEquals(userId, result.getId());
     }
 
     @Test
@@ -60,10 +57,8 @@ class AuthServiceImplTest {
         Profile profile =
                 Profile.builder().id(userId.toString()).username("johndoe123").build();
 
-        User user = new User(userId, "John", null, "Doe", hash, null, true, OffsetDateTime.now());
-
         when(profileRepository.findByUsername("johndoe123")).thenReturn(Optional.of(profile));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findPasswordHashById(userId)).thenReturn(Optional.of(hash));
 
         RuntimeException exception =
                 assertThrows(RuntimeException.class, () -> authService.login("johndoe123", "wrongPassword"));

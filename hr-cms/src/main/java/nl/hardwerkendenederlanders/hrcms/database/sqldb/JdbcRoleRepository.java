@@ -7,7 +7,6 @@ import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.RoleRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Role;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -27,36 +26,6 @@ public class JdbcRoleRepository implements RoleRepository {
                 .build();
     }
 
-    private MapSqlParameterSource paramsFromRole(Role role) {
-        return new MapSqlParameterSource()
-                .addValue("id", role.getId())
-                .addValue("roleName", role.getRoleName())
-                .addValue("internalName", role.getInternalName());
-    }
-
-    @Override
-    public void insert(Role entity) {
-
-        String sql = """
-            INSERT INTO roles (id, role_name)
-            VALUES (:id, :roleName);
-            """;
-
-        jdbc.update(sql, paramsFromRole(entity));
-    }
-
-    @Override
-    public void update(Role entity) {
-
-        String sql = """
-            UPDATE roles
-            SET role_name = :roleName
-            WHERE id = :id;
-            """;
-
-        jdbc.update(sql, paramsFromRole(entity));
-    }
-
     @Override
     public Optional<Role> findById(UUID id) {
 
@@ -71,14 +40,15 @@ public class JdbcRoleRepository implements RoleRepository {
     }
 
     @Override
-    public void delete(UUID id) {
-
+    public Optional<String> findInternalNameById(UUID id) {
         String sql = """
-            DELETE FROM roles
+            SELECT internal_name
+            FROM roles
             WHERE id = :id;
             """;
 
-        jdbc.update(sql, Map.of("id", id));
+        return jdbc.query(sql, Map.of("id", id), (rs, _) -> rs.getString("internal_name")).stream()
+                .findFirst();
     }
 
     @Override

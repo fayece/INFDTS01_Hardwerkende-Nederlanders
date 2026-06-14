@@ -23,14 +23,15 @@ public class AuthServiceImpl implements AuthService {
     public User login(String username, String password) {
         Optional<Profile> profile = profileRepository.findByUsername(username);
         if (profile.isEmpty()) throw new RuntimeException("Invalid credentials");
-        User user = userRepository
-                .findById(UUID.fromString(profile.get().getId()))
+        UUID userId = UUID.fromString(profile.get().getId());
+        String passwordHash = userRepository
+                .findPasswordHashById(userId)
                 .orElseThrow(() ->
                         new RuntimeException("Invalid credentials")); // both the same error so no brute force possible
-        if (!BCrypt.checkpw(password, user.getPasswordHash())) {
+        if (!BCrypt.checkpw(password, passwordHash)) {
             throw new RuntimeException("Invalid credentials");
         }
 
-        return user;
+        return User.builder().id(userId).build();
     }
 }
