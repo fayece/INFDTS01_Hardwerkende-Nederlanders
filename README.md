@@ -55,7 +55,7 @@ After the application is up and running, it can be accessed on localhost, using 
 | **Language**   | Java           |
 | **Framework**  | Spring Boot    |
 | **Frontend**   | Thymeleaf      |
-| **Database**   | PostgreSQL     |
+| **Database**   | PostgreSQL, MongoDb, Neo4J     |
 | **Migrations** | Flyway         |
 | **Build Tool** | Maven          |
 | **JDK**        | Java 25        |
