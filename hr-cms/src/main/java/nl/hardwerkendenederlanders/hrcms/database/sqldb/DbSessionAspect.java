@@ -1,5 +1,6 @@
 package nl.hardwerkendenederlanders.hrcms.database.sqldb;
 
+import java.util.UUID;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -10,22 +11,27 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 @Aspect
 @Component
-public class DbRoleAspect {
+public class DbSessionAspect {
 
     private final TransactionTemplate transactionTemplate;
     private final JdbcTemplate jdbcTemplate;
 
-    public DbRoleAspect(PlatformTransactionManager transactionManager, JdbcTemplate jdbcTemplate) {
+    public DbSessionAspect(PlatformTransactionManager transactionManager, JdbcTemplate jdbcTemplate) {
         this.transactionTemplate = new TransactionTemplate(transactionManager);
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Around("execution(public * nl.hardwerkendenederlanders.hrcms.database.sqldb..*Repository.*(..))")
-    public Object applyDbRole(ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object applyDbSession(ProceedingJoinPoint joinPoint) throws Throwable {
         try {
             return transactionTemplate.execute(status -> {
-                DbSessionRole role = DbRoleContext.get();
+                DbSessionRole role = DbSessionContext.getRole();
+                UUID userId = DbSessionContext.getUserId();
                 jdbcTemplate.execute("SET LOCAL ROLE " + role.getPostgresqlRole());
+                jdbcTemplate.queryForObject(
+                        "SELECT set_config('app.current_user_id', ?, true)",
+                        String.class,
+                        userId == null ? "" : userId.toString());
                 try {
                     return joinPoint.proceed();
                 } catch (Throwable e) {

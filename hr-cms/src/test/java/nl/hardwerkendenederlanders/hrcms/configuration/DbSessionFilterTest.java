@@ -12,18 +12,18 @@ import java.util.Optional;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.RoleRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.DbRoleContext;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.DbSessionContext;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.DbSessionRole;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class DbRoleFilterTest {
+class DbSessionFilterTest {
 
     private final UserSessionService userSessionService = mock(UserSessionService.class);
     private final UserRepository userRepository = mock(UserRepository.class);
     private final RoleRepository roleRepository = mock(RoleRepository.class);
-    private final DbRoleFilter filter = new DbRoleFilter(userSessionService, userRepository, roleRepository);
+    private final DbSessionFilter filter = new DbSessionFilter(userSessionService, userRepository, roleRepository);
 
     private final ServletRequest request = mock(HttpServletRequest.class);
     private final ServletResponse response = mock(ServletResponse.class);
@@ -32,7 +32,7 @@ class DbRoleFilterTest {
 
     @BeforeEach
     void setUp() {
-        DbRoleContext.clear();
+        DbSessionContext.clear();
     }
 
     @Test
@@ -40,7 +40,7 @@ class DbRoleFilterTest {
         when(((HttpServletRequest) request).getSession(false)).thenReturn(null);
 
         doAnswer(_ -> {
-                    assertEquals(DbSessionRole.UNAUTHENTICATED, DbRoleContext.get());
+                    assertEquals(DbSessionRole.UNAUTHENTICATED, DbSessionContext.getRole());
                     return null;
                 })
                 .when(chain)
@@ -57,7 +57,7 @@ class DbRoleFilterTest {
         when(userSessionService.getLoggedInUser(session)).thenReturn(Optional.empty());
 
         doAnswer(_ -> {
-                    assertEquals(DbSessionRole.UNAUTHENTICATED, DbRoleContext.get());
+                    assertEquals(DbSessionRole.UNAUTHENTICATED, DbSessionContext.getRole());
                     return null;
                 })
                 .when(chain)
@@ -77,7 +77,8 @@ class DbRoleFilterTest {
         when(roleRepository.findInternalNameById(roleId)).thenReturn(Optional.of("ADMINISTRATOR"));
 
         doAnswer(_ -> {
-                    assertEquals(DbSessionRole.ADMINISTRATOR, DbRoleContext.get());
+                    assertEquals(DbSessionRole.ADMINISTRATOR, DbSessionContext.getRole());
+                    assertEquals(userId, DbSessionContext.getUserId());
                     return null;
                 })
                 .when(chain)
@@ -95,7 +96,8 @@ class DbRoleFilterTest {
         when(userRepository.findRoleIdById(userId)).thenReturn(Optional.empty());
 
         doAnswer(_ -> {
-                    assertEquals(DbSessionRole.UNAUTHENTICATED, DbRoleContext.get());
+                    assertEquals(DbSessionRole.UNAUTHENTICATED, DbSessionContext.getRole());
+                    assertNull(DbSessionContext.getUserId());
                     return null;
                 })
                 .when(chain)
@@ -110,6 +112,7 @@ class DbRoleFilterTest {
 
         filter.doFilter(request, response, chain);
 
-        assertEquals(DbSessionRole.UNAUTHENTICATED, DbRoleContext.get());
+        assertEquals(DbSessionRole.UNAUTHENTICATED, DbSessionContext.getRole());
+        assertNull(DbSessionContext.getUserId());
     }
 }
