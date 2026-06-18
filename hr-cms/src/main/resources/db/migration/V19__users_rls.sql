@@ -30,7 +30,10 @@ ALTER TABLE pii_strict.users_pii_strict ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY users_pii_strict_select ON pii_strict.users_pii_strict
     FOR SELECT
-    USING (current_user IN ('cms_role_unauthenticated', 'cms_backup'));
+    USING (
+        current_user IN ('cms_role_unauthenticated', 'cms_backup')
+        OR user_id = pii.current_user_id()
+    );
 
 CREATE POLICY users_pii_strict_insert ON pii_strict.users_pii_strict
     FOR INSERT

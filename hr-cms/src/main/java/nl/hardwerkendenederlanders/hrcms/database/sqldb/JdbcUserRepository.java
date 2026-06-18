@@ -78,8 +78,8 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public Optional<User> findById(UUID id) {
-        String sql = AUTH_SELECT + "WHERE u.id = :id";
-        return jdbc.query(sql, new MapSqlParameterSource("id", id), authRowMapper).stream()
+        String sql = BASE_SELECT + "WHERE u.id = :id";
+        return jdbc.query(sql, new MapSqlParameterSource("id", id), rowMapper).stream()
                 .findFirst();
     }
 

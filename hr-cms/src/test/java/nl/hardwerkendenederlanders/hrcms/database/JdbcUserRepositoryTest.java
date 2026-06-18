@@ -6,6 +6,8 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.DbSessionContext;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.DbSessionRole;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcRoleRepository;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcUserRepository;
 import nl.hardwerkendenederlanders.hrcms.models.User;
@@ -137,11 +139,13 @@ class JdbcUserRepositoryTest {
         User userWithNewPassword =
                 new User(user.getId(), "Kim", null, "Possible", "newHashedPassword", null, true, OffsetDateTime.now());
 
+        DbSessionContext.set(DbSessionRole.USER, user.getId());
         repository.updatePasswordSelf(userWithNewPassword);
 
-        Optional<User> fromDb = repository.findById(user.getId());
-        assertTrue(fromDb.isPresent());
-        assertEquals("newHashedPassword", fromDb.get().getPasswordHash());
+        Optional<String> passwordHash = repository.findPasswordHashById(user.getId());
+
+        assertTrue(passwordHash.isPresent());
+        assertEquals("newHashedPassword", passwordHash.get());
     }
 
     @Test
