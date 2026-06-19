@@ -8,4 +8,4 @@ import java.lang.annotation.Target;
 // Opt out of the default role setup
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface SkipDbRoleContext {}
+public @interface SkipDbSessionContext {}

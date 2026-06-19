@@ -19,8 +19,9 @@ Ook worden de rechten die op tabel- en schemaniveau worden toegewezen hier besch
   Dit ontwerp legt hierdoor tevens de basis voor de PostgreSQL database-rollen en -privileges.
 - **Extra Rollen**: Naast de rollen die direct gebruikt en beheerd worden door de applicatie, zijn er extra rollen opgenomen voor operationele doeleinden.
   Deze extra rollen zijn niet gekoppeld aan in-app RBAC-rollen, maar zijn nodig voor taken zoals database migraties, back-ups, en moderatie van audit logs.
-- **RLS**: Row-Level Security is niet opgenomen in dit initiële ontwerp, maar de "own row" notaties in de tabellen geven aan waar RLS in de toekomst kan worden toegepast.
-  Voor nu vertrouwt het ontwerp op de applicatielaag om `WHERE` clauses te gebruiken om toegang tot rijen te beperken op basis van de geauthenticeerde gebruiker.
+- **RLS**: Row-Level Security is voor `pii.users_pii` en `pii_strict.users_pii_strict` geïmplementeerd.
+  Dit dwingt een gebruiker op database-niveau om enkel hun eigen rij te kunnen bereiken, gebaseerd op de UUID van de huidige gebruiker.
+  Voor de overige tabellen met "own row" notaties is RLS nog niet geïmplementeerd; daar vertrouwt het ontwerp nog op de applicatielaag om `WHERE` clauses te gebruiken om toegang tot rijen te beperken op basis van de geauthenticeerde gebruiker.
   Zie [Issues](#issues) voor meer details.
 
 ---
@@ -111,8 +112,9 @@ Elke cel is een combinatie van privileges op schema- en tabelniveau.
 Legenda per positie:
 - **S / I / U / D** (hoofdletter) = privilege is toegekend (`SELECT` / `INSERT` / `UPDATE` / `DELETE`)
 - **s / i / u / d** (kleine letter) = privilege is toegekend op tabelniveau, maar beperkt op rijniveau. De specifieke beperkingen kunnen verschillen per tabel. Hieronder volgen de algemene richtlijnen en de uitzonderingen:
-  - *Algemene richtlijn*: Beperkt tot de eigen rij van de geauthenticeerde gebruiker. Toegang wordt beperkt met een `WHERE` clause in de applicatielaag.
-    Zie [Issues](#issues) voor details over de afwezigheid van Row-Level Security in dit ontwerp.
+  - *Algemene richtlijn*: Beperkt tot de eigen rij van de geauthenticeerde gebruiker.
+    Voor `pii.users_pii` en `pii_strict.users_pii_strict` wordt dit afgedwongen op database-niveau via Row-Level Security.
+    Voor overige tabellen wordt dit nog beperkt met een `WHERE` clause in de applicatielaag. Zie [Issues](#issues) voor details.
   - *`roles`, `permissions` en `role_permissions`*: Beperkt tot de rij/rijen die overeenkomen met de `role_id` van de geauthenticeerde gebruiker.
 - **-** = privilege op deze positie niet toegekend
 
@@ -171,12 +173,12 @@ Tabellen met `*` zijn nog niet geïmplementeerd, maar zijn opgenomen in de tabel
 > rijen worden verwijderd via `ON DELETE CASCADE` vanuit `users`, geen directe `DELETE` toegang nodig.
 
 ## Issues
-### Row-level security wordt niet afgedwongen door de database
-De tabellen met de kleine letter notaties (**r / i / u / d**) vertrouwen op de applicatielaag om `WHERE` clauses te gebruiken om toegang te beperken tot de eigen rij van de geauthenticeerde gebruiker.
+### Row-Level Security wordt nog niet overal afgedwongen door de database
+Voor `pii.users_pii` en `pii_strict.users_pii_strict` is Row-Level Security (RLS) geïmplementeerd.
+De overige tabellen met de kleine letter notaties (**r / i / u / d**) vertrouwen nog op de applicatielaag om `WHERE` clauses te gebruiken om toegang te beperken tot de eigen rij van de geauthenticeerde gebruiker.
 Dit betekent dat een fout in de applicatielaag (zoals het vergeten van een `WHERE` clause) ervoor kan zorgen dat gebruikers toegang krijgen tot gegevens van andere gebruikers, wat een beveiligingsrisico is.
 Ook kan een kwaadwillige gebruiker `WHERE` clauses omzeilen als ze directe toegang tot de database hebben, wat nog een beveiligingsrisico is.
-Row-Level Security (RLS) in PostgreSQL zou een robuustere oplossing bieden door deze beperkingen op database-niveau af te dwingen, maar is vanwege de scope niet in dit initiële ontwerp opgenomen.
-RLS zal zo spoedig mogelijk worden geïmplementeerd in een toekomstige iteratie om deze beveiligingsrisico's te verminderen.
+RLS moet zo spoedig mogelijk voor alle relevante tabellen geïmplementeerd worden om deze beveiligingsrisico's te verminderen.
 
 Hetzelfde geldt voor de hoofdletter-privileges (bijvoorbeeld volledige `S` op `articles`): de database staat toegang tot alle rijen toe, ongeacht `publication_status`, en vertrouwt op de applicatielaag om bijvoorbeeld `DRAFT`/`ARCHIVED` artikelen te filteren voor wie ze niet mag zien.
 

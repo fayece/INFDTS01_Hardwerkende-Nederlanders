@@ -1,5 +1,6 @@
 package nl.hardwerkendenederlanders.hrcms.seeding;
 
+import java.time.OffsetDateTime;
 import java.util.*;
 import lombok.AllArgsConstructor;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.*;
@@ -500,13 +501,21 @@ public class databaseSeeder {
 
             int batchEnd = Math.min(batchStart + BATCH_SIZE, articles.size());
 
-            StringBuilder query = new StringBuilder("INSERT INTO article_authors (article_id, author_id) VALUES ");
+            StringBuilder query =
+                    new StringBuilder("INSERT INTO article_authors (article_id, author_id, created_at) VALUES ");
 
             for (int i = batchStart; i < batchEnd; i++) {
                 UUID cm = contentManagers.get(rand.nextInt(contentManagers.size()));
                 UUID art = articles.get(i);
+                OffsetDateTime odt = OffsetDateTime.now().minusSeconds(rand.nextInt(10, 5000000));
 
-                query.append("('").append(art).append("', '").append(cm).append("'),");
+                query.append("('")
+                        .append(art)
+                        .append("', '")
+                        .append(cm)
+                        .append("', '")
+                        .append(odt)
+                        .append("'),");
             }
 
             query.setLength(query.length() - 1);

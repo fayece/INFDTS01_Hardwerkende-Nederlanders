@@ -7,7 +7,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.UserRepository;
 import nl.hardwerkendenederlanders.hrcms.database.mongodb.ProfileRepository;
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.DbRoleContext;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.DbSessionContext;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.DbSessionRole;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcIntegrityLogRepository;
 import nl.hardwerkendenederlanders.hrcms.models.LoggingEntity;
@@ -36,7 +36,7 @@ public class DataIntegrityScheduler {
 
     @Scheduled(cron = "0 0 3 * * *") // elke nacht om 3 uur
     public void checkUsersWithoutProfile() {
-        DbRoleContext.set(DbSessionRole.ADMINISTRATOR);
+        DbSessionContext.set(DbSessionRole.ADMINISTRATOR, null);
         try {
             List<User> users = userRepository.findAllUsers();
 
@@ -62,13 +62,13 @@ public class DataIntegrityScheduler {
                 }
             }
         } finally {
-            DbRoleContext.clear();
+            DbSessionContext.clear();
         }
     }
 
     @Scheduled(cron = "0 0 3 * * *") // elke nacht om 3 uur
     public void checkProfilesWithoutUser() {
-        DbRoleContext.set(DbSessionRole.ADMINISTRATOR);
+        DbSessionContext.set(DbSessionRole.ADMINISTRATOR, null);
         try {
             List<Profile> profiles = profileRepository.findAll();
 
@@ -87,7 +87,7 @@ public class DataIntegrityScheduler {
                 }
             }
         } finally {
-            DbRoleContext.clear();
+            DbSessionContext.clear();
         }
     }
 }

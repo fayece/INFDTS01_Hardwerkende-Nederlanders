@@ -33,9 +33,9 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public FilterRegistrationBean<DbRoleFilter> dbRoleFilter() {
-        FilterRegistrationBean<DbRoleFilter> registration =
-                new FilterRegistrationBean<>(new DbRoleFilter(userSessionService, userRepository, roleRepository));
+    public FilterRegistrationBean<DbSessionFilter> dbSessionFilter() {
+        FilterRegistrationBean<DbSessionFilter> registration =
+                new FilterRegistrationBean<>(new DbSessionFilter(userSessionService, userRepository, roleRepository));
         registration.addUrlPatterns("/*");
         return registration;
     }

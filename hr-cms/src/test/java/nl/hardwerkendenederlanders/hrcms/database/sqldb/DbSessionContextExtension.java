@@ -4,23 +4,23 @@ import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-public class DbRoleContextExtension implements BeforeEachCallback, AfterEachCallback {
+public class DbSessionContextExtension implements BeforeEachCallback, AfterEachCallback {
 
     @Override
     public void beforeEach(ExtensionContext context) {
         if (isSkipped(context)) return;
-        DbRoleContext.set(DbSessionRole.ADMINISTRATOR);
+        DbSessionContext.set(DbSessionRole.ADMINISTRATOR, null);
     }
 
     @Override
     public void afterEach(ExtensionContext context) {
         if (isSkipped(context)) return;
-        DbRoleContext.clear();
+        DbSessionContext.clear();
     }
 
     private boolean isSkipped(ExtensionContext context) {
         return context.getTestClass()
-                .map(c -> c.isAnnotationPresent(SkipDbRoleContext.class))
+                .map(c -> c.isAnnotationPresent(SkipDbSessionContext.class))
                 .orElse(false);
     }
 }
