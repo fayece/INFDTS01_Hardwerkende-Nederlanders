@@ -20,6 +20,9 @@ Spotlight! is an intranet CMS with a forum. It is designed specifically for venu
 
 ### Stap 1. Open het project in IntelliJ
 
+### Stap 2. Verbind de .env file
+Zorg ervoor dat Java de .env file kan uitlezen door in je launch configuratie de .env file aan te merken als "Environment variables".
+
 ### Stap 2. Start the docker containers
 In de console, run:
 docker compose up --build
