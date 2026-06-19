@@ -9,6 +9,8 @@ import io.gatling.javaapi.core.*;
 import io.gatling.javaapi.http.*;
 import java.util.*;
 
+// A handclicked delight!
+
 public class LoadTestLogin extends Simulation {
 
     private HttpProtocolBuilder httpProtocol = http.baseUrl("http://localhost:" + performanceTestServerPort)
