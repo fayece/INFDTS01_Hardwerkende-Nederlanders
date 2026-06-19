@@ -21,42 +21,28 @@ Spotlight! is an intranet CMS with a forum. It is designed specifically for venu
 cd hr-cms
 ```
 
-### Step 2. Build the project
-If you have Maven installed:
-```bash
-mvn clean install
-```
-
-If you don't have Maven installed, use the wrapper.
-
-MacOS/Linux:
-```bash
-./mvnw clean install
-```
-Windows:
-```bash
-mvnw.cmd clean install
-```
-
-> Troubleshooting: Ensure you have **Java 25** installed. Run `java -version` to check.
-
-### Step 3. Start the application
+### Step 2. Start the application
 ```bash
 docker compose --env-file ../.env -f ../compose.yml -p hard-work up -d --build
 ```
 
 After the application is up and running, it can be accessed on localhost, using the port specified in the .env file.
 
+### Step 3. Make an admin account
+To create an admin account, you can use the following command whilst in the `hr-cms` directory:
+```bash
+./make_admin.sh <username> <password>
+```
+
 ---
 
 ## Tech Stack
-| **Layer**      | **Technology** |
-|----------------|----------------|
-| **Language**   | Java           |
-| **Framework**  | Spring Boot    |
-| **Frontend**   | Thymeleaf      |
-| **Database**   | PostgreSQL, MongoDb, Neo4J, Redis     |
-| **Migrations** | Flyway         |
-| **Build Tool** | Maven          |
-| **JDK**        | Java 25        |
-
+| **Layer**      | **Technology**                     |
+|----------------|------------------------------------|
+| **Language**   | Java                               |
+| **Framework**  | Spring Boot                        |
+| **Frontend**   | Thymeleaf                          |
+| **Database**   | PostgreSQL, MongoDb, Neo4j, Redis  |
+| **Migrations** | Flyway                             |
+| **Build Tool** | Maven                              |
+| **JDK**        | Java 25                            |
