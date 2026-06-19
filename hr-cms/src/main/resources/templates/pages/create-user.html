@@ -14,31 +14,28 @@
                 <h4>You can create as many new users as you'd like and leave by pressing the return button</h4>
 
                 <div th:if="${errorMessage}" th:text="${errorMessage}" class="error-container"></div>
+                <div th:if="${successMessage}" th:text="${successMessage}" class="success-container"></div>
 
                 <div class="create-user-form-container">
-                    <form class="create-user-form" th:action="@{/manage-users/new}" method="post">
+                    <form class="create-user-form" th:action="@{/manage-users/new}" th:object="${user}" method="post">
                         <label><b>First name:</b>
-                            <input type="text" name="firstName" required>
+                            <input type="text" th:field="*{firstName}" required>
                         </label>
 
                         <label><b>Prefix:</b>
-                            <input type="text" name="prefix">
+                            <input type="text" th:field="*{prefix}">
                         </label>
 
                         <label><b>Last name:</b>
-                            <input type="text" name="lastName" required>
-                        </label>
-
-                        <label><b>Email</b>
-                            <input type="text" name="email" required>
+                            <input type="text" th:field="*{lastName}" required>
                         </label>
 
                         <label><b>Password</b>
-                            <input type="text" name="password" required>
+                            <input type="text" th:field="*{passwordHash}" required>
                         </label>
 
                         <label><b>Role</b>
-                            <select name="roleId" required>
+                            <select th:field="*{roleId}" required>
                                 <option value="" disabled selected>Choose role</option>
                                 <option th:each="role : ${roles}"
                                         th:value="${role.id}"

@@ -73,3 +73,7 @@
     cursor: pointer;
     text-decoration: underline;
 }
+
+.success-container{
+    color: green;
+}

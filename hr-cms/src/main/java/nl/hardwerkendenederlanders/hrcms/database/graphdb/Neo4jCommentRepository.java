@@ -57,7 +57,7 @@ public class Neo4jCommentRepository implements CommentRepository {
                             : record.get("lastName").asString());
 
     @Override
-    @Transactional
+    @Transactional("neo4jTransactionManager")
     public void insert(Comment comment) {
         neo4jClient
                 .query("CREATE (c:Comment $props)")
@@ -79,24 +79,27 @@ public class Neo4jCommentRepository implements CommentRepository {
                     .run();
         }
 
-        if (!neo4jUserRepository.existsById(comment.getCreatorId()))
+        if (!neo4jUserRepository.existsById(comment.getCreatorId())) {
             userRepository.findById(comment.getCreatorId()).ifPresent(neo4jUserRepository::upsert);
+        }
 
-        neo4jClient
-                .query(
-                        // language=Cypher
-                        """
+        if (neo4jUserRepository.existsById(comment.getCreatorId())) {
+            neo4jClient
+                    .query(
+                            // language=Cypher
+                            """
                 MATCH (c:Comment {id: $commentId}), (u:User {id: $userId})
                 CREATE (c) -[:AUTHORED_BY]-> (u)
                 """)
-                .bindAll(Map.of(
-                        "commentId", comment.getId().toString(),
-                        "userId", comment.getCreatorId().toString()))
-                .run();
+                    .bindAll(Map.of(
+                            "commentId", comment.getId().toString(),
+                            "userId", comment.getCreatorId().toString()))
+                    .run();
+        }
     }
 
     @Override
-    @Transactional
+    @Transactional("neo4jTransactionManager")
     public CommentWithAuthor insertReturning(Comment comment) {
         insert(comment);
         return findByIdWithAuthor(comment.getId()).orElseThrow();
@@ -280,18 +283,15 @@ public class Neo4jCommentRepository implements CommentRepository {
 
     private CommentWithAuthor toCommentWithAuthor(RawCommentResult raw) {
         String authorName;
-        if (raw.comment().getDeletedAt() != null || raw.firstName() == null) {
+        if (raw.comment().getDeletedAt() != null) {
             authorName = HIDDEN_AUTHOR;
+        } else if (raw.firstName() != null && raw.lastName() != null) {
+            authorName = raw.prefix() != null
+                    ? raw.firstName() + " " + raw.prefix() + " " + raw.lastName()
+                    : raw.firstName() + " " + raw.lastName();
         } else {
-            authorName = buildFullName(raw.firstName(), raw.prefix(), raw.lastName());
+            authorName = HIDDEN_AUTHOR;
         }
         return new CommentWithAuthor(raw.comment(), authorName, raw.replyCount());
-    }
-
-    private String buildFullName(String firstName, String prefix, String lastName) {
-        if (prefix == null || prefix.isBlank()) {
-            return firstName + " " + lastName;
-        }
-        return firstName + " " + prefix + " " + lastName;
     }
 }

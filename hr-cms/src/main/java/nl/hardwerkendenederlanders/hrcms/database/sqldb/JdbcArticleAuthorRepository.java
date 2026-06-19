@@ -33,7 +33,7 @@ public class JdbcArticleAuthorRepository implements ArticleAuthorRepository {
      * @return The RowMapper
      */
     private RowMapper<AuthorDto> authorNameMapper() {
-        return (rs, _) -> new AuthorDto(rs.getString("first_name"), rs.getString("prefix"), rs.getString("last_name"));
+        return (rs, _) -> new AuthorDto(rs.getString("author_id"));
     }
 
     /**
@@ -65,7 +65,7 @@ public class JdbcArticleAuthorRepository implements ArticleAuthorRepository {
     public AuthorDto[] findAuthorsForArticle(UUID articleId) {
         String sql = """
                 SELECT *
-                FROM article_authors_named
+                FROM article_authors
                 WHERE article_id = :articleId
                 """;
         MapSqlParameterSource mapping = new MapSqlParameterSource();

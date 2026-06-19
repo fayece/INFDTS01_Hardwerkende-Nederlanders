@@ -8,29 +8,47 @@ import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import nl.hardwerkendenederlanders.hrcms.models.Profile;
 import nl.hardwerkendenederlanders.hrcms.models.Role;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.userDtos.UserViewDto;
+import nl.hardwerkendenederlanders.hrcms.services.interfaces.ProfileService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.RoleService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserService;
 import nl.hardwerkendenederlanders.hrcms.services.interfaces.UserSessionService;
 import org.junit.jupiter.api.Test;
 import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 class UserControllerTest {
 
     private final UserService userService = mock(UserService.class);
     private final UserSessionService userSessionService = mock(UserSessionService.class);
     private final RoleService roleService = mock(RoleService.class);
-    private final UserController userController = new UserController(userService, userSessionService, roleService);
+    private final ProfileService profileService = mock(ProfileService.class);
+    private final UserController userController =
+            new UserController(userService, userSessionService, roleService, profileService);
 
     @Test
     void manageUserPage_default() {
         Model model = new ConcurrentModel();
         HttpSession session = mock(HttpSession.class);
-        List<User> users = List.of(mock(User.class), mock(User.class));
 
+        User user1 = mock(User.class);
+        User user2 = mock(User.class);
+        Profile profile1 = mock(Profile.class);
+        Profile profile2 = mock(Profile.class);
+
+        when(user1.getId()).thenReturn(UUID.randomUUID());
+        when(user2.getId()).thenReturn(UUID.randomUUID());
+        when(profile1.getUsername()).thenReturn("user1");
+        when(profile2.getUsername()).thenReturn("user2");
+        when(profileService.getProfileById(user1.getId())).thenReturn(profile1);
+        when(profileService.getProfileById(user2.getId())).thenReturn(profile2);
+
+        List<User> users = List.of(user1, user2);
         when(userService.getUsers(0, null, null)).thenReturn(users);
         when(userService.getMaxPages(null, null)).thenReturn(1);
         when(roleService.findAll()).thenReturn(List.of());
@@ -59,8 +77,16 @@ class UserControllerTest {
     void manageUserPage_withSearchName() {
         Model model = new ConcurrentModel();
         HttpSession session = mock(HttpSession.class);
-        List<User> users = List.of(mock(User.class));
 
+        UUID id1 = UUID.randomUUID();
+        User user1 = mock(User.class);
+        Profile profile1 = mock(Profile.class);
+
+        when(user1.getId()).thenReturn(id1);
+        when(profile1.getUsername()).thenReturn("user1");
+        when(profileService.getProfileById(id1)).thenReturn(profile1);
+
+        List<User> users = List.of(user1);
         when(userService.getUsers(0, "Kim", null)).thenReturn(users);
         when(userService.getMaxPages("Kim", null)).thenReturn(1);
         when(roleService.findAll()).thenReturn(List.of());
@@ -90,8 +116,16 @@ class UserControllerTest {
     void manageUserPage_withSortActive() {
         Model model = new ConcurrentModel();
         HttpSession session = mock(HttpSession.class);
-        List<User> users = List.of(mock(User.class));
 
+        UUID id1 = UUID.randomUUID();
+        User user1 = mock(User.class);
+        Profile profile1 = mock(Profile.class);
+
+        when(user1.getId()).thenReturn(id1);
+        when(profile1.getUsername()).thenReturn("user1");
+        when(profileService.getProfileById(id1)).thenReturn(profile1);
+
+        List<User> users = List.of(user1);
         when(userService.getUsers(0, null, true)).thenReturn(users);
         when(userService.getMaxPages(null, true)).thenReturn(1);
         when(roleService.findAll()).thenReturn(List.of());
@@ -165,32 +199,39 @@ class UserControllerTest {
 
     @Test
     void createNewUser_success() {
+        RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
         Model model = new ConcurrentModel();
         UUID roleId = UUID.randomUUID();
-        List<Role> roles = List.of(mock(Role.class));
-        when(roleService.findAll()).thenReturn(roles);
 
-        String result = userController.createNewUser("Kim", "", "Possible", "kp@example.com", "secret", roleId, model);
+        User user = User.builder()
+                .firstName("Kim")
+                .prefix("")
+                .lastName("Possible")
+                .passwordHash("secret")
+                .roleId(roleId)
+                .build();
 
-        assertEquals("pages/create-user", result);
-        assertEquals(true, model.getAttribute("inserted"));
-        assertEquals(roles, model.getAttribute("roles"));
+        when(userService.insertUser(any(User.class))).thenReturn("kim.possible");
 
-        verify(userService).insertUser("Kim", "", "Possible", "kp@example.com", "secret", roleId);
-        verify(roleService).findAll();
+        String result = userController.createNewUser(user, model, redirectAttributes);
+
+        assertEquals("redirect:/manage-users/create-user", result);
+        assertEquals(
+                "User \"kim.possible\" created successfully!",
+                redirectAttributes.getFlashAttributes().get("successMessage"));
+
+        verify(userService, times(1)).insertUser(any(User.class));
     }
 
     @Test
     void updateUser_success() {
         UUID id = UUID.randomUUID();
         UUID roleId = UUID.randomUUID();
-        UUID orgId = UUID.randomUUID();
 
-        String result = userController.updateUser(id, "New", "de", "Name", "new@test.com", roleId, orgId);
+        String result = userController.updateUser(id, "New", "de", "Name", roleId);
 
         assertEquals("redirect:/manage-users", result);
-
-        verify(userService).updateUser(id, "New", "de", "Name", "new@test.com", roleId, orgId);
+        verify(userService).updateUser(id, "New", "de", "Name", roleId);
     }
 
     @Test
@@ -211,7 +252,6 @@ class UserControllerTest {
         User user = mock(User.class);
         when(user.getFirstName()).thenReturn("Kim");
         when(user.getLastName()).thenReturn("Possible");
-        when(user.getEmail()).thenReturn("kp@example.com");
 
         when(userService.findById(id)).thenReturn(user);
 
@@ -220,7 +260,6 @@ class UserControllerTest {
         assertEquals("pages/confirm-delete-user", result);
         assertEquals("Kim", model.getAttribute("userFirstName"));
         assertEquals("Possible", model.getAttribute("userLastName"));
-        assertEquals("kp@example.com", model.getAttribute("userEmail"));
         assertEquals(id, model.getAttribute("userToDeleteId"));
 
         verify(userService).findById(id);

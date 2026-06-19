@@ -7,7 +7,6 @@ import java.util.UUID;
 import java.util.stream.Stream;
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcRolePermissionRepository;
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcRoleRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Permission;
 import nl.hardwerkendenederlanders.hrcms.models.Role;
 import nl.hardwerkendenederlanders.hrcms.models.RolePermission;
@@ -32,9 +31,6 @@ public class JdbcRolePermissionRepositoryTest {
     private JdbcRolePermissionRepository jdbcRolePermissionRepository;
 
     @Autowired
-    private JdbcRoleRepository jdbcRoleRepository;
-
-    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     private Role role;
@@ -46,7 +42,7 @@ public class JdbcRolePermissionRepositoryTest {
         JdbcTestUtils.deleteFromTables(jdbcTemplate, "roles");
 
         role = Role.of("Editor").build();
-        jdbcRoleRepository.insert(role);
+        RoleTestSupport.insertRole(jdbcTemplate, role);
 
         String sql = "SELECT id, resource, action_name, permission_key FROM permissions LIMIT 1";
         permission = jdbcTemplate.queryForObject(
@@ -60,25 +56,10 @@ public class JdbcRolePermissionRepositoryTest {
     }
 
     @Test
-    void insertRolePermission_withValidRolePermission_shouldPersistAndRetrieve() {
-        RolePermission rolePermission = new RolePermission(role.getId(), permission.getId());
-
-        jdbcRolePermissionRepository.insert(rolePermission);
-
-        RolePermission retrieved =
-                jdbcRolePermissionRepository.findById(rolePermission.getId()).orElse(null);
-
-        assertNotNull(retrieved);
-        assertEquals(rolePermission.getId(), retrieved.getId());
-        assertEquals(role.getId(), retrieved.getRoleId());
-        assertEquals(permission.getId(), retrieved.getPermissionId());
-    }
-
-    @Test
     void findRolePermissionById_withExistingId_shouldReturnRolePermission() {
         RolePermission rolePermission = new RolePermission(role.getId(), permission.getId());
 
-        jdbcRolePermissionRepository.insert(rolePermission);
+        RolePermissionTestSupport.insertRolePermission(jdbcTemplate, rolePermission);
 
         RolePermission retrieved =
                 jdbcRolePermissionRepository.findById(rolePermission.getId()).orElse(null);
@@ -99,8 +80,9 @@ public class JdbcRolePermissionRepositoryTest {
     void findAllRolePermissionsPaged_withValidPaginationData_shouldReturnCorrectCount() {
         for (int i = 0; i < 15; i++) {
             Role newRole = Role.of("Role " + i).build();
-            jdbcRoleRepository.insert(newRole);
-            jdbcRolePermissionRepository.insert(new RolePermission(newRole.getId(), permission.getId()));
+            RoleTestSupport.insertRole(jdbcTemplate, newRole);
+            RolePermissionTestSupport.insertRolePermission(
+                    jdbcTemplate, new RolePermission(newRole.getId(), permission.getId()));
         }
 
         var page1 = jdbcRolePermissionRepository.findAllPaged(1, 10);

@@ -8,9 +8,13 @@ public interface UserRepository {
 
     void update(User user);
 
+    void updatePasswordSelf(User user);
+
     Optional<User> findById(UUID id);
 
-    Optional<User> findByEmail(String email);
+    Optional<String> findPasswordHashById(UUID id);
+
+    Optional<UUID> findRoleIdById(UUID id);
 
     List<User> findAllUsers();
 
@@ -18,7 +22,7 @@ public interface UserRepository {
 
     void updateActivityById(UUID id, boolean setActive);
 
-    List<User> findByNameOrEmailPaginated(String name, int page, int amount);
+    List<User> findByNamePaginated(String name, int page, int amount);
 
     List<User> findUserOnActivityPaginated(boolean isActive, int page, int amount);
 
@@ -28,5 +32,5 @@ public interface UserRepository {
 
     Integer countAll();
 
-    Integer countByNameOrEmailPaginated(String name);
+    Integer countByNamePaginated(String name);
 }

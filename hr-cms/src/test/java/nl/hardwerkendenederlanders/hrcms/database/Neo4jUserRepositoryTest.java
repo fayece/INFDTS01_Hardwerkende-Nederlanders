@@ -36,10 +36,8 @@ class Neo4jUserRepositoryTest {
                 .id(UUID.randomUUID())
                 .firstName("Test")
                 .lastName("User")
-                .email("test@example.com")
                 .passwordHash("hash")
                 .roleId(null)
-                .organizationId(null)
                 .active(true)
                 .createdAt(OffsetDateTime.now())
                 .build();

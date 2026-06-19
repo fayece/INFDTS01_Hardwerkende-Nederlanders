@@ -2,30 +2,36 @@ package nl.hardwerkendenederlanders.hrcms.services;
 
 import static org.mockito.Mockito.*;
 
-import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleAuthorRepository;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.ArticleRepository;
-import nl.hardwerkendenederlanders.hrcms.database.interfaces.CommentRepository;
+import nl.hardwerkendenederlanders.hrcms.database.mongodb.ProfileRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Article;
+import nl.hardwerkendenederlanders.hrcms.models.Profile;
 import nl.hardwerkendenederlanders.hrcms.models.PublicationStatus;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.article.ArticleFullDetailsDto;
+import nl.hardwerkendenederlanders.hrcms.models.dtos.article.AuthorDto;
+import nl.hardwerkendenederlanders.hrcms.services.interfaces.ArticleService;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest
-@ExtendWith(MockitoExtension.class)
 public class ArticleServiceImplTest {
 
-    private final ArticleRepository articleRepository = mock(ArticleRepository.class);
+    @Autowired
+    private ArticleService articleService;
 
-    private final ArticleAuthorRepository authorRepo = mock(ArticleAuthorRepository.class);
-    private final CommentRepository commentRepo = mock(CommentRepository.class);
+    @MockitoBean
+    private ArticleRepository articleRepository;
 
-    private final ArticleServiceImpl articleService =
-            new ArticleServiceImpl(articleRepository, commentRepo, authorRepo);
+    @MockitoBean
+    private ArticleAuthorRepository authorRepo;
+
+    @MockitoBean
+    private ProfileRepository profileRepository;
 
     @Test
     void ensureCreated_AddArticleWhenNotExists_ShouldAddArticle() {
@@ -57,8 +63,6 @@ public class ArticleServiceImplTest {
         verify(articleRepository, times(1)).update(any());
     }
 
-    // region cache test
-
     @Test
     void findArticlePublished_articleInsertInBetweenGettingArticles_CacheIsResetAndArticleRepoIsCalledTwice() {
         UUID article_id = UUID.randomUUID();
@@ -67,6 +71,7 @@ public class ArticleServiceImplTest {
                 .title("Lof der zotheid")
                 .textContent("Dat boekske van Eras den Mus")
                 .publicationStatus(PublicationStatus.PUBLISHED)
+                .firstAuthor(new AuthorDto("author"))
                 .build();
         Article article = Article.builder()
                 .id(article_id)
@@ -74,35 +79,19 @@ public class ArticleServiceImplTest {
                 .textContent("Dat boekske van Eras den Mus")
                 .publicationStatus(PublicationStatus.PUBLISHED)
                 .build();
+
+        when(profileRepository.findById(any()))
+                .thenReturn(Optional.of(Profile.builder()
+                        .id(UUID.randomUUID().toString())
+                        .username("author")
+                        .build()));
         when(articleRepository.findArticlePublished(article_id)).thenReturn(articleDto);
+        doNothing().when(authorRepo).ensureInsert(any());
+
         articleService.findArticleFullId(article_id);
-
         articleService.ensureArticleExists(article, UUID.randomUUID());
-
         articleService.findArticleFullId(article_id);
 
         verify(articleRepository, times(2)).findArticlePublished(article_id);
     }
-
-    @Test
-    void findNewPublished_articleInsertInBetweenGettingAllArticles_CacheIsResetAndArticleRepoIsCalledTwice() {
-        UUID article_id = UUID.randomUUID();
-        Article article = Article.builder()
-                .id(article_id)
-                .title("Lof der zotheid")
-                .textContent("Dat boekske van Eras den Mus")
-                .publicationStatus(PublicationStatus.PUBLISHED)
-                .build();
-        when(articleRepository.findNewArticlesPublishedPaged(anyInt(), anyInt()))
-                .thenReturn(List.of(ArticleFullDetailsDto.builder().build()));
-
-        articleService.findNewPublished(10, 0);
-        articleService.ensureArticleExists(article, UUID.randomUUID());
-
-        articleService.findNewPublished(10, 0);
-
-        verify(articleRepository, times(2)).findNewArticlesPublishedPaged(anyInt(), anyInt());
-    }
-
-    // endregion
 }

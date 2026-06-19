@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.CommentRepository;
+import nl.hardwerkendenederlanders.hrcms.database.mongodb.ProfileRepository;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentActionException;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentUnavailableException;
 import nl.hardwerkendenederlanders.hrcms.models.Comment;
+import nl.hardwerkendenederlanders.hrcms.models.Profile;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentViewDto;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentWithAuthor;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.PagedComments;
@@ -22,12 +24,17 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
     private final UserSessionService userSessionService;
+    private final ProfileRepository profileRepository;
 
     private static final String UNAVAILABLE_FRAGMENT = "fragments/articles/comment-section :: comments-unavailable";
 
-    public CommentServiceImpl(CommentRepository commentRepository, UserSessionService userSessionService) {
+    public CommentServiceImpl(
+            CommentRepository commentRepository,
+            UserSessionService userSessionService,
+            ProfileRepository profileRepository) {
         this.commentRepository = commentRepository;
         this.userSessionService = userSessionService;
+        this.profileRepository = profileRepository;
     }
 
     @Cacheable(value = "topCommentsArticle", key = "#articleId")
@@ -35,8 +42,14 @@ public class CommentServiceImpl implements CommentService {
         try {
             List<CommentViewDto> comments =
                     commentRepository.findTopLevelCommentsByArticleIdPaged(articleId, offset, limit + 1).stream()
-                            .map(record ->
-                                    CommentViewDto.from(record.comment(), record.authorName(), record.replyCount()))
+                            .map(record -> {
+                                String username = profileRepository
+                                        .findById(
+                                                record.comment().getCreatorId().toString())
+                                        .map(Profile::getUsername)
+                                        .orElse("deleted_user");
+                                return CommentViewDto.from(record.comment(), username, record.replyCount());
+                            })
                             .toList();
 
             boolean hasMore = comments.size() > limit;
@@ -51,7 +64,13 @@ public class CommentServiceImpl implements CommentService {
     public List<CommentViewDto> getReplies(UUID parentId) {
         try {
             return commentRepository.findCommentsByParentId(parentId).stream()
-                    .map(record -> CommentViewDto.from(record.comment(), record.authorName(), record.replyCount()))
+                    .map(record -> {
+                        String username = profileRepository
+                                .findById(record.comment().getCreatorId().toString())
+                                .map(Profile::getUsername)
+                                .orElse("deleted_user");
+                        return CommentViewDto.from(record.comment(), username, record.replyCount());
+                    })
                     .toList();
         } catch (Exception e) {
             throw new ComponentUnavailableException("comments", UNAVAILABLE_FRAGMENT, e);
@@ -69,8 +88,13 @@ public class CommentServiceImpl implements CommentService {
         try {
             comment.setCreatorId(userId.get());
             CommentWithAuthor result = commentRepository.insertReturning(comment);
-            return CommentViewDto.from(result.comment(), result.authorName(), result.replyCount());
 
+            String username = profileRepository
+                    .findById(result.comment().getCreatorId().toString())
+                    .map(Profile::getUsername)
+                    .orElse("deleted_user");
+
+            return CommentViewDto.from(result.comment(), username, result.replyCount());
         } catch (ComponentActionException e) {
             throw e;
         } catch (Exception e) {
@@ -112,6 +136,11 @@ public class CommentServiceImpl implements CommentService {
                         null,
                         "Comment not found after deletion"));
 
-        return CommentViewDto.from(deleted.comment(), deleted.authorName(), deleted.replyCount());
+        String username = profileRepository
+                .findById(deleted.comment().getCreatorId().toString())
+                .map(Profile::getUsername)
+                .orElse("deleted_user");
+
+        return CommentViewDto.from(deleted.comment(), username, deleted.replyCount());
     }
 }

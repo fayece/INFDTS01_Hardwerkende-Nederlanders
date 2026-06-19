@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import nl.hardwerkendenederlanders.hrcms.TestcontainersConfiguration;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcPermissionRepository;
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcRolePermissionRepository;
-import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcRoleRepository;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcUserRepository;
 import nl.hardwerkendenederlanders.hrcms.models.Permission;
 import nl.hardwerkendenederlanders.hrcms.models.Role;
@@ -32,12 +30,6 @@ public class JdbcPermissionRepositoryTest {
     private JdbcUserRepository userRepository;
 
     @Autowired
-    private JdbcRoleRepository roleRepository;
-
-    @Autowired
-    private JdbcRolePermissionRepository rolePermissionRepository;
-
-    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     private Permission permission;
@@ -60,15 +52,14 @@ public class JdbcPermissionRepositoryTest {
                         .build());
 
         Role role = Role.of("test_role").build();
-        roleRepository.insert(role);
+        RoleTestSupport.insertRole(jdbcTemplate, role);
 
         RolePermission rolePermission = new RolePermission(role.getId(), permission.getId());
-        rolePermissionRepository.insert(rolePermission);
+        RolePermissionTestSupport.insertRolePermission(jdbcTemplate, rolePermission);
 
         user = User.builder()
                 .firstName("Test")
                 .lastName("User")
-                .email("test@user.com")
                 .passwordHash("hash123-005-12X")
                 .roleId(role.getId())
                 .build();

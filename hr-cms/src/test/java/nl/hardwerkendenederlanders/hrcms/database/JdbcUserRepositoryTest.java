@@ -6,6 +6,9 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.DbSessionContext;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.DbSessionRole;
+import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcRoleRepository;
 import nl.hardwerkendenederlanders.hrcms.database.sqldb.JdbcUserRepository;
 import nl.hardwerkendenederlanders.hrcms.models.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +25,9 @@ class JdbcUserRepositoryTest {
     JdbcUserRepository repository;
 
     @Autowired
+    private JdbcRoleRepository roleRepository;
+
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
@@ -32,16 +38,7 @@ class JdbcUserRepositoryTest {
     @Test
     void insert_shouldInsertUser() {
         User user = new User(
-                UUID.randomUUID(),
-                "Kim",
-                null,
-                "Possible",
-                "kp@example.com",
-                "hashedPassword",
-                null,
-                null,
-                true,
-                OffsetDateTime.now());
+                UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", null, true, OffsetDateTime.now());
 
         repository.insert(user);
         Optional<User> fromDb = repository.findById(user.getId());
@@ -51,16 +48,7 @@ class JdbcUserRepositoryTest {
     @Test
     void findById_shouldReturnOneUserWithSameId() {
         User user = new User(
-                UUID.randomUUID(),
-                "Kim",
-                null,
-                "Possible",
-                "kp@example.com",
-                "hashedPassword",
-                null,
-                null,
-                true,
-                OffsetDateTime.now());
+                UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", null, true, OffsetDateTime.now());
 
         repository.insert(user);
 
@@ -70,73 +58,22 @@ class JdbcUserRepositoryTest {
     }
 
     @Test
-    void findByEmail_shouldReturnOneUserWithSameEmail() {
+    void findByNamePaginated_shouldReturnUser() {
         User user = new User(
-                UUID.randomUUID(),
-                "Kim",
-                null,
-                "Possible",
-                "kp@example.com",
-                "hashedPassword",
-                null,
-                null,
-                true,
-                OffsetDateTime.now());
+                UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", null, true, OffsetDateTime.now());
 
         repository.insert(user);
 
-        Optional<User> userFromDb = repository.findByEmail(user.getEmail());
-
-        assertEquals(user.getEmail(), userFromDb.get().getEmail());
-    }
-
-    @Test
-    void findByNameOrEmailPaginated_shouldReturnUser() {
-        User user = new User(
-                UUID.randomUUID(),
-                "Kim",
-                null,
-                "Possible",
-                "kp@example.com",
-                "hashedPassword",
-                null,
-                null,
-                true,
-                OffsetDateTime.now());
-
-        repository.insert(user);
-
-        List<User> byName = repository.findByNameOrEmailPaginated("kim", 0, 1);
+        List<User> byName = repository.findByNamePaginated("kim", 0, 1);
         assertEquals(user.getFirstName(), (byName.get(0)).getFirstName());
-
-        List<User> byEmail = repository.findByNameOrEmailPaginated("kp@", 0, 1);
-        assertEquals(user.getEmail(), (byEmail.get(0)).getEmail());
     }
 
     @Test
     void findUserOnActivityPaginated_shouldReturnUsersOnActivity() {
         User user = new User(
-                UUID.randomUUID(),
-                "Kim",
-                null,
-                "Possible",
-                "kp@example.com",
-                "hashedPassword",
-                null,
-                null,
-                true,
-                OffsetDateTime.now());
+                UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", null, true, OffsetDateTime.now());
         User user2 = new User(
-                UUID.randomUUID(),
-                "Kim2",
-                null,
-                "Possible2",
-                "kp2@example.com",
-                "hashedPassword",
-                null,
-                null,
-                false,
-                OffsetDateTime.now());
+                UUID.randomUUID(), "Kim2", null, "Possible2", "hashedPassword", null, false, OffsetDateTime.now());
 
         repository.insert(user);
         repository.insert(user2);
@@ -151,27 +88,9 @@ class JdbcUserRepositoryTest {
     @Test
     void findAllUsers_shouldReturnAListOfAllUsers() {
         User user = new User(
-                UUID.randomUUID(),
-                "Kim",
-                null,
-                "Possible",
-                "kp@example.com",
-                "hashedPassword",
-                null,
-                null,
-                true,
-                OffsetDateTime.now());
+                UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", null, true, OffsetDateTime.now());
         User user2 = new User(
-                UUID.randomUUID(),
-                "Kim2",
-                null,
-                "Possible2",
-                "kp2@example.com",
-                "hashedPassword",
-                null,
-                null,
-                false,
-                OffsetDateTime.now());
+                UUID.randomUUID(), "Kim2", null, "Possible2", "hashedPassword", null, false, OffsetDateTime.now());
 
         repository.insert(user);
         repository.insert(user2);
@@ -183,16 +102,7 @@ class JdbcUserRepositoryTest {
     @Test
     void updateActivityById_shouldSetActive() {
         User user = new User(
-                UUID.randomUUID(),
-                "Kim",
-                null,
-                "Possible",
-                "kp@example.com",
-                "hashedPassword",
-                null,
-                null,
-                true,
-                OffsetDateTime.now());
+                UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", null, true, OffsetDateTime.now());
 
         repository.insert(user);
 
@@ -204,53 +114,73 @@ class JdbcUserRepositoryTest {
     @Test
     void update_shouldChangeAllUserFields() {
         User user = new User(
-                UUID.randomUUID(),
-                "Kim",
-                null,
-                "Possible",
-                "kp@example.com",
-                "hashedPassword",
-                null,
-                null,
-                true,
-                OffsetDateTime.now());
+                UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", null, true, OffsetDateTime.now());
 
         repository.insert(user);
 
-        User updatedUser = new User(
-                user.getId(),
-                "Kom",
-                null,
-                "Pissable",
-                "kp@answer.com",
-                "hashedPassword",
-                null,
-                null,
-                false,
-                OffsetDateTime.now());
+        User updatedUser =
+                new User(user.getId(), "Kom", null, "Pissable", "hashedPassword", null, false, OffsetDateTime.now());
 
         repository.update(updatedUser);
 
         Optional<User> fromDb = repository.findById(user.getId());
         assertEquals(updatedUser.getFirstName(), fromDb.get().getFirstName());
         assertEquals(updatedUser.getLastName(), fromDb.get().getLastName());
-        assertEquals(updatedUser.getEmail(), fromDb.get().getEmail());
         assertFalse(fromDb.get().isActive());
+    }
+
+    @Test
+    void updatePasswordSelf_shouldChangePasswordHash() {
+        User user = new User(
+                UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", null, true, OffsetDateTime.now());
+
+        repository.insert(user);
+
+        User userWithNewPassword =
+                new User(user.getId(), "Kim", null, "Possible", "newHashedPassword", null, true, OffsetDateTime.now());
+
+        DbSessionContext.set(DbSessionRole.USER, user.getId());
+        repository.updatePasswordSelf(userWithNewPassword);
+
+        Optional<String> passwordHash = repository.findPasswordHashById(user.getId());
+
+        assertTrue(passwordHash.isPresent());
+        assertEquals("newHashedPassword", passwordHash.get());
+    }
+
+    @Test
+    void updatePasswordSelf_unknownUser_doesNothing() {
+        User unknownUser = new User(
+                UUID.randomUUID(), "Kim", null, "Possible", "newHashedPassword", null, true, OffsetDateTime.now());
+
+        assertDoesNotThrow(() -> repository.updatePasswordSelf(unknownUser));
+        assertEquals(Optional.empty(), repository.findById(unknownUser.getId()));
+    }
+
+    @Test
+    void findRoleIdById_shouldReturnRoleId() {
+        UUID roleId = roleRepository.findAll().getFirst().getId();
+        User user = new User(
+                UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", roleId, true, OffsetDateTime.now());
+
+        repository.insert(user);
+
+        Optional<UUID> foundRoleId = repository.findRoleIdById(user.getId());
+
+        assertEquals(Optional.of(roleId), foundRoleId);
+    }
+
+    @Test
+    void findRoleIdById_unknownUser_returnsEmptyOptional() {
+        Optional<UUID> foundRoleId = repository.findRoleIdById(UUID.randomUUID());
+
+        assertEquals(Optional.empty(), foundRoleId);
     }
 
     @Test
     void deleteById_shouldReturnOptionalEmpty() {
         User user = new User(
-                UUID.randomUUID(),
-                "Kim",
-                null,
-                "Possible",
-                "kp@example.com",
-                "hashedPassword",
-                null,
-                null,
-                true,
-                OffsetDateTime.now());
+                UUID.randomUUID(), "Kim", null, "Possible", "hashedPassword", null, true, OffsetDateTime.now());
 
         repository.insert(user);
         repository.deleteById(user.getId());

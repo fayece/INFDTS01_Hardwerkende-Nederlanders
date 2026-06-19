@@ -11,9 +11,11 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.IntStream;
 import nl.hardwerkendenederlanders.hrcms.database.interfaces.CommentRepository;
+import nl.hardwerkendenederlanders.hrcms.database.mongodb.ProfileRepository;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentActionException;
 import nl.hardwerkendenederlanders.hrcms.exceptions.ComponentUnavailableException;
 import nl.hardwerkendenederlanders.hrcms.models.Comment;
+import nl.hardwerkendenederlanders.hrcms.models.Profile;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentViewDto;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.CommentWithAuthor;
 import nl.hardwerkendenederlanders.hrcms.models.dtos.comment.PagedComments;
@@ -27,17 +29,36 @@ class CommentServiceImplTest {
     // region Setup
     private final CommentRepository commentRepository = mock(CommentRepository.class);
     private final UserSessionService userSessionService = mock(UserSessionService.class);
-    private final CommentServiceImpl commentService = new CommentServiceImpl(commentRepository, userSessionService);
+    private final ProfileRepository profileRepository = mock(ProfileRepository.class);
+    private final CommentServiceImpl commentService =
+            new CommentServiceImpl(commentRepository, userSessionService, profileRepository);
     // endregion
 
     // region getTopLevelComments tests
     @Test
     void getTopLevelComments_hasMoreTrue_returnsCommentSublist() {
         UUID articleId = UUID.randomUUID();
+
+        List<UUID> creatorIds =
+                IntStream.range(0, 11).mapToObj(i -> UUID.randomUUID()).toList();
+
         List<CommentWithAuthor> mockData = IntStream.range(0, 11)
-                .mapToObj(i -> new CommentWithAuthor(
-                        Comment.builder().id(UUID.randomUUID()).build(), "Author " + i, 0))
+                .mapToObj(i -> {
+                    Comment comment = Comment.builder()
+                            .id(UUID.randomUUID())
+                            .creatorId(creatorIds.get(i))
+                            .build();
+                    return new CommentWithAuthor(comment, "Author " + i, 0);
+                })
                 .toList();
+
+        for (int i = 0; i < 11; i++) {
+            Profile profile = Profile.builder()
+                    .id(creatorIds.get(i).toString())
+                    .username("Author " + i)
+                    .build();
+            when(profileRepository.findById(creatorIds.get(i).toString())).thenReturn(Optional.of(profile));
+        }
 
         when(commentRepository.findTopLevelCommentsByArticleIdPaged(eq(articleId), anyInt(), eq(11)))
                 .thenReturn(mockData);
@@ -51,9 +72,15 @@ class CommentServiceImplTest {
 
     @Test
     void getTopLevelComments_hasMoreFalse_returnsAllComments() {
+        UUID creatorId = UUID.randomUUID();
+        Comment comment =
+                Comment.builder().id(UUID.randomUUID()).creatorId(creatorId).build();
+        Profile profile =
+                Profile.builder().id(creatorId.toString()).username("Author").build();
+        when(profileRepository.findById(creatorId.toString())).thenReturn(Optional.of(profile));
+
         UUID articleId = UUID.randomUUID();
-        List<CommentWithAuthor> mockData = List.of(
-                new CommentWithAuthor(Comment.builder().id(UUID.randomUUID()).build(), "Author", 0));
+        List<CommentWithAuthor> mockData = List.of(new CommentWithAuthor(comment, "Author", 0));
 
         when(commentRepository.findTopLevelCommentsByArticleIdPaged(eq(articleId), anyInt(), eq(11)))
                 .thenReturn(mockData);
@@ -79,8 +106,13 @@ class CommentServiceImplTest {
     @Test
     void getReplies_success_returnsList() {
         UUID parentId = UUID.randomUUID();
+        UUID creatorId = UUID.randomUUID();
+        Comment comment = Comment.builder().creatorId(creatorId).build();
+        Profile profile =
+                Profile.builder().id(creatorId.toString()).username("Author").build();
+        when(profileRepository.findById(creatorId.toString())).thenReturn(Optional.of(profile));
         when(commentRepository.findCommentsByParentId(parentId))
-                .thenReturn(List.of(new CommentWithAuthor(Comment.builder().build(), "Author", 0)));
+                .thenReturn(List.of(new CommentWithAuthor(comment, "Author", 0)));
 
         List<CommentViewDto> result = commentService.getReplies(parentId);
 
@@ -100,6 +132,10 @@ class CommentServiceImplTest {
                 .creatorId(userId)
                 .articleId(UUID.randomUUID())
                 .build();
+        Profile profile =
+                Profile.builder().id(userId.toString()).username("Author").build();
+        when(profileRepository.findById(userId.toString())).thenReturn(Optional.of(profile));
+
         CommentWithAuthor deletedRecord = new CommentWithAuthor(comment, "Unknown", 0);
 
         when(userSessionService.getLoggedInUser(session)).thenReturn(Optional.of(userId));
@@ -173,6 +209,10 @@ class CommentServiceImplTest {
                 .commentBody("# Hello World")
                 .build();
 
+        Profile profile =
+                Profile.builder().id(userId.toString()).username("John Doe").build();
+        when(profileRepository.findById(userId.toString())).thenReturn(Optional.of(profile));
+
         CommentWithAuthor savedRecord = new CommentWithAuthor(inputComment, "John Doe", 0);
 
         when(userSessionService.getLoggedInUser(session)).thenReturn(Optional.of(userId));
@@ -188,8 +228,10 @@ class CommentServiceImplTest {
     @Test
     void postComment_genericException_wrapsInComponentActionException() {
         HttpSession session = mock(HttpSession.class);
+        UUID userId = UUID.randomUUID();
         Comment comment = Comment.builder().articleId(UUID.randomUUID()).build();
 
+        when(userSessionService.getLoggedInUser(session)).thenReturn(Optional.of(userId));
         when(commentRepository.insertReturning(any(Comment.class))).thenThrow(new RuntimeException("DB error"));
 
         ComponentActionException ex =
@@ -223,6 +265,10 @@ class CommentServiceImplTest {
                 .commentBody("# Goodbye World")
                 .build();
 
+        Profile profile =
+                Profile.builder().id(userId.toString()).username("John Doe").build();
+        when(profileRepository.findById(userId.toString())).thenReturn(Optional.of(profile));
+
         when(commentRepository.findTopLevelCommentsByArticleIdPaged(any(), anyInt(), anyInt()))
                 .thenReturn(new ArrayList<>());
         when(userSessionService.getLoggedInUser(session)).thenReturn(Optional.of(userId));
@@ -236,6 +282,5 @@ class CommentServiceImplTest {
 
         verify(commentRepository, times(2)).findTopLevelCommentsByArticleIdPaged(articleId, 0, 11);
     }
-
     // endregion
 }

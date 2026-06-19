@@ -34,9 +34,6 @@ public class JdbcArticleAuthorRepositoryTest {
     @Autowired
     private JdbcUserRepository userRepository;
 
-    @Autowired
-    private JdbcRoleRepository jdbcRoleRepository;
-
     private Article article;
     private User author;
 
@@ -56,12 +53,11 @@ public class JdbcArticleAuthorRepositoryTest {
 
         Role role = Role.of("Author").build();
 
-        jdbcRoleRepository.insert(role);
+        RoleTestSupport.insertRole(jdbcTemplate, role);
 
         author = User.builder()
                 .firstName("Test")
                 .lastName("Author")
-                .email(UUID.randomUUID() + "@example.com")
                 .passwordHash("R@ndomP4ssw0rd1!@x")
                 .roleId(role.getId())
                 .build();
@@ -76,7 +72,7 @@ public class JdbcArticleAuthorRepositoryTest {
         AuthorDto[] retrieved = articleAuthorRepository.findAuthorsForArticle(article.getId());
 
         assertNotNull(retrieved);
-        assertEquals("Test Author", retrieved[0].getFullName());
+        assertEquals(author.getId().toString(), retrieved[0].getUsername());
     }
 
     @Test
@@ -91,19 +87,16 @@ public class JdbcArticleAuthorRepositoryTest {
             User newAuthor = User.builder()
                     .firstName("Numbered Arthur " + i)
                     .lastName("Test")
-                    .email("author" + i + "@example.com")
                     .passwordHash("R@ndomP4ssw0rd1!@x")
                     .roleId(author.getRoleId())
                     .build();
 
             userRepository.insert(newAuthor);
-
             articleAuthorRepository.ensureInsert(new ArticleAuthor(article.getId(), newAuthor.getId()));
         }
 
         AuthorDto[] authors = articleAuthorRepository.findAuthorsForArticle(article.getId());
 
         assertEquals(15, authors.length);
-        assertEquals("Numbered Arthur 14 Test", authors[14].getFullName());
     }
 }

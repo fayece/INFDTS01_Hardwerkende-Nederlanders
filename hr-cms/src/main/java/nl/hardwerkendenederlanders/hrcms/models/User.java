@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import nl.hardwerkendenederlanders.hrcms.models.commonalities.FullName;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 @SuperBuilder
 @Getter
+@NoArgsConstructor
 public class User implements FullName {
 
     @Builder.Default
@@ -27,17 +29,10 @@ public class User implements FullName {
     private String lastName;
 
     @Setter
-    private String email;
-
-    @Setter
     private String passwordHash;
 
     @Setter
     private UUID roleId;
-
-    @Setter
-    @Nullable
-    private UUID organizationId;
 
     @Setter
     @Builder.Default
@@ -51,19 +46,15 @@ public class User implements FullName {
             String firstName,
             @Nullable String prefix,
             String lastName,
-            String email,
             String passwordHash,
             UUID roleId,
-            @Nullable UUID organizationId,
             boolean active,
             OffsetDateTime createdAt) {
         this.firstName = firstName;
         this.prefix = prefix;
         this.lastName = lastName;
-        this.email = email;
         this.passwordHash = passwordHash;
         this.roleId = roleId;
-        this.organizationId = organizationId;
         this.active = active;
         this.createdAt = createdAt;
     }
@@ -73,20 +64,16 @@ public class User implements FullName {
             String firstName,
             @Nullable String prefix,
             String lastName,
-            String email,
             String passwordHash,
             UUID roleId,
-            @Nullable UUID organizationId,
             boolean active,
             OffsetDateTime createdAt) {
         this.id = id;
         this.firstName = firstName;
         this.prefix = prefix;
         this.lastName = lastName;
-        this.email = email;
         this.passwordHash = passwordHash;
         this.roleId = roleId;
-        this.organizationId = organizationId;
         this.active = active;
         this.createdAt = createdAt;
     }

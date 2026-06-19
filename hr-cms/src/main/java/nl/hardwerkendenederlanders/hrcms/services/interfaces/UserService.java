@@ -9,11 +9,9 @@ public interface UserService {
 
     int getMaxPages(String searchName, Boolean sortActive);
 
-    void insertUser(User user);
+    void createUser(User user);
 
-    void insertUser(String firstName, String prefix, String lastName, String email, String password, UUID roleId);
-
-    User findByEmail(String email);
+    String insertUser(User user);
 
     User findById(UUID id);
 
@@ -23,8 +21,7 @@ public interface UserService {
 
     void updateUser(User user);
 
-    void updateUser(
-            UUID id, String firstName, String prefix, String lastName, String email, UUID roleId, UUID organisationId);
+    void updateUser(UUID id, String firstName, String prefix, String lastName, UUID roleId);
 
     void deleteById(UUID id, UUID currentUserId);
 
@@ -38,5 +35,5 @@ public interface UserService {
 
     int countAll();
 
-    int countByNameOrEmailPaginated(String name);
+    int countByNamePaginated(String name);
 }

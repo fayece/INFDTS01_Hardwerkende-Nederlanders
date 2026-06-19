@@ -19,8 +19,7 @@ class UserSessionServiceImplTest {
         HttpSession session = mock(HttpSession.class);
         UUID id = UUID.randomUUID();
 
-        User user = new User(
-                id, "Kim", null, "Kardashian", "test@test.com", "hash", null, null, true, OffsetDateTime.now());
+        User user = new User(id, "Kim", null, "Kardashian", "hash", null, true, OffsetDateTime.now());
 
         service.login(session, user);
 
