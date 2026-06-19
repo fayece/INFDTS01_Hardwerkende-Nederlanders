@@ -69,9 +69,9 @@ public class StressTestLogin extends Simulation {
                     http("post login request")
                             .post("/login")
                             .headers(headers_1)
-                            .formParam("email", randint(20_000) + "@theorg.nl")
+                            .formParam("username", "user" + randint(20_000))
                             .formParam("password", "secret")
-                            .check(status().is(404)), // for some reason logging in on gatling sends you to 404
+                            .check(status().is(200)), // for some reason logging in on gatling sends you to 404
                     // page. probs sends you to
                     // http://localhost:6031/jsession<somethingelsehere>
                     http("force move to home page").get("/").headers(headers_1).check(status().is(200)));
