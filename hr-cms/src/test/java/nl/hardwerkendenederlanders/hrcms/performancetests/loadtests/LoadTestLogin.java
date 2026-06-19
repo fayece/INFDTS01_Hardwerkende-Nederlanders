@@ -9,6 +9,8 @@ import io.gatling.javaapi.core.*;
 import io.gatling.javaapi.http.*;
 import java.util.*;
 
+// A handclicked delight!
+
 public class LoadTestLogin extends Simulation {
 
     private HttpProtocolBuilder httpProtocol = http.baseUrl("http://localhost:" + performanceTestServerPort)
@@ -67,7 +69,7 @@ public class LoadTestLogin extends Simulation {
                     http("post login request")
                             .post("/login")
                             .headers(headers_1)
-                            .formParam("email", randint(20_000) + "@theorg.nl")
+                            .formParam("username", "user" + randint(20_000))
                             .formParam("password", "secret")
                             .check(status().is(404)), // for some reason logging in on gatling sends you to 404
                     // page. probs sends you to

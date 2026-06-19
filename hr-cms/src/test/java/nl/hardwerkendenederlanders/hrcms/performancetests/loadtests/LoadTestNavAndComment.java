@@ -94,7 +94,7 @@ public class LoadTestNavAndComment extends Simulation {
                     http("post login information")
                             .post("/login")
                             .headers(headers_1)
-                            .formParam("email", randint(10_000) + "@theorg.nl")
+                            .formParam("username", "user" + randint(10_000))
                             .formParam("password", "secret")
                             .check(status().is(404)), // for some reason logging in on gatling sends you to 404
                     // page. probs sends you to
